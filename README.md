@@ -181,7 +181,9 @@ roleprint/
 ├── dashboard/         React + Vite + Tailwind + Recharts
 ├── tests/             208 tests — SQLite in-memory, no infra required
 ├── alembic/           Migrations
-├── scripts/           seed_demo_data.py · generate_trend_report.py
+├── scripts/           seed_demo_data.py · generate_trend_report.py · evaluate_sentiment.py · evaluate_topics.py
+├── data/              sentiment_labels.csv (50 labelled) · skill_labels.csv (30 labelled)
+├── reports/           sentiment_eval.md · topic_coherence.md · topic_coherence.png
 ├── Dockerfile         Python 3.11-slim for Railway (API + worker)
 ├── railway.toml       Railway web service config
 └── pyproject.toml     Hatchling build, prod + dev deps
@@ -227,4 +229,52 @@ make lint      # ruff check src/ tests/
 make format    # ruff format src/ tests/
 make scrape    # one-off scrape run
 make migrate   # alembic upgrade head
+```
+
+---
+
+## Model Evaluation
+
+Analytical artefacts for interview methodology discussions.
+
+### Sentiment model comparison
+
+Compares VADER (production), TextBlob, and DistilBERT (SST-2) on 50 manually-labelled
+job postings.  VADER wins on this domain because its lexicon includes professional affect
+markers and the wider neutral band (pos ≥ 0.15, neg ≤ −0.05) handles muted professional
+register better than the default ±0.05.
+
+```bash
+pip install textblob transformers torch
+python -m textblob.download_corpora
+PYTHONPATH=src python scripts/evaluate_sentiment.py
+# report → reports/sentiment_eval.md
+```
+
+### BERTopic coherence evaluation
+
+Trains BERTopic at n_topics ∈ [5, 10, 20] and measures c_v coherence via gensim.
+Justifies the production `nr_topics` choice.
+
+```bash
+pip install gensim matplotlib
+PYTHONPATH=src python scripts/evaluate_topics.py
+# plot  → reports/topic_coherence.png
+# report → reports/topic_coherence.md
+```
+
+### Skill extractor A/B test
+
+Compares the production vocab-regex extractor (A) against a spaCy noun-chunk heuristic
+(B) on 30 gold-standard annotated job excerpts.  Measures precision, recall, and F1 for
+each approach.
+
+```bash
+PYTHONPATH=src python src/roleprint/nlp/ab_test.py
+PYTHONPATH=src python src/roleprint/nlp/ab_test.py --verbose   # per-example predictions
+```
+
+Install all eval deps at once:
+```bash
+pip install ".[eval]"
 ```
