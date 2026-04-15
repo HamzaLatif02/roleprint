@@ -41,6 +41,7 @@ dependencies = [
     # Utilities
     "python-dotenv>=1.0.0",
     "structlog>=24.1.0",
+    "redis>=5.0.0",
 ]
 
 [project.optional-dependencies]
