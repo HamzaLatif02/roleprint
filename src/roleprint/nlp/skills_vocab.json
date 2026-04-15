@@ -1,0 +1,113 @@
+{
+  "technical": {
+    "languages": [
+      "Python", "SQL", "R", "Java", "Scala", "Go", "Rust",
+      "TypeScript", "JavaScript", "C++", "C#", "Swift", "Kotlin",
+      "PHP", "Ruby", "Bash", "Perl", "MATLAB", "Julia", "Elixir"
+    ],
+    "data_tools": [
+      "dbt", "Apache Spark", "Spark", "Kafka", "Apache Kafka",
+      "Airflow", "Apache Airflow", "Databricks", "Snowflake",
+      "Redshift", "BigQuery", "Hadoop", "Apache Hadoop",
+      "Hive", "Apache Flink", "Flink", "Dask", "Ray",
+      "Prefect", "Luigi", "Great Expectations", "dvc",
+      "Fivetran", "Stitch", "Airbyte", "Talend"
+    ],
+    "ml_frameworks": [
+      "PyTorch", "TensorFlow", "scikit-learn", "Keras",
+      "HuggingFace", "Hugging Face", "XGBoost", "LightGBM",
+      "CatBoost", "spaCy", "NLTK", "fastai", "JAX",
+      "ONNX", "MLflow", "Weights & Biases", "wandb",
+      "OpenAI", "LangChain", "LlamaIndex", "transformers",
+      "sentence-transformers", "BERTopic", "BERT", "GPT"
+    ],
+    "cloud": [
+      "AWS", "GCP", "Azure", "Amazon Web Services",
+      "Google Cloud", "Microsoft Azure", "S3", "EC2",
+      "Lambda", "GCS", "Cloud Run", "Cloud Functions",
+      "Azure DevOps", "CloudFormation", "CDK", "Pulumi",
+      "ECS", "EKS", "GKE", "AKS", "RDS", "DynamoDB"
+    ],
+    "infrastructure": [
+      "Kubernetes", "Docker", "Terraform", "Ansible",
+      "Jenkins", "GitHub Actions", "GitLab CI", "CircleCI",
+      "ArgoCD", "Helm", "Prometheus", "Grafana",
+      "Datadog", "New Relic", "Splunk", "PagerDuty",
+      "Vault", "Consul", "Nginx", "Traefik"
+    ],
+    "frontend": [
+      "React", "Vue", "Angular", "Next.js", "Svelte",
+      "Nuxt.js", "Webpack", "Vite", "TailwindCSS",
+      "Styled Components", "Redux", "MobX", "GraphQL",
+      "Apollo", "Storybook", "Jest", "Cypress", "Playwright",
+      "React Native", "Expo", "Flutter"
+    ],
+    "databases": [
+      "PostgreSQL", "MySQL", "MongoDB", "Redis",
+      "Elasticsearch", "Cassandra", "Neo4j", "ClickHouse",
+      "SQLite", "Oracle", "SQL Server", "MariaDB",
+      "CockroachDB", "Firestore", "Supabase", "PlanetScale",
+      "Pinecone", "Weaviate", "Chroma"
+    ],
+    "visualization": [
+      "Tableau", "Power BI", "Looker", "Metabase",
+      "D3.js", "matplotlib", "plotly", "seaborn",
+      "Grafana", "Kibana", "Apache Superset", "Superset",
+      "Google Data Studio", "Looker Studio", "Excel"
+    ],
+    "apis_frameworks": [
+      "REST API", "REST", "GraphQL", "gRPC",
+      "FastAPI", "Django", "Flask", "Express",
+      "Spring Boot", "Rails", "Laravel", "FastAPI",
+      "Celery", "RabbitMQ", "MQTT", "WebSockets",
+      "OpenAPI", "Swagger", "Postman"
+    ],
+    "data_science_tools": [
+      "pandas", "NumPy", "Polars", "SciPy",
+      "statsmodels", "Prophet", "PyCaret",
+      "Power Query", "Excel", "Google Sheets",
+      "Jupyter", "JupyterLab", "Colab", "VS Code"
+    ],
+    "devops_practices": [
+      "CI/CD", "DevOps", "MLOps", "DataOps",
+      "Infrastructure as Code", "IaC", "GitOps",
+      "microservices", "serverless", "containerisation",
+      "containerization", "observability", "SRE"
+    ]
+  },
+  "soft": [
+    "stakeholder management",
+    "cross-functional",
+    "agile",
+    "scrum",
+    "kanban",
+    "communication",
+    "leadership",
+    "problem-solving",
+    "analytical thinking",
+    "attention to detail",
+    "project management",
+    "product thinking",
+    "data-driven",
+    "A/B testing",
+    "OKRs",
+    "roadmap",
+    "sprint planning",
+    "mentoring",
+    "coaching",
+    "collaboration",
+    "critical thinking",
+    "time management",
+    "presentation",
+    "storytelling",
+    "client-facing",
+    "customer success",
+    "requirements gathering",
+    "user research",
+    "prioritisation",
+    "prioritization",
+    "strategic thinking",
+    "commercial awareness",
+    "business acumen"
+  ]
+}
