@@ -26,7 +26,7 @@ migrate-down:
 
 # ── Scraping ──────────────────────────────────────────────────────────────────
 scrape:
-	python -m roleprint.scraper.runner
+	PYTHONPATH=src python -m roleprint.scraper.runner
 
 # ── Code quality ──────────────────────────────────────────────────────────────
 lint:
