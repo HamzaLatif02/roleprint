@@ -21,9 +21,8 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
-# Alembic
-alembic/versions/*.py
-!alembic/versions/.gitkeep
+# Alembic — track migration files, ignore pycache inside versions
+alembic/versions/__pycache__/
 
 # Node / Dashboard
 node_modules/

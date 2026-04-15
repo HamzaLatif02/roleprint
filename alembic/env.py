@@ -15,10 +15,16 @@ config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Import your models here so Alembic can detect schema changes
-# from roleprint.db.models import Base
-# target_metadata = Base.metadata
-target_metadata = None
+# Import models so Alembic can detect schema changes via autogenerate
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from roleprint.db.base import Base  # noqa: E402
+import roleprint.db.models  # noqa: E402, F401 — registers all models on Base.metadata
+
+target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
