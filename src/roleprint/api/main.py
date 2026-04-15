@@ -21,6 +21,7 @@ from roleprint.api.routers import (  # noqa: E402
     sentiment,
     skills,
     stats,
+    subscribe,
     topics,
 )
 from roleprint.api.schemas import HealthResponse
@@ -56,6 +57,7 @@ def create_app() -> FastAPI:
     app.include_router(roles.router)
     app.include_router(postings.router)
     app.include_router(stats.router)
+    app.include_router(subscribe.router)
 
     # ── /health ───────────────────────────────────────────────────────────────
 

@@ -1,0 +1,337 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roleprint Weekly Digest — {{ week }}</title>
+  <style type="text/css">
+    body { margin: 0; padding: 0; background-color: #f4f4f7; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    a { color: #e07b00; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .arrow-up   { color: #16a34a; font-weight: bold; }
+    .arrow-down { color: #dc2626; font-weight: bold; }
+    .arrow-flat { color: #9ca3af; }
+    @media only screen and (max-width: 600px) {
+      .email-body { width: 100% !important; }
+      .section-table { width: 100% !important; }
+      .skill-col { min-width: 80px !important; }
+    }
+  </style>
+</head>
+<body>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f4f4f7">
+  <tr>
+    <td align="center" valign="top" style="padding: 28px 16px;">
+
+      <!-- Email wrapper -->
+      <table class="email-body" width="600" cellpadding="0" cellspacing="0" border="0"
+             style="background-color: #ffffff; border-radius: 8px; overflow: hidden;
+                    box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+
+        <!-- ── HEADER ──────────────────────────────────────────────────── -->
+        <tr>
+          <td bgcolor="#0a0c18" align="center" valign="middle"
+              style="padding: 32px 40px 28px;">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center">
+                  <!-- Logo dot -->
+                  <div style="width: 36px; height: 36px; border-radius: 50%;
+                               background: radial-gradient(circle, #f5a623 0%, rgba(245,166,35,0.3) 70%);
+                               margin: 0 auto 14px; display: inline-block;"></div>
+                  <br />
+                  <span style="font-family: Georgia, 'Times New Roman', serif;
+                                font-size: 22px; font-weight: bold; letter-spacing: 4px;
+                                color: #f5a623;">ROLEPRINT</span>
+                  <br />
+                  <span style="font-size: 11px; letter-spacing: 2px; color: #6b7280;
+                                text-transform: uppercase; margin-top: 4px; display: block;">
+                    Weekly Digest
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Week label strip -->
+        <tr>
+          <td bgcolor="#13162a" align="center"
+              style="padding: 10px 40px; font-size: 11px; letter-spacing: 2px;
+                     color: #9ca3af; font-family: 'Courier New', Courier, monospace;
+                     border-bottom: 1px solid #1e2238;">
+            WEEK OF &nbsp;{{ week }}&nbsp; &middot; &nbsp;{{ total_postings_this_week }} POSTINGS ANALYSED
+          </td>
+        </tr>
+
+        <!-- ── SECTION 1: TOP 10 SKILLS ────────────────────────────────── -->
+        <tr>
+          <td style="padding: 32px 40px 24px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="padding-bottom: 16px;">
+                  <span style="font-size: 10px; letter-spacing: 2px; color: #9ca3af;
+                                text-transform: uppercase; font-family: 'Courier New', Courier, monospace;">
+                    01 &mdash;
+                  </span>
+                  <span style="font-size: 16px; font-weight: 700; color: #111827;
+                                margin-left: 6px; letter-spacing: 1px;">
+                    Top Skills This Week
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <table class="section-table" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         style="border-collapse: collapse;">
+                    <!-- Table header -->
+                    <tr bgcolor="#f9fafb">
+                      <th class="skill-col" align="left"
+                          style="padding: 8px 12px; font-size: 10px; letter-spacing: 1px; color: #6b7280;
+                                 text-transform: uppercase; font-weight: 600; border-bottom: 1px solid #e5e7eb;
+                                 min-width: 120px;">Skill</th>
+                      <th align="left"
+                          style="padding: 8px 12px; font-size: 10px; letter-spacing: 1px; color: #6b7280;
+                                 text-transform: uppercase; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Role</th>
+                      <th align="right"
+                          style="padding: 8px 12px; font-size: 10px; letter-spacing: 1px; color: #6b7280;
+                                 text-transform: uppercase; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Mentions</th>
+                      <th align="right"
+                          style="padding: 8px 12px; font-size: 10px; letter-spacing: 1px; color: #6b7280;
+                                 text-transform: uppercase; font-weight: 600; border-bottom: 1px solid #e5e7eb;">vs Last Wk</th>
+                    </tr>
+                    {% for row in top_skills %}
+                    <tr bgcolor="{{ '#f9fafb' if loop.index is even else '#ffffff' }}">
+                      <td style="padding: 9px 12px; font-size: 13px; font-weight: 600;
+                                  color: #111827; border-bottom: 1px solid #f3f4f6;">
+                        {{ row.skill }}
+                      </td>
+                      <td style="padding: 9px 12px; font-size: 11px; color: #6b7280;
+                                  font-family: 'Courier New', Courier, monospace;
+                                  border-bottom: 1px solid #f3f4f6;">
+                        {{ row.role_category }}
+                      </td>
+                      <td align="right" style="padding: 9px 12px; font-size: 13px; font-weight: 600;
+                                               color: #374151; font-family: 'Courier New', Courier, monospace;
+                                               border-bottom: 1px solid #f3f4f6;">
+                        {{ row.mention_count }}
+                      </td>
+                      <td align="right" style="padding: 9px 12px; font-size: 12px; font-weight: 700;
+                                               font-family: 'Courier New', Courier, monospace;
+                                               border-bottom: 1px solid #f3f4f6;">
+                        {% if row.change_pct > 5 %}
+                          <span class="arrow-up">▲ {{ row.change_pct | abs | round(1) }}%</span>
+                        {% elif row.change_pct < -5 %}
+                          <span class="arrow-down">▼ {{ row.change_pct | abs | round(1) }}%</span>
+                        {% else %}
+                          <span class="arrow-flat">→ {{ row.change_pct | abs | round(1) }}%</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                      <td colspan="4" align="center"
+                          style="padding: 20px; font-size: 13px; color: #9ca3af;">
+                        No skill data available yet.
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Divider -->
+        <tr><td><table width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td style="padding: 0 40px;"><div style="height:1px;background:#e5e7eb;"></div></td>
+        </tr></table></td></tr>
+
+        <!-- ── SECTION 2: EMERGING SKILLS ──────────────────────────────── -->
+        <tr>
+          <td style="padding: 28px 40px 24px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="padding-bottom: 16px;">
+                  <span style="font-size: 10px; letter-spacing: 2px; color: #9ca3af;
+                                text-transform: uppercase; font-family: 'Courier New', Courier, monospace;">
+                    02 &mdash;
+                  </span>
+                  <span style="font-size: 16px; font-weight: 700; color: #111827;
+                                margin-left: 6px; letter-spacing: 1px;">
+                    Emerging Skills
+                  </span>
+                  <span style="font-size: 11px; color: #6b7280; margin-left: 8px;">
+                    (fastest-growing, last 4 weeks)
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      {% if emerging %}
+                        {% for item in emerging %}
+                        <td width="{{ (100 / emerging|length)|int }}%" valign="top"
+                            style="padding: 0 {% if not loop.last %}8px{% else %}0{% endif %} 0 0;">
+                          <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                 style="background: linear-gradient(135deg, #fef9f0 0%, #fffbf5 100%);
+                                        border: 1px solid #fcd38d; border-radius: 6px;
+                                        border-top: 3px solid #f5a623;">
+                            <tr>
+                              <td style="padding: 14px 14px 12px;">
+                                <div style="font-size: 10px; letter-spacing: 1.5px; color: #92400e;
+                                             text-transform: uppercase; font-family: 'Courier New', Courier, monospace;
+                                             margin-bottom: 6px;">
+                                  {{ item.role_category }}
+                                </div>
+                                <div style="font-size: 15px; font-weight: 700; color: #111827;
+                                             margin-bottom: 8px;">
+                                  {{ item.skill }}
+                                </div>
+                                <div style="display: inline-block; background: #f5a623; color: #7c2d12;
+                                             font-size: 12px; font-weight: 800; padding: 3px 8px;
+                                             border-radius: 12px; font-family: 'Courier New', Courier, monospace;">
+                                  +{{ item.growth_pct | round(0) | int }}% growth
+                                </div>
+                                <div style="font-size: 11px; color: #6b7280; margin-top: 6px;
+                                             font-family: 'Courier New', Courier, monospace;">
+                                  {{ item.old_count }} &rarr; {{ item.current_count }} mentions
+                                </div>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        {% endfor %}
+                      {% else %}
+                        <td>
+                          <p style="font-size: 13px; color: #9ca3af; margin: 0;">
+                            No emerging skills detected this period.
+                          </p>
+                        </td>
+                      {% endif %}
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Divider -->
+        <tr><td><table width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td style="padding: 0 40px;"><div style="height:1px;background:#e5e7eb;"></div></td>
+        </tr></table></td></tr>
+
+        <!-- ── SECTION 3: SENTIMENT BY ROLE ────────────────────────────── -->
+        <tr>
+          <td style="padding: 28px 40px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="padding-bottom: 16px;">
+                  <span style="font-size: 10px; letter-spacing: 2px; color: #9ca3af;
+                                text-transform: uppercase; font-family: 'Courier New', Courier, monospace;">
+                    03 &mdash;
+                  </span>
+                  <span style="font-size: 16px; font-weight: 700; color: #111827;
+                                margin-left: 6px; letter-spacing: 1px;">
+                    Sentiment by Role
+                  </span>
+                  <span style="font-size: 11px; color: #6b7280; margin-left: 8px;">
+                    (avg VADER score this week)
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <table class="section-table" width="100%" cellpadding="0" cellspacing="0" border="0"
+                         style="border-collapse: collapse;">
+                    <tr bgcolor="#f9fafb">
+                      <th align="left"
+                          style="padding: 8px 12px; font-size: 10px; letter-spacing: 1px; color: #6b7280;
+                                 text-transform: uppercase; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Role</th>
+                      <th align="right"
+                          style="padding: 8px 12px; font-size: 10px; letter-spacing: 1px; color: #6b7280;
+                                 text-transform: uppercase; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Avg Sentiment</th>
+                      <th align="right"
+                          style="padding: 8px 12px; font-size: 10px; letter-spacing: 1px; color: #6b7280;
+                                 text-transform: uppercase; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Postings</th>
+                      <th align="right"
+                          style="padding: 8px 12px; font-size: 10px; letter-spacing: 1px; color: #6b7280;
+                                 text-transform: uppercase; font-weight: 600; border-bottom: 1px solid #e5e7eb;">Urgency</th>
+                    </tr>
+                    {% for row in sentiment_by_role %}
+                    <tr bgcolor="{{ '#f9fafb' if loop.index is even else '#ffffff' }}">
+                      <td style="padding: 9px 12px; font-size: 13px; font-weight: 600;
+                                  color: #111827; border-bottom: 1px solid #f3f4f6;">
+                        {{ row.role_category }}
+                      </td>
+                      <td align="right" style="padding: 9px 12px; font-size: 13px; font-weight: 700;
+                                               font-family: 'Courier New', Courier, monospace;
+                                               border-bottom: 1px solid #f3f4f6;
+                                               color: {% if row.avg_sentiment > 0.05 %}#15803d{% elif row.avg_sentiment < -0.05 %}#dc2626{% else %}#374151{% endif %};">
+                        {% if row.avg_sentiment > 0 %}+{% endif %}{{ row.avg_sentiment | round(3) }}
+                      </td>
+                      <td align="right" style="padding: 9px 12px; font-size: 12px; color: #6b7280;
+                                               font-family: 'Courier New', Courier, monospace;
+                                               border-bottom: 1px solid #f3f4f6;">
+                        {{ row.posting_count }}
+                      </td>
+                      <td align="right" style="padding: 9px 12px; font-size: 12px;
+                                               font-family: 'Courier New', Courier, monospace;
+                                               border-bottom: 1px solid #f3f4f6;
+                                               color: {% if row.urgency_total > 0 %}#92400e{% else %}#9ca3af{% endif %};">
+                        {{ row.urgency_total }}
+                      </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                      <td colspan="4" align="center"
+                          style="padding: 20px; font-size: 13px; color: #9ca3af;">
+                        No sentiment data available yet.
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ── FOOTER ───────────────────────────────────────────────────── -->
+        <tr>
+          <td bgcolor="#0a0c18" style="padding: 24px 40px; border-top: 1px solid #1e2238;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" style="font-size: 11px; color: #6b7280;
+                                           font-family: 'Courier New', Courier, monospace;
+                                           line-height: 1.8;">
+                  <span style="color: #9ca3af;">Roleprint</span>
+                  &nbsp;&middot;&nbsp;
+                  Job Market Intelligence
+                  <br />
+                  You're receiving this because you subscribed at
+                  <span style="color: #f5a623;">{{ subscribe_url }}</span>
+                  <br />
+                  <a href="{{ unsubscribe_url }}"
+                     style="color: #6b7280; text-decoration: underline; font-size: 10px;
+                             letter-spacing: 1px;">
+                    Unsubscribe
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+      <!-- /Email wrapper -->
+
+    </td>
+  </tr>
+</table>
+</body>
+</html>
