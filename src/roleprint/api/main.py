@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 import os
-from pathlib import Path
 
 import structlog
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -40,8 +38,11 @@ def create_app() -> FastAPI:
         openapi_url="/openapi.json",
     )
 
-    # CORS — allow all origins for development; tighten in production via env var
-    origins = os.environ.get("CORS_ORIGINS", "*").split(",")
+    # CORS — set CORS_ORIGINS in production to the Vercel domain, e.g.:
+    #   CORS_ORIGINS=https://roleprint.xyz,https://www.roleprint.xyz
+    # Falls back to wildcard for local development.
+    raw_origins = os.environ.get("CORS_ORIGINS", "*")
+    origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
@@ -87,15 +88,6 @@ def create_app() -> FastAPI:
             version="0.1.0",
         )
         return JSONResponse(content=body.model_dump(), status_code=http_status)
-
-    # ── React static files (production) ──────────────────────────────────────
-
-    static_dir = Path(os.environ.get("REACT_BUILD_DIR", "frontend/dist"))
-    if static_dir.exists() and static_dir.is_dir():
-        app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
-        log.info("app.static_mounted", path=str(static_dir))
-    else:
-        log.debug("app.static_skipped", path=str(static_dir))
 
     return app
 

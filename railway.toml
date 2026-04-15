@@ -1,0 +1,41 @@
+# Railway deployment configuration for Roleprint
+#
+# This repo deploys two services on Railway from the same Dockerfile:
+#
+#   web    — FastAPI API server (this file configures the primary service)
+#   worker — APScheduler background worker
+#
+# How to set up in Railway dashboard:
+#   1. Create a new project → "Deploy from GitHub repo" → select roleprint
+#   2. Railway auto-creates one service; rename it to "web"
+#   3. Click "+ New Service" → "GitHub Repo" → same repo → rename to "worker"
+#   4. In each service Settings → set the startCommand (see below)
+#   5. Add the shared env vars listed in the [variables] comment below
+#
+# Shared environment variables (set on both services):
+#   DATABASE_URL        postgresql+psycopg2://... (from Supabase → Settings → Database)
+#   REDIS_URL           redis://... (Railway Redis add-on or Upstash)
+#   SENDGRID_API_KEY    from SendGrid dashboard
+#   FROM_EMAIL          digest@roleprint.io
+#   SITE_URL            https://roleprint.xyz
+#   CORS_ORIGINS        https://roleprint.xyz,https://www.roleprint.xyz
+#   SCRAPE_INTERVAL_HRS 6
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+# ── web service (FastAPI API) ─────────────────────────────────────────────────
+[deploy]
+startCommand = "uvicorn roleprint.api.main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+# ── worker service ────────────────────────────────────────────────────────────
+# In the Railway dashboard, override startCommand for the worker service to:
+#   python -m roleprint.scheduler.main
+#
+# The worker does not expose a port, so no healthcheck is needed.
+# Set the same Dockerfile and build config on the worker service.
