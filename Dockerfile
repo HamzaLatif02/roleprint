@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Copy dependency manifests first so this layer is cached when only source changes
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
 # Stub src package so pip can resolve the project metadata without full source
 RUN mkdir -p src/roleprint && touch src/roleprint/__init__.py
 
