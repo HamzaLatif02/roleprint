@@ -52,5 +52,6 @@ ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8000
 
-# Railway overrides this per service (worker uses python -m roleprint.scheduler.main)
-CMD ["uvicorn", "roleprint.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Shell form so $PORT is expanded by sh before uvicorn receives it.
+# Railway injects $PORT at runtime; falls back to 8000 locally.
+CMD uvicorn roleprint.api.main:app --host 0.0.0.0 --port "${PORT:-8000}"
