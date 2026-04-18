@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from contextlib import asynccontextmanager
 
 import structlog
 from fastapi import FastAPI
@@ -18,7 +19,31 @@ from roleprint.api.routers import (  # noqa: E402
     subscribe,
     topics,
 )
+
 log = structlog.get_logger(__name__)
+
+
+# ── Lifespan ──────────────────────────────────────────────────────────────────
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # ── startup ───────────────────────────────────────────────────────────────
+    try:
+        from alembic import command
+        from alembic.config import Config
+        import pathlib
+
+        ini_path = pathlib.Path(__file__).resolve().parents[3] / "alembic.ini"
+        alembic_cfg = Config(str(ini_path))
+        command.upgrade(alembic_cfg, "head")
+        log.info("migrations.done")
+    except Exception as exc:
+        log.warning("migrations.failed", error=str(exc))
+        # don't crash the server — let it start anyway
+
+    yield
+    # ── shutdown (nothing to clean up) ────────────────────────────────────────
+
 
 # ── App factory ───────────────────────────────────────────────────────────────
 
@@ -30,6 +55,7 @@ def create_app() -> FastAPI:
         docs_url="/docs",
         redoc_url="/redoc",
         openapi_url="/openapi.json",
+        lifespan=lifespan,
     )
 
     # CORS — set CORS_ORIGINS in production to the Vercel domain, e.g.:
@@ -44,30 +70,6 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
-    # ── Startup: run migrations ───────────────────────────────────────────────
-
-    @app.on_event("startup")
-    def run_migrations() -> None:
-        """Apply any pending Alembic migrations on startup.
-
-        Only runs when RUN_MIGRATIONS=true is set — keeps tests fast and
-        avoids touching the DB in environments that manage migrations
-        separately.  Safe to run on every deploy; Alembic skips
-        already-applied versions.
-        """
-        if os.environ.get("RUN_MIGRATIONS", "").lower() != "true":
-            return
-
-        import pathlib
-        from alembic import command
-        from alembic.config import Config
-
-        ini_path = pathlib.Path(__file__).resolve().parents[3] / "alembic.ini"
-        alembic_cfg = Config(str(ini_path))
-        log.info("migrations.start", ini=str(ini_path))
-        command.upgrade(alembic_cfg, "head")
-        log.info("migrations.done")
 
     # Routers
     app.include_router(skills.router)
