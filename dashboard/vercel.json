@@ -5,6 +5,14 @@
   "installCommand": "npm install",
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://roleprint-api.up.railway.app/api/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "https://roleprint-api.up.railway.app/health"
+    },
+    {
       "source": "/((?!assets|favicon\\.svg).*)",
       "destination": "/index.html"
     }

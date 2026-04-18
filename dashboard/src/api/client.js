@@ -1,4 +1,5 @@
-const BASE = import.meta.env.VITE_API_BASE_URL ?? ''
+// Requests are proxied to Railway via vercel.json rewrites — no env var needed.
+const BASE = ''
 
 async function apiFetch(path, opts = {}) {
   const url = `${BASE}${path}`
