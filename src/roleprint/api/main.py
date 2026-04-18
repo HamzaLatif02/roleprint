@@ -62,32 +62,10 @@ def create_app() -> FastAPI:
 
     # ── /health ───────────────────────────────────────────────────────────────
 
-    @app.get("/health", response_model=HealthResponse, tags=["meta"])
-    def health(session: Session = Depends(get_session)):
-        """Liveness/readiness probe.
-
-        Returns HTTP 200 with ``status=ok`` when the database is reachable.
-        Returns HTTP 503 with ``status=degraded`` when the database is down.
-        Redis being unavailable is reflected in the ``redis`` field but does
-        NOT change the HTTP status code (cache is optional).
-        """
-        db_status = "connected"
-        http_status = 200
-        try:
-            session.execute(text("SELECT 1"))
-        except Exception as exc:
-            db_status = str(exc)
-            http_status = 503
-
-        redis_status = "connected" if cache.is_available() else "unavailable"
-
-        body = HealthResponse(
-            status="ok" if http_status == 200 else "degraded",
-            db=db_status,
-            redis=redis_status,
-            version="0.1.0",
-        )
-        return JSONResponse(content=body.model_dump(), status_code=http_status)
+    @app.get("/health", tags=["meta"])
+    def health():
+        """Liveness probe — always 200 if the process is up."""
+        return {"status": "ok"}
 
     return app
 
