@@ -5,14 +5,10 @@ from __future__ import annotations
 import os
 
 import structlog
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from sqlalchemy import text
-from sqlalchemy.orm import Session
 
 from roleprint.api import cache
-from roleprint.api.deps import get_session
 from roleprint.api.routers import (  # noqa: E402
     postings,
     roles,
@@ -22,8 +18,6 @@ from roleprint.api.routers import (  # noqa: E402
     subscribe,
     topics,
 )
-from roleprint.api.schemas import HealthResponse
-
 log = structlog.get_logger(__name__)
 
 # ── App factory ───────────────────────────────────────────────────────────────
@@ -50,6 +44,30 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # ── Startup: run migrations ───────────────────────────────────────────────
+
+    @app.on_event("startup")
+    def run_migrations() -> None:
+        """Apply any pending Alembic migrations on startup.
+
+        Only runs when RUN_MIGRATIONS=true is set — keeps tests fast and
+        avoids touching the DB in environments that manage migrations
+        separately.  Safe to run on every deploy; Alembic skips
+        already-applied versions.
+        """
+        if os.environ.get("RUN_MIGRATIONS", "").lower() != "true":
+            return
+
+        import pathlib
+        from alembic import command
+        from alembic.config import Config
+
+        ini_path = pathlib.Path(__file__).resolve().parents[3] / "alembic.ini"
+        alembic_cfg = Config(str(ini_path))
+        log.info("migrations.start", ini=str(ini_path))
+        command.upgrade(alembic_cfg, "head")
+        log.info("migrations.done")
 
     # Routers
     app.include_router(skills.router)
