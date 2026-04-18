@@ -31,7 +31,7 @@ def upgrade() -> None:
         sa.Column(
             "role_preferences",
             postgresql.JSONB(astext_type=sa.Text()),
-            server_default="'[]'::jsonb",
+            server_default=sa.text("'[]'::jsonb"),
             nullable=False,
         ),
         sa.Column(
