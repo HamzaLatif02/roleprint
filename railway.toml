@@ -27,7 +27,7 @@ dockerfilePath = "Dockerfile"
 
 # ── web service (FastAPI API) ─────────────────────────────────────────────────
 [deploy]
-startCommand = "uvicorn roleprint.api.main:app --host 0.0.0.0 --port $PORT"
+startCommand = "python -m roleprint.api.main"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
