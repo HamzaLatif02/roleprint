@@ -8,7 +8,7 @@ On Railway, add a second service with the start command:
 
 Environment variables (all optional except DATABASE_URL):
     DATABASE_URL         PostgreSQL connection string (required)
-    SENDGRID_API_KEY     SendGrid API key for digest emails
+    RESEND_API_KEY       Resend API key for digest emails
     FROM_EMAIL           Sender address  (default: digest@roleprint.io)
     FROM_NAME            Sender name     (default: Roleprint)
     SITE_URL             Base URL for links in emails (default: https://roleprint.io)

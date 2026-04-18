@@ -6,7 +6,7 @@ Covers:
   - GET  /api/unsubscribe?token=...
   - generate_digest_data  (with seeded skill/sentiment data)
   - render_digest_html    (template renders without errors)
-  - weekly_digest_job     (send_fn is mocked, no real SendGrid)
+  - weekly_digest_job     (send_fn is mocked, no real Resend)
   - build_scheduler       (jobs registered with correct IDs)
 
 All DB operations use an in-memory SQLite database with StaticPool so
@@ -414,7 +414,7 @@ class TestWeeklyDigestJob:
 
         def failing_send(to, subj, html):
             if to == "fail_test@example.com":
-                raise RuntimeError("SendGrid error")
+                raise RuntimeError("Resend error")
 
         with patch("roleprint.scheduler.jobs.SessionLocal", return_value=seeded_db):
             result = weekly_digest_job(send_fn=failing_send)

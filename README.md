@@ -157,7 +157,7 @@ cd dashboard && npm install && npm run dev
 Shared environment variables (set on both services):
   DATABASE_URL         postgresql+psycopg2://...   (Supabase connection string)
   REDIS_URL            redis://...                  (Railway Redis add-on)
-  SENDGRID_API_KEY     from SendGrid dashboard
+  RESEND_API_KEY       from Resend dashboard
   FROM_EMAIL           digest@roleprint.io
   SITE_URL             https://roleprint.xyz
   CORS_ORIGINS         https://roleprint.xyz,https://www.roleprint.xyz

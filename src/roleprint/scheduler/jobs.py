@@ -3,10 +3,10 @@
 Three scheduled jobs:
   - scrape_job      every 6 h — scrapes all role categories
   - process_job     every 6 h (1 h after scrape) — NLP pipeline on unprocessed rows
-  - weekly_digest_job  Mondays 08:00 UTC — renders + sends HTML digest via SendGrid
+  - weekly_digest_job  Mondays 08:00 UTC — renders + sends HTML digest via Resend
 
 Each job opens its own database session and closes it when done.
-All side-effects (SendGrid, DB) are injected/mockable for tests.
+All side-effects (Resend, DB) are injected/mockable for tests.
 """
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ _JINJA_ENV = Environment(
 
 # ── env knobs ─────────────────────────────────────────────────────────────────
 
-SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "")
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 FROM_EMAIL = os.environ.get("FROM_EMAIL", "digest@roleprint.io")
 FROM_NAME = os.environ.get("FROM_NAME", "Roleprint")
 SITE_URL = os.environ.get("SITE_URL", "https://roleprint.io")
@@ -215,31 +215,27 @@ def render_digest_html(context: Dict[str, Any], subscriber_token: str) -> str:
     return template.render(**tmpl_ctx)
 
 
-def _send_via_sendgrid(
+def _send_via_resend(
     to_email: str,
     subject: str,
     html_content: str,
-    api_key: str = SENDGRID_API_KEY,
+    api_key: str = RESEND_API_KEY,
 ) -> None:
-    """Send one email via the SendGrid Web API v3.
+    """Send one email via the Resend API.
 
     Raises on HTTP errors so the caller can catch and log per-recipient.
     """
-    import sendgrid  # type: ignore[import]
-    from sendgrid.helpers.mail import Mail  # type: ignore[import]
+    import resend  # type: ignore[import]
 
-    sg = sendgrid.SendGridAPIClient(api_key=api_key)
-    message = Mail(
-        from_email=(FROM_EMAIL, FROM_NAME),
-        to_emails=to_email,
-        subject=subject,
-        html_content=html_content,
-    )
-    response = sg.send(message)
-    if response.status_code not in (200, 202):
-        raise RuntimeError(
-            f"SendGrid returned {response.status_code}: {response.body}"
-        )
+    resend.api_key = api_key
+    response = resend.Emails.send({
+        "from": f"{FROM_NAME} <{FROM_EMAIL}>",
+        "to": [to_email],
+        "subject": subject,
+        "html": html_content,
+    })
+    if not response.get("id"):
+        raise RuntimeError(f"Resend returned unexpected response: {response}")
 
 
 def weekly_digest_job(
@@ -250,13 +246,13 @@ def weekly_digest_job(
     Args:
         send_fn: Optional override for the send function — accepts
                  ``(to_email, subject, html_content)``.  Defaults to
-                 :func:`_send_via_sendgrid`.  Pass a mock in tests.
+                 :func:`_send_via_resend`.  Pass a mock in tests.
 
     Returns:
         Dict with ``sent``, ``skipped``, ``failed`` counts.
     """
     if send_fn is None:
-        send_fn = lambda to, subj, html: _send_via_sendgrid(to, subj, html)
+        send_fn = lambda to, subj, html: _send_via_resend(to, subj, html)
 
     log.info("weekly_digest.start")
     sent = skipped = failed = 0
