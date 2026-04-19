@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Weekly job-market trend digest.
+"""Weekly job-market trend report.
 
-Prints a plain-text report to stdout that can be piped directly into an
-email, saved to a file, or consumed by the scheduler.
+Prints a plain-text report to stdout that can be saved to a file or
+consumed by the scheduler.
 
 Usage:
     # With a running Postgres database:

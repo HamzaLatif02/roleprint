@@ -29,8 +29,8 @@
                         ▼
 ┌───────────────────────────────────────────────────────────────────────┐
 │  Supabase — PostgreSQL                                                 │
-│  job_postings · processed_postings · skill_trends · subscribers        │
-│  Alembic migrations (0001 initial schema · 0002 subscribers)           │
+│  job_postings · processed_postings · skill_trends                      │
+│  Alembic migrations (0001 initial schema)                              │
 └───────────────────────────────────────────────────────────────────────┘
                         ▲
                         │  SQLAlchemy / psycopg2
@@ -42,7 +42,6 @@
 │  process_job    every 6 h (1 h offset) — NLP pipeline                  │
 │                   spaCy NER · VADER sentiment · skill extractor         │
 │                   BERTopic topics · skill_trends aggregation            │
-│  weekly_digest  Mondays 08:00 UTC — Jinja2 HTML email via SendGrid      │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -73,14 +72,6 @@ Four views built with React 18, Recharts, and Tailwind CSS (dark/light mode):
 | Trends | Momentum LineChart · sparkline cards with WoW badges · emerging table |
 | Compare | Venn circles · Jaccard % + cosine similarity · unique/shared skill pills |
 | Sentiment | ComposedChart (area + dashed urgency line) · weekly breakdown table |
-
-### Weekly digest
-Every Monday, the scheduler generates an HTML email (Jinja2 table-based, Gmail/Outlook compatible) with:
-- Top 10 skills + ▲▼ week-over-week arrows
-- 3 emerging skills callout cards
-- Sentiment summary per role
-
-Sent via SendGrid to the `subscribers` table. One-click unsubscribe via opaque token.
 
 ---
 
@@ -157,8 +148,6 @@ cd dashboard && npm install && npm run dev
 Shared environment variables (set on both services):
   DATABASE_URL         postgresql+psycopg2://...   (Supabase connection string)
   REDIS_URL            redis://...                  (Railway Redis add-on)
-  RESEND_API_KEY       from Resend dashboard
-  FROM_EMAIL           digest@roleprint.io
   SITE_URL             https://roleprint.xyz
   CORS_ORIGINS         https://roleprint.xyz,https://www.roleprint.xyz
   SCRAPE_INTERVAL_HRS  6
@@ -177,7 +166,7 @@ roleprint/
 │   ├── db/            SQLAlchemy models, Alembic env, typed query helpers
 │   ├── nlp/           Cleaner, skill extractor, VADER, NER, BERTopic, pipeline
 │   ├── scraper/       Reed + RemoteOK scrapers, dedup, async runner
-│   └── scheduler/     APScheduler jobs, Jinja2 digest template, entry point
+│   └── scheduler/     APScheduler jobs, entry point
 ├── dashboard/         React + Vite + Tailwind + Recharts
 ├── tests/             208 tests — SQLite in-memory, no infra required
 ├── alembic/           Migrations
@@ -203,8 +192,6 @@ roleprint/
 | GET | `/api/roles` | Role categories with posting counts |
 | GET | `/api/postings/recent` | Latest postings with NLP enrichment |
 | GET | `/api/stats/summary` | Dataset statistics |
-| POST | `/api/subscribe` | Subscribe to weekly digest |
-| GET | `/api/unsubscribe` | One-click unsubscribe via token |
 | GET | `/health` | Liveness probe (DB + Redis status) |
 
 All trend endpoints accept `?role_category=<role>` filter. Full schema at `/docs`.

@@ -8,14 +8,8 @@ On Railway, add a second service with the start command:
 
 Environment variables (all optional except DATABASE_URL):
     DATABASE_URL         PostgreSQL connection string (required)
-    RESEND_API_KEY       Resend API key for digest emails
-    FROM_EMAIL           Sender address  (default: digest@roleprint.io)
-    FROM_NAME            Sender name     (default: Roleprint)
-    SITE_URL             Base URL for links in emails (default: https://roleprint.io)
     SCRAPE_INTERVAL_HRS  Hours between scrape runs (default: 6)
     PROCESS_DELAY_HRS    Hours after scrape before NLP run (default: 1)
-    DIGEST_DAY           Day of week for digest, 0=Monday (default: 0)
-    DIGEST_HOUR          UTC hour for digest (default: 8)
 """
 
 from __future__ import annotations
@@ -62,12 +56,10 @@ def build_scheduler() -> BlockingScheduler:
     Jobs are registered but the scheduler is NOT started here — the caller
     does that.  This separation makes unit-testing easier.
     """
-    from roleprint.scheduler.jobs import process_job, scrape_job, weekly_digest_job
+    from roleprint.scheduler.jobs import process_job, scrape_job
 
     scrape_hours = int(os.environ.get("SCRAPE_INTERVAL_HRS", "6"))
     process_delay = int(os.environ.get("PROCESS_DELAY_HRS", "1"))
-    digest_day = int(os.environ.get("DIGEST_DAY", "0"))      # 0 = Monday
-    digest_hour = int(os.environ.get("DIGEST_HOUR", "8"))
 
     log = structlog.get_logger(__name__)
 
@@ -108,25 +100,6 @@ def build_scheduler() -> BlockingScheduler:
         "scheduler.job_registered",
         job="process_job",
         trigger=f"cron hour={process_hours_list} min=0",
-    )
-
-    # Job 3 — Weekly digest
-    _DAY_NAMES = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
-    digest_day_str = _DAY_NAMES[digest_day % 7]
-    scheduler.add_job(
-        weekly_digest_job,
-        trigger=CronTrigger(
-            day_of_week=digest_day_str, hour=digest_hour, minute=0, timezone="UTC"
-        ),
-        id="weekly_digest_job",
-        name="Weekly digest email",
-        replace_existing=True,
-        misfire_grace_time=3600,  # 1 h grace — it's a weekly job
-    )
-    log.info(
-        "scheduler.job_registered",
-        job="weekly_digest_job",
-        trigger=f"cron day_of_week={digest_day_str} hour={digest_hour}:00 UTC",
     )
 
     return scheduler

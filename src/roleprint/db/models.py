@@ -101,37 +101,6 @@ class ProcessedPosting(Base):
         return f"<ProcessedPosting id={self.id} posting_id={self.posting_id}>"
 
 
-class Subscriber(Base):
-    """Email subscribers for the weekly digest."""
-
-    __tablename__ = "subscribers"
-
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
-    email: Mapped[str] = mapped_column(String(255), nullable=False)
-    role_preferences: Mapped[List[str]] = mapped_column(
-        JSON, nullable=False, default=list
-    )
-    subscribed_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
-    )
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    # Opaque token for one-click unsubscribe links — stored as plain string
-    unsubscribe_token: Mapped[str] = mapped_column(
-        String(64), nullable=False, default=lambda: uuid.uuid4().hex
-    )
-
-    __table_args__ = (
-        UniqueConstraint("email", name="uq_subscribers_email"),
-        Index("ix_subscribers_unsubscribe_token", "unsubscribe_token"),
-        Index("ix_subscribers_is_active", "is_active"),
-    )
-
-    def __repr__(self) -> str:
-        return f"<Subscriber email={self.email!r} active={self.is_active}>"
-
-
 class SkillTrend(Base):
     """Weekly aggregated skill mention counts per role category."""
 
