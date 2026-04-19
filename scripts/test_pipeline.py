@@ -37,6 +37,9 @@ from pathlib import Path
 _ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_ROOT / "src"))
 
+from dotenv import load_dotenv
+load_dotenv(_ROOT / ".env")
+
 # ── Colours ───────────────────────────────────────────────────────────────────
 G, R, Y, B, W, Z = "\033[92m", "\033[91m", "\033[93m", "\033[94m", "\033[97m", "\033[0m"
 
@@ -131,7 +134,7 @@ def step_nlp() -> int:
         return 0
 
     result = run_all()
-    ok(f"Processed: {result['processed']}  Failed: {result['failed']}  Skipped: {result['skipped']}")
+    ok(f"Processed: {result['processed']}  Errors: {result.get('errors', result.get('failed', 0))}")
 
     # Sample output
     session = SessionLocal()
@@ -141,7 +144,7 @@ def step_nlp() -> int:
                pp.sentiment_label, pp.urgency_count,
                pp.entities, pp.topic_id
         FROM processed_postings pp
-        JOIN job_postings jp ON jp.id = pp.job_posting_id
+        JOIN job_postings jp ON jp.id = pp.posting_id
         ORDER BY pp.id DESC
         LIMIT 1
     """)).fetchone()

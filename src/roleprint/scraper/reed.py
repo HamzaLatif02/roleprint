@@ -119,9 +119,9 @@ class ReedScraper(BaseJobScraper):
 
         # ── title & URL ───────────────────────────────────────────────────────
         title_tag = (
-            article.find("a", attrs={"data-gtm": "search-job-card-title"})
-            or article.find("h2")
-            and article.find("h2").find("a")
+            article.find("a", attrs={"data-qa": "job-card-title"})
+            or article.find("a", attrs={"data-element": "job_title"})
+            or (article.find("h2") and article.find("h2").find("a"))
             or article.find("a", class_=lambda c: c and "title" in c.lower() if c else False)
         )
         if title_tag is None:
@@ -138,6 +138,13 @@ class ReedScraper(BaseJobScraper):
         company_tag = (
             article.find("a", class_=lambda c: c and "recruiter" in c.lower() if c else False)
             or article.find("span", class_=lambda c: c and "recruiter" in c.lower() if c else False)
+            # Reed now uses /jobs/{company-slug}/p{id} pattern for employer links
+            or next(
+                (a for a in article.find_all("a")
+                 if a.get("href", "").startswith("/jobs/") and "/p" in a.get("href", "")
+                 and a.get("data-qa") != "job-card-title" and a.get_text(strip=True)),
+                None,
+            )
         )
         company = company_tag.get_text(strip=True) if company_tag else "Unknown"
 
@@ -247,7 +254,7 @@ class ReedScraper(BaseJobScraper):
     def _parse_search_page(self, html: str, role: str) -> List[dict]:
         """Extract all job cards from a search results page."""
         soup = BeautifulSoup(html, "html.parser")
-        cards = soup.find_all("article", attrs={"data-job-id": True})
+        cards = soup.find_all("article", attrs={"data-qa": "job-card"})
 
         postings: List[dict] = []
         for card in cards:
