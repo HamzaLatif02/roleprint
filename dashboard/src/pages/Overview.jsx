@@ -124,8 +124,18 @@ function SkillsChart({ data, loading, error, refetch }) {
           <h2 className="font-display text-base tracking-widest text-ink-100">TOP SKILLS</h2>
           <p className="font-mono text-[10px] text-ink-400 mt-0.5">current week · by mention count</p>
         </div>
-        <div className="label-mono text-[9px] text-ink-400">
-          {top10.length} of {data?.length ?? 0}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 label-mono text-[9px] text-ink-400">
+            <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: AMBER }} />
+            skill
+          </div>
+          <div className="flex items-center gap-1.5 label-mono text-[9px] text-teal-signal">
+            <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: TEAL }} />
+            rising &gt;20% WoW
+          </div>
+          <div className="label-mono text-[9px] text-ink-400">
+            {top10.length} of {data?.length ?? 0}
+          </div>
         </div>
       </div>
 
@@ -152,11 +162,11 @@ function SkillsChart({ data, loading, error, refetch }) {
             />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(245,166,35,0.04)' }} />
             <Bar dataKey="mention_count" radius={[3, 3, 0, 0]}>
-              {top10.map((entry, i) => (
+              {top10.map((entry) => (
                 <Cell
                   key={entry.skill}
-                  fill={entry.is_rising ? TEAL : i === 0 ? AMBER : AMBER_DIM}
-                  fillOpacity={0.85 - i * 0.04}
+                  fill={entry.is_rising ? TEAL : AMBER}
+                  fillOpacity={0.85}
                 />
               ))}
             </Bar>
