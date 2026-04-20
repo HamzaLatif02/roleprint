@@ -14,6 +14,15 @@ const TEAL = '#2dd4bf'
 const ROSE = '#f05151'
 const INDIGO = '#818cf8'
 
+function useChartColors() {
+  const isDark = document.documentElement.classList.contains('dark')
+  return {
+    axis: isDark ? '#565878' : '#4b5563',
+    grid: isDark ? '#1e2238' : '#e2e5f0',
+    zeroLine: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.15)',
+  }
+}
+
 function SentimentTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
   const sentiment = payload.find((p) => p.dataKey === 'avg_sentiment')
@@ -58,6 +67,7 @@ function SentimentBadge({ value }) {
 
 export default function Sentiment() {
   const { roleFilter } = useApp()
+  const { axis, grid, zeroLine } = useChartColors()
 
   const fetchSentiment = useCallback(
     () => api.sentiment(roleFilter, 12),
@@ -173,15 +183,30 @@ export default function Sentiment() {
                   <stop offset="95%" stopColor={ROSE} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid />
+              <CartesianGrid stroke={grid} />
               <XAxis
                 dataKey="week"
                 tickFormatter={(v) => v.slice(5)}
+                tick={{ fill: axis, fontSize: 11 }}
+                axisLine={{ stroke: grid }}
+                tickLine={{ stroke: grid }}
               />
-              <YAxis yAxisId="left" domain={[-1, 1]} />
-              <YAxis yAxisId="right" orientation="right" />
+              <YAxis
+                yAxisId="left"
+                domain={[-1, 1]}
+                tick={{ fill: axis, fontSize: 11 }}
+                axisLine={{ stroke: grid }}
+                tickLine={{ stroke: grid }}
+              />
+              <YAxis
+                yAxisId="right"
+                orientation="right"
+                tick={{ fill: axis, fontSize: 11 }}
+                axisLine={{ stroke: grid }}
+                tickLine={{ stroke: grid }}
+              />
               <Tooltip content={<SentimentTooltip />} />
-              <ReferenceLine yAxisId="left" y={0} stroke="rgba(255,255,255,0.1)" strokeDasharray="4 4" />
+              <ReferenceLine yAxisId="left" y={0} stroke={zeroLine} strokeDasharray="4 4" />
               <Area
                 yAxisId="left"
                 type="monotone"
@@ -215,7 +240,7 @@ export default function Sentiment() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border">
+              <tr className="border-b border-border bg-void-700">
                 <th className="text-left px-5 py-3 label-mono text-[9px] font-normal text-ink-400">WEEK</th>
                 <th className="text-right px-4 py-3 label-mono text-[9px] font-normal text-ink-400">SENTIMENT</th>
                 <th className="text-right px-4 py-3 label-mono text-[9px] font-normal text-ink-400">URGENCY</th>
@@ -236,7 +261,7 @@ export default function Sentiment() {
               ) : [...weeks].reverse().map((row, i) => (
                 <tr
                   key={row.week}
-                  className="border-b border-border hover:bg-void-700 transition-colors"
+                  className="border-b border-border odd:bg-void-800 even:bg-void-900 hover:bg-void-700 transition-colors"
                 >
                   <td className="px-5 py-3 font-mono text-xs text-ink-300">{row.week}</td>
                   <td className="px-4 py-3 text-right">

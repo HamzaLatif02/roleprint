@@ -26,23 +26,24 @@
 
   /* ── Light mode ────────────────────────────────────────────────────────── */
   html.light {
-    --void-950: #e2e5f5;
-    --void-900: #f0f2fa;
+    --void-950: #e8eaf5;
+    --void-900: #f1f3fa;
     --void-800: #ffffff;
     --void-700: #f7f8fd;
     --void-600: #eef0f8;
     --void-500: #e4e6f2;
-    --void-400: #d8daf0;
+    --void-400: #d5d8ed;
 
-    --color-border: #dde0ee;
-    --color-border-bright: #c4c9e0;
-    --color-border-glow: #9da5cc;
+    --color-border: #e2e5f0;
+    --color-border-bright: #c8cde3;
+    --color-border-glow: #a0a8cc;
 
-    --ink-100: #1a1e34;
-    --ink-200: #363855;
-    --ink-300: #565878;
-    --ink-400: #7c83b0;
-    --ink-500: #a8aed4;
+    /* True grays for readable text on white */
+    --ink-100: #111827;   /* gray-900 — headings, primary text */
+    --ink-200: #1f2937;   /* gray-800 — body text */
+    --ink-300: #374151;   /* gray-700 — secondary body */
+    --ink-400: #4b5563;   /* gray-600 — muted text */
+    --ink-500: #6b7280;   /* gray-500 — very muted */
   }
 
   * {
@@ -106,6 +107,25 @@
     @apply inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono text-xs font-bold text-ink-300 bg-void-600 border border-border;
   }
 
+  /* Light mode badge overrides — dark faint backgrounds don't work on white */
+  html.light .badge-rising {
+    background: #ecfdf5;
+    border-color: #6ee7b7;
+    color: #065f46;
+  }
+
+  html.light .badge-falling {
+    background: #fff1f2;
+    border-color: #fca5a5;
+    color: #991b1b;
+  }
+
+  html.light .badge-neutral {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #374151;
+  }
+
   .page-enter {
     animation: fadeUp 0.35s ease forwards;
   }
@@ -115,6 +135,11 @@
     background-image: linear-gradient(rgba(30,34,56,0.4) 1px, transparent 1px),
                       linear-gradient(90deg, rgba(30,34,56,0.4) 1px, transparent 1px);
     background-size: 28px 28px;
+  }
+
+  html.light .grid-bg {
+    background-image: linear-gradient(rgba(200,205,227,0.6) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(200,205,227,0.6) 1px, transparent 1px);
   }
 
   /* Skeleton shimmer */
@@ -134,6 +159,15 @@
     );
     background-size: 200% 100%;
     animation: shimmer 1.8s ease-in-out infinite;
+  }
+
+  html.light .skeleton::after {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255,255,255,0.7) 50%,
+      transparent 100%
+    );
   }
 
   /* Amber accent line on sidebar active */
@@ -210,21 +244,21 @@
   }
 }
 
-/* Recharts customization */
+/* Recharts customization — uses CSS variables so dark/light mode works */
 .recharts-cartesian-grid-horizontal line,
 .recharts-cartesian-grid-vertical line {
-  stroke: #1e2238 !important;
+  stroke: var(--color-border) !important;
 }
 
 .recharts-xAxis .recharts-tick text,
 .recharts-yAxis .recharts-tick text {
-  fill: #565878 !important;
+  fill: var(--ink-400) !important;
   font-family: 'Space Mono', monospace !important;
   font-size: 11px !important;
 }
 
 .recharts-legend-item-text {
-  color: #a8aed4 !important;
+  color: var(--ink-200) !important;
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-size: 12px !important;
 }

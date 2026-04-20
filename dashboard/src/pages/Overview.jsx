@@ -8,6 +8,16 @@ import { useApp } from '../context/AppContext'
 import { SkeletonStat, SkeletonChart } from '../components/Skeleton'
 import { FetchError } from '../components/ErrorBoundary'
 
+function useChartColors() {
+  const isDark = document.documentElement.classList.contains('dark')
+  return {
+    axis: isDark ? '#565878' : '#4b5563',
+    grid: isDark ? '#1e2238' : '#e2e5f0',
+    tooltipBg: isDark ? '#0e1020' : '#ffffff',
+    tooltipBorder: isDark ? '#2d3354' : '#e2e5f0',
+  }
+}
+
 const AMBER = '#f5a623'
 const AMBER_DIM = '#c47d12'
 const TEAL = '#2dd4bf'
@@ -96,6 +106,8 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 function SkillsChart({ data, loading, error, refetch }) {
+  const { axis, grid } = useChartColors()
+
   if (loading) return <SkeletonChart height={280} />
   if (error) return (
     <div className="card p-5">
@@ -124,14 +136,20 @@ function SkillsChart({ data, loading, error, refetch }) {
       ) : (
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={top10} margin={{ top: 0, right: 8, bottom: 0, left: -10 }} barCategoryGap="30%">
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={false} stroke={grid} />
             <XAxis
               dataKey="skill"
-              tick={{ angle: -30, textAnchor: 'end', dy: 8 }}
+              tick={{ angle: -30, textAnchor: 'end', dy: 8, fill: axis, fontSize: 11 }}
               height={56}
               interval={0}
+              axisLine={{ stroke: grid }}
+              tickLine={{ stroke: grid }}
             />
-            <YAxis />
+            <YAxis
+              tick={{ fill: axis, fontSize: 11 }}
+              axisLine={{ stroke: grid }}
+              tickLine={{ stroke: grid }}
+            />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(245,166,35,0.04)' }} />
             <Bar dataKey="mention_count" radius={[3, 3, 0, 0]}>
               {top10.map((entry, i) => (
@@ -246,7 +264,7 @@ export default function Overview() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border">
+              <tr className="border-b border-border bg-void-700">
                 <th className="text-left px-5 py-3 label-mono text-[9px] font-normal text-ink-400">SKILL</th>
                 <th className="text-left px-4 py-3 label-mono text-[9px] font-normal text-ink-400">ROLE</th>
                 <th className="text-right px-4 py-3 label-mono text-[9px] font-normal text-ink-400">MENTIONS</th>
@@ -271,7 +289,7 @@ export default function Overview() {
                 return (
                   <tr
                     key={`${row.skill}:${row.role_category}`}
-                    className="border-b border-border hover:bg-void-700 transition-colors group"
+                    className="border-b border-border odd:bg-void-800 even:bg-void-900 hover:bg-void-700 transition-colors group"
                   >
                     <td className="px-5 py-3 font-medium text-ink-100 group-hover:text-amber-glow transition-colors">
                       {row.skill}

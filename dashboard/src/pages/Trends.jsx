@@ -11,6 +11,14 @@ import { FetchError } from '../components/ErrorBoundary'
 
 const PALETTE = ['#f5a623', '#2dd4bf', '#818cf8', '#fb7185', '#4ade80']
 
+function useChartColors() {
+  const isDark = document.documentElement.classList.contains('dark')
+  return {
+    axis: isDark ? '#565878' : '#4b5563',
+    grid: isDark ? '#1e2238' : '#e2e5f0',
+  }
+}
+
 function TrendTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
   return (
@@ -103,6 +111,7 @@ function SparklineCard({ item, color }) {
 
 export default function Trends() {
   const { roleFilter } = useApp()
+  const { axis, grid } = useChartColors()
 
   const fetchTrending = useCallback(() => api.trending(roleFilter, 8), [roleFilter])
   const { data: trending, loading: trendingLoading, error: trendingError, refetch: refetchTrending } = useApi(fetchTrending, [roleFilter])
@@ -167,9 +176,18 @@ export default function Trends() {
         ) : (
           <ResponsiveContainer width="100%" height={240}>
             <LineChart data={chartData} margin={{ top: 4, right: 16, bottom: 0, left: -10 }}>
-              <CartesianGrid />
-              <XAxis dataKey="week" />
-              <YAxis />
+              <CartesianGrid stroke={grid} />
+              <XAxis
+                dataKey="week"
+                tick={{ fill: axis, fontSize: 11 }}
+                axisLine={{ stroke: grid }}
+                tickLine={{ stroke: grid }}
+              />
+              <YAxis
+                tick={{ fill: axis, fontSize: 11 }}
+                axisLine={{ stroke: grid }}
+                tickLine={{ stroke: grid }}
+              />
               <Tooltip content={<TrendTooltip />} />
               <Legend />
               {top5Skills.map((s, i) => (
@@ -235,7 +253,7 @@ export default function Trends() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border">
+              <tr className="border-b border-border bg-void-700">
                 <th className="text-left px-5 py-3 label-mono text-[9px] font-normal text-ink-400">SKILL</th>
                 <th className="text-left px-4 py-3 label-mono text-[9px] font-normal text-ink-400">ROLE</th>
                 <th className="text-right px-4 py-3 label-mono text-[9px] font-normal text-ink-400">GROWTH</th>
@@ -271,7 +289,7 @@ export default function Trends() {
                 (emerging ?? []).map((row, i) => (
                   <tr
                     key={`${row.skill}:${row.role_category}:${i}`}
-                    className="border-b border-border hover:bg-void-700 transition-colors group"
+                    className="border-b border-border odd:bg-void-800 even:bg-void-900 hover:bg-void-700 transition-colors group"
                     style={{ animationDelay: `${i * 40}ms` }}
                   >
                     <td className="px-5 py-3 font-medium text-ink-100 group-hover:text-teal-signal transition-colors">
