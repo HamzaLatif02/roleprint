@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext'
 import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
 import { useCallback } from 'react'
+import { toTitleCase } from '../utils'
 
 const NAV = [
   {
@@ -134,7 +135,7 @@ export function Sidebar() {
           <option value="">All Roles</option>
           {roles?.map((r) => (
             <option key={r.role_category} value={r.role_category}>
-              {r.role_category}
+              {toTitleCase(r.role_category)}
             </option>
           ))}
         </select>

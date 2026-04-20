@@ -3,6 +3,7 @@ import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
 import { SkeletonChart } from '../components/Skeleton'
 import { FetchError } from '../components/ErrorBoundary'
+import { toTitleCase } from '../utils'
 
 function VennOverlap({ pct }) {
   // Visual overlap indicator: two overlapping circles, overlap width proportional to pct
@@ -123,7 +124,7 @@ export default function Comparison() {
               <option value="">Select role…</option>
               {(roles ?? []).map((r) => (
                 <option key={r.role_category} value={r.role_category} disabled={r.role_category === roleB}>
-                  {r.role_category}
+                  {toTitleCase(r.role_category)}
                 </option>
               ))}
             </select>
@@ -145,7 +146,7 @@ export default function Comparison() {
               <option value="">Select role…</option>
               {(roles ?? []).map((r) => (
                 <option key={r.role_category} value={r.role_category} disabled={r.role_category === roleA}>
-                  {r.role_category}
+                  {toTitleCase(r.role_category)}
                 </option>
               ))}
             </select>
