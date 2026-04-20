@@ -190,8 +190,8 @@ function RisingPill({ item }) {
 export default function Overview() {
   const { roleFilter } = useApp()
 
-  const fetchStats = useCallback(() => api.stats(), [])
-  const { data: stats, loading: statsLoading, error: statsError, refetch: refetchStats } = useApi(fetchStats)
+  const fetchStats = useCallback(() => api.stats(roleFilter), [roleFilter])
+  const { data: stats, loading: statsLoading, error: statsError, refetch: refetchStats } = useApi(fetchStats, [roleFilter])
 
   const fetchTrending = useCallback(() => api.trending(roleFilter, 4), [roleFilter])
   const { data: trending, loading: trendingLoading, error: trendingError, refetch: refetchTrending } = useApi(fetchTrending, [roleFilter])

@@ -15,7 +15,12 @@ async function apiFetch(path, opts = {}) {
 }
 
 export const api = {
-  stats: () => apiFetch('/api/stats/summary'),
+  stats: (roleCategory) => {
+    const params = new URLSearchParams()
+    if (roleCategory) params.set('role_category', roleCategory)
+    const qs = params.toString()
+    return apiFetch(`/api/stats/summary${qs ? `?${qs}` : ''}`)
+  },
 
   roles: () => apiFetch('/api/roles'),
 
