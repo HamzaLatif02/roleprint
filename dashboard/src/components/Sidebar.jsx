@@ -65,13 +65,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="px-5 pt-6 pb-5 border-b border-border">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-amber-faint border border-amber-muted flex items-center justify-center animate-pulse-amber">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <circle cx="7" cy="7" r="3" fill="#f5a623"/>
-              <circle cx="7" cy="7" r="5.5" stroke="#f5a623" strokeWidth="1" strokeOpacity="0.4"/>
-              <circle cx="7" cy="7" r="7.5" stroke="#f5a623" strokeWidth="0.5" strokeOpacity="0.15"/>
-            </svg>
-          </div>
+          <img src="/logo.png" alt="Roleprint logo" className="h-8 w-8 rounded-lg object-cover" />
           <div>
             <div className="font-display text-lg text-amber-glow glow-amber leading-none tracking-widest">ROLEPRINT</div>
             <div className="label-mono text-[9px] text-ink-400 leading-none mt-0.5">job market intelligence</div>
