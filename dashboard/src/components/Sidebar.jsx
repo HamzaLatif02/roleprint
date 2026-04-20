@@ -65,7 +65,9 @@ export function Sidebar() {
       {/* Logo */}
       <div className="px-5 pt-6 pb-5 border-b border-border">
         <div className="flex items-center gap-2.5">
-          <img src="/logo.png" alt="Roleprint logo" className="h-8 w-8 rounded-lg object-cover" />
+          <div className="w-9 h-9 rounded-lg bg-gray-900 flex items-center justify-center overflow-hidden shrink-0">
+            <img src="/logo.png" alt="Roleprint logo" className="w-full h-full object-contain" />
+          </div>
           <div>
             <div className="font-display text-lg text-amber-glow glow-amber leading-none tracking-widest">ROLEPRINT</div>
             <div className="label-mono text-[9px] text-ink-400 leading-none mt-0.5">job market intelligence</div>
