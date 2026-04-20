@@ -10,20 +10,30 @@ export default {
         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
       },
       colors: {
+        // These reference CSS variables so dark/light mode switching works.
+        // The variables are defined in index.css and swapped via html.light.
         void: {
-          950: '#04050c',
-          900: '#06070e',
-          800: '#0a0c18',
-          700: '#0e1020',
-          600: '#13162a',
-          500: '#1a1e34',
-          400: '#232840',
+          950: 'var(--void-950)',
+          900: 'var(--void-900)',
+          800: 'var(--void-800)',
+          700: 'var(--void-700)',
+          600: 'var(--void-600)',
+          500: 'var(--void-500)',
+          400: 'var(--void-400)',
         },
         border: {
-          DEFAULT: '#1e2238',
-          bright: '#2d3354',
-          glow: '#3d4a7a',
+          DEFAULT: 'var(--color-border)',
+          bright: 'var(--color-border-bright)',
+          glow: 'var(--color-border-glow)',
         },
+        ink: {
+          100: 'var(--ink-100)',
+          200: 'var(--ink-200)',
+          300: 'var(--ink-300)',
+          400: 'var(--ink-400)',
+          500: 'var(--ink-500)',
+        },
+        // Static accent colors — same in both modes
         amber: {
           glow: '#f5a623',
           dim: '#c47d12',
@@ -39,13 +49,6 @@ export default {
           signal: '#f05151',
           dim: '#b33636',
           faint: '#200d0d',
-        },
-        ink: {
-          100: '#d4d8f0',
-          200: '#a8aed4',
-          300: '#7c83b0',
-          400: '#565878',
-          500: '#363855',
         },
       },
       backgroundImage: {

@@ -3,19 +3,46 @@
 @tailwind utilities;
 
 @layer base {
+  /* ── Dark mode (default) ───────────────────────────────────────────────── */
   :root {
-    --amber: #f5a623;
-    --amber-dim: #c47d12;
-    --teal: #2dd4bf;
-    --rose: #f05151;
-    --void: #06070e;
-    --surface: #0a0c18;
-    --surface-raised: #0e1020;
-    --border: #1e2238;
-    --border-bright: #2d3354;
+    --void-950: #04050c;
+    --void-900: #06070e;
+    --void-800: #0a0c18;
+    --void-700: #0e1020;
+    --void-600: #13162a;
+    --void-500: #1a1e34;
+    --void-400: #232840;
+
+    --color-border: #1e2238;
+    --color-border-bright: #2d3354;
+    --color-border-glow: #3d4a7a;
+
     --ink-100: #d4d8f0;
     --ink-200: #a8aed4;
+    --ink-300: #7c83b0;
     --ink-400: #565878;
+    --ink-500: #363855;
+  }
+
+  /* ── Light mode ────────────────────────────────────────────────────────── */
+  html.light {
+    --void-950: #e2e5f5;
+    --void-900: #f0f2fa;
+    --void-800: #ffffff;
+    --void-700: #f7f8fd;
+    --void-600: #eef0f8;
+    --void-500: #e4e6f2;
+    --void-400: #d8daf0;
+
+    --color-border: #dde0ee;
+    --color-border-bright: #c4c9e0;
+    --color-border-glow: #9da5cc;
+
+    --ink-100: #1a1e34;
+    --ink-200: #363855;
+    --ink-300: #565878;
+    --ink-400: #7c83b0;
+    --ink-500: #a8aed4;
   }
 
   * {
@@ -37,34 +64,16 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #0a0c18;
+    background: var(--void-800);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #2d3354;
+    background: var(--color-border-bright);
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
     background: #f5a623;
-  }
-
-  /* Light mode overrides */
-  html.light {
-    --void: #f0f2fa;
-    --surface: #ffffff;
-    --surface-raised: #f7f8fd;
-    --border: #dde0ee;
-    --border-bright: #c4c9e0;
-    --ink-100: #1a1e34;
-    --ink-200: #363855;
-    --ink-400: #7c83b0;
-  }
-
-  html.light body {
-    @apply bg-slate-50 text-slate-900;
-    background-color: #f0f2fa;
-    color: #1a1e34;
   }
 }
 
