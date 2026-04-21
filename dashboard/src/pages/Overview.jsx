@@ -15,8 +15,8 @@ import { getRelativeTime } from '../utils'
 function useChartColors() {
   const isDark = document.documentElement.classList.contains('dark')
   return {
-    axis: isDark ? '#565878' : '#4b5563',
-    grid: isDark ? '#1e2238' : '#e2e5f0',
+    axis: isDark ? '#565878' : '#374151',
+    grid: isDark ? '#1e2238' : '#e5e7eb',
   }
 }
 

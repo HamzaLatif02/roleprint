@@ -27,16 +27,16 @@
   /* ── Light mode ────────────────────────────────────────────────────────── */
   html.light {
     --void-950: #e8eaf5;
-    --void-900: #f1f3fa;
-    --void-800: #ffffff;
-    --void-700: #f7f8fd;
-    --void-600: #eef0f8;
+    --void-900: #f9fafb;   /* gray-50  — page background */
+    --void-800: #ffffff;   /* white    — cards, panels */
+    --void-700: #f3f4f6;   /* gray-100 — sidebar, table headers, hover states */
+    --void-600: #e9eaed;   /* gray-150 — subtle backgrounds */
     --void-500: #e4e6f2;
     --void-400: #d5d8ed;
 
-    --color-border: #e2e5f0;
-    --color-border-bright: #c8cde3;
-    --color-border-glow: #a0a8cc;
+    --color-border: #e5e7eb;        /* gray-200 — standard borders */
+    --color-border-bright: #d1d5db; /* gray-300 — prominent borders */
+    --color-border-glow: #9ca3af;   /* gray-400 — glow/focus borders */
 
     /* True grays for readable text on white */
     --ink-100: #111827;   /* gray-900 — headings, primary text */
@@ -195,6 +195,13 @@
     @apply rounded-lg border border-border-bright bg-void-700 shadow-card p-3 font-sans text-sm;
   }
 
+  html.light .recharts-tooltip-wrapper .custom-tooltip {
+    background: #ffffff;
+    border-color: #d1d5db;
+    color: #1f2937;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
   /* Glow text */
   .glow-amber {
     text-shadow: 0 0 20px rgba(245,166,35,0.4);
@@ -210,6 +217,10 @@
     background-repeat: no-repeat;
     background-position: right 10px center;
     padding-right: 30px;
+  }
+
+  html.light select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234b5563' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
 
   select:focus {
