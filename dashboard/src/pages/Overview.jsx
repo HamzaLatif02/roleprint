@@ -8,6 +8,7 @@ import { useApp } from '../context/AppContext'
 import { SkeletonStat, SkeletonChart } from '../components/Skeleton'
 import { FetchError } from '../components/ErrorBoundary'
 import { ExportButton } from '../components/ExportButton'
+import { getRelativeTime } from '../utils'
 
 function useChartColors() {
   const isDark = document.documentElement.classList.contains('dark')
@@ -45,10 +46,14 @@ function StatBar({ data, loading, error, refetch }) {
     },
     {
       label: 'Last Updated',
-      value: data?.last_updated
-        ? new Date(data.last_updated).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
-        : null,
-      sub: data?.sources?.join(' · ') ?? '—',
+      value: getRelativeTime(data?.last_scraped) ?? '—',
+      sub: data?.last_scraped
+        ? new Date(data.last_scraped).toLocaleString('en-GB', {
+            day: 'numeric', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', timeZoneName: 'short',
+          })
+        : '—',
+      sub2: data?.sources?.join(' · ') ?? '—',
       color: '#fb7185',
       mono: true,
     },
@@ -77,12 +82,15 @@ function StatBar({ data, loading, error, refetch }) {
             {s.label.toUpperCase()}
           </div>
           <div
-            className={`leading-none mb-1.5 ${s.mono ? 'font-mono text-2xl font-bold' : 'font-display text-4xl'}`}
+            className={`leading-none mb-1.5 ${s.mono ? 'font-mono text-xl font-bold' : 'font-display text-4xl'}`}
             style={{ color: s.color, textShadow: `0 0 20px ${s.color}30` }}
           >
             {s.value ?? '—'}
           </div>
           <div className="font-mono text-[10px] text-ink-400 truncate">{s.sub}</div>
+          {s.sub2 && (
+            <div className="font-mono text-[9px] text-ink-500 truncate mt-0.5">{s.sub2}</div>
+          )}
           <div
             className="absolute bottom-0 left-0 right-0 h-0.5 rounded-b-xl opacity-0 group-hover:opacity-100 transition-opacity"
             style={{ background: `linear-gradient(90deg, transparent, ${s.color}60, transparent)` }}

@@ -67,11 +67,13 @@ def get_stats_summary(
             .where(JobPosting.role_category == role, JobPosting.source.isnot(None))
         ))
 
+        last_scraped_str = str(last_updated) if last_updated else None
         result = {
             "total_postings": total,
             "processed_postings": processed,
             "unprocessed_postings": total - processed,
-            "last_updated": str(last_updated) if last_updated else None,
+            "last_updated": last_scraped_str,
+            "last_scraped": last_scraped_str,
             "roles_tracked": 1,
             "weeks_of_data": weeks_of_data,
             "sources": sorted(source_rows),
@@ -95,11 +97,13 @@ def get_stats_summary(
             select(distinct(JobPosting.source)).where(JobPosting.source.isnot(None))
         ))
 
+        last_scraped_str = str(last_updated) if last_updated else None
         result = {
             "total_postings": total,
             "processed_postings": processed,
             "unprocessed_postings": total - processed,
-            "last_updated": str(last_updated) if last_updated else None,
+            "last_updated": last_scraped_str,
+            "last_scraped": last_scraped_str,
             "roles_tracked": roles_tracked,
             "weeks_of_data": weeks_of_data,
             "sources": sorted(source_rows),

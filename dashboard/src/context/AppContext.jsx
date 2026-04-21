@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useCallback, useContext, useState, useEffect } from 'react'
 
 const AppContext = createContext(null)
 
@@ -6,6 +6,10 @@ export function AppProvider({ children }) {
   const [roleFilter, setRoleFilter] = useState('')
   const [darkMode, setDarkMode] = useState(true)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  // Global stats — used by the navbar staleness indicator
+  const [lastScraped, setLastScraped] = useState(null)
+  const [statsRefreshing, setStatsRefreshing] = useState(false)
 
   // Persist dark mode preference
   useEffect(() => {
@@ -24,6 +28,28 @@ export function AppProvider({ children }) {
     }
   }, [darkMode])
 
+  // Fetch stats summary for the active role filter (used by navbar indicator)
+  const refetchStats = useCallback(async () => {
+    setStatsRefreshing(true)
+    try {
+      const params = new URLSearchParams()
+      if (roleFilter) params.set('role_category', roleFilter)
+      const qs = params.toString()
+      const res = await fetch(`/api/stats/summary${qs ? `?${qs}` : ''}`)
+      if (res.ok) {
+        const data = await res.json()
+        setLastScraped(data.last_scraped ?? data.last_updated ?? null)
+      }
+    } catch {
+      // silently ignore — indicator stays at last known value
+    } finally {
+      setStatsRefreshing(false)
+    }
+  }, [roleFilter])
+
+  // Re-fetch whenever the role filter changes or on mount
+  useEffect(() => { refetchStats() }, [refetchStats])
+
   // Close sidebar on route change (mobile)
   const closeSidebar = () => setSidebarOpen(false)
 
@@ -37,6 +63,9 @@ export function AppProvider({ children }) {
         sidebarOpen,
         setSidebarOpen,
         closeSidebar,
+        lastScraped,
+        statsRefreshing,
+        refetchStats,
       }}
     >
       {children}

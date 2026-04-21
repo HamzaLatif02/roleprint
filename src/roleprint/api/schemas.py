@@ -106,6 +106,10 @@ class StatsSummary(BaseModel):
     processed_postings: int
     unprocessed_postings: int
     last_updated: Optional[str] = None
+    last_scraped: Optional[str] = Field(
+        default=None,
+        description="ISO timestamp of the most recent scraped_at in job_postings for the queried scope",
+    )
     roles_tracked: int
     weeks_of_data: int
     sources: List[str] = Field(default_factory=list)
