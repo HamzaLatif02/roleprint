@@ -8,6 +8,7 @@ import { api } from '../api/client'
 import { useApp } from '../context/AppContext'
 import { SkeletonChart } from '../components/Skeleton'
 import { FetchError } from '../components/ErrorBoundary'
+import { EmptyState, EmptyStateRow } from '../components/EmptyState'
 
 const AMBER = '#f5a623'
 const TEAL = '#2dd4bf'
@@ -167,9 +168,12 @@ export default function Sentiment() {
         ) : error ? (
           <FetchError message={error} onRetry={refetch} />
         ) : weeks.length === 0 ? (
-          <div className="h-60 flex items-center justify-center text-ink-400 font-mono text-xs">
-            No sentiment data yet
-          </div>
+          <EmptyState
+            icon="〰️"
+            title="NO SENTIMENT DATA"
+            message="No sentiment data available for this selection yet. Try clearing the role filter or check back after the next scrape run."
+            className="h-60"
+          />
         ) : (
           <ResponsiveContainer width="100%" height={280}>
             <ComposedChart data={weeks} margin={{ top: 4, right: 24, bottom: 0, left: -10 }}>
@@ -279,11 +283,12 @@ export default function Sentiment() {
                 </tr>
               ))}
               {!loading && weeks.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="px-5 py-10 text-center text-ink-400 font-mono text-xs">
-                    No sentiment data available
-                  </td>
-                </tr>
+                <EmptyStateRow
+                  colSpan={4}
+                  icon="〰️"
+                  title="NO WEEKLY DATA"
+                  message="No sentiment records found for this selection."
+                />
               )}
             </tbody>
           </table>

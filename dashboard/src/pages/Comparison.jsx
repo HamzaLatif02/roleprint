@@ -3,6 +3,7 @@ import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
 import { SkeletonChart } from '../components/Skeleton'
 import { FetchError } from '../components/ErrorBoundary'
+import { EmptyState } from '../components/EmptyState'
 import { toTitleCase } from '../utils'
 
 function VennOverlap({ pct }) {
@@ -274,9 +275,13 @@ export default function Comparison() {
       )}
 
       {!result && !loading && !error && (
-        <div className="card p-16 text-center">
-          <div className="font-display text-4xl text-ink-500 tracking-widest mb-3">SELECT TWO ROLES</div>
-          <p className="font-mono text-xs text-ink-400">Choose roles above and click Analyze to compare skill profiles</p>
+        <div className="card">
+          <EmptyState
+            icon="⚖️"
+            title="SELECT TWO ROLES"
+            message="Choose two roles above and click Analyze to compare their skill profiles side by side."
+            className="h-64"
+          />
         </div>
       )}
     </div>

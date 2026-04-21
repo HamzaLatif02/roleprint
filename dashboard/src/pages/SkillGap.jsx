@@ -3,6 +3,7 @@ import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
 import { FetchError } from '../components/ErrorBoundary'
 import { ExportButton } from '../components/ExportButton'
+import { EmptyState } from '../components/EmptyState'
 import { toTitleCase } from '../utils'
 
 const LS_KEY = 'roleprint:skill-gap:skills'
@@ -413,11 +414,13 @@ export default function SkillGap() {
 
           {/* No data state */}
           {result.matched_skills.length === 0 && result.missing_skills.length === 0 && (
-            <div className="card p-12 text-center">
-              <div className="font-display text-3xl text-ink-500 tracking-widest mb-2">NO DATA YET</div>
-              <p className="font-mono text-xs text-ink-400">
-                No skill data available for this role yet — check back after the next scrape run
-              </p>
+            <div className="card">
+              <EmptyState
+                icon="📭"
+                title="NO ROLE DATA"
+                message="No skill data available for this role yet — check back after the next scrape run."
+                className="h-48"
+              />
             </div>
           )}
 
@@ -458,12 +461,13 @@ export default function SkillGap() {
 
       {/* Empty state before first analysis */}
       {!result && !loading && !error && (
-        <div className="card p-14 text-center border-dashed">
-          <div className="font-display text-4xl text-ink-500 tracking-widest mb-3">READY TO ANALYSE</div>
-          <p className="font-mono text-xs text-ink-400 max-w-sm mx-auto">
-            Select a target role, add the skills you already have, then click{' '}
-            <span className="text-ink-200">Analyse Gap</span> to see what you're missing
-          </p>
+        <div className="card border-dashed">
+          <EmptyState
+            icon="🎯"
+            title="READY TO ANALYSE"
+            message="Select a target role, add the skills you already have, then click Analyse Gap to see what you're missing."
+            className="h-56"
+          />
         </div>
       )}
     </div>

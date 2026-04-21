@@ -8,6 +8,7 @@ import { useApp } from '../context/AppContext'
 import { SkeletonStat, SkeletonChart } from '../components/Skeleton'
 import { FetchError } from '../components/ErrorBoundary'
 import { ExportButton } from '../components/ExportButton'
+import { EmptyState, EmptyStateRow } from '../components/EmptyState'
 import { getRelativeTime } from '../utils'
 
 function useChartColors() {
@@ -152,9 +153,12 @@ function SkillsChart({ data, loading, error, refetch, roleFilter }) {
       </div>
 
       {top10.length === 0 ? (
-        <div className="h-60 flex items-center justify-center text-ink-400 font-mono text-xs">
-          No data yet
-        </div>
+        <EmptyState
+          icon="📊"
+          title="NO SKILLS YET"
+          message="No skill data available for this selection. Try clearing the role filter or check back after the next scrape run."
+          className="h-60"
+        />
       ) : (
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={top10} margin={{ top: 0, right: 8, bottom: 0, left: -10 }} barCategoryGap="30%">
@@ -233,6 +237,16 @@ export default function Overview() {
       {/* Stats */}
       <StatBar data={stats} loading={statsLoading} error={statsError} refetch={refetchStats} />
 
+      {/* Global empty state — no data scraped yet */}
+      {!statsLoading && !statsError && stats?.total_postings === 0 && (
+        <EmptyState
+          icon="🌅"
+          title="WARMING UP"
+          message="The database is empty — no postings have been scraped yet. Run the scraper to start collecting data."
+          className="h-72"
+        />
+      )}
+
       {/* Charts row */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
         {/* Main bar chart — takes 2/3 */}
@@ -264,9 +278,12 @@ export default function Overview() {
           ) : trendingError ? (
             <FetchError message={trendingError} onRetry={refetchTrending} />
           ) : rising.length === 0 ? (
-            <div className="text-center py-8 text-ink-400 font-mono text-xs">
-              No rising skills detected
-            </div>
+            <EmptyState
+              icon="📈"
+              title="NONE RISING"
+              message="No skills detected with >20% week-over-week growth this week."
+              className="h-40"
+            />
           ) : (
             <div>
               {rising.map((item) => (
@@ -305,6 +322,15 @@ export default function Overview() {
                     ))}
                   </tr>
                 ))
+              ) : (trending ?? []).length === 0 ? (
+                <EmptyStateRow
+                  colSpan={5}
+                  icon="🗂"
+                  title="NO SKILLS TRACKED"
+                  message={roleFilter
+                    ? 'No skills found for this role. Try clearing the role filter.'
+                    : 'No skills have been extracted yet. The pipeline needs to process some postings first.'}
+                />
               ) : (trending ?? []).map((row) => {
                 const wow = row.wow_change
                 const sign = wow > 0 ? '+' : ''
@@ -331,12 +357,6 @@ export default function Overview() {
               })}
             </tbody>
           </table>
-          {!trendingLoading && (trending ?? []).length === 0 && (
-            <div className="text-center py-12 text-ink-400 font-mono text-xs">
-              No skill data available yet.
-              {roleFilter && ' Try clearing the role filter.'}
-            </div>
-          )}
         </div>
       </div>
     </div>

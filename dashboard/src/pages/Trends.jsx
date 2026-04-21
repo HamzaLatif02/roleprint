@@ -9,6 +9,7 @@ import { useApp } from '../context/AppContext'
 import { SkeletonChart, SkeletonRow } from '../components/Skeleton'
 import { FetchError } from '../components/ErrorBoundary'
 import { ExportButton } from '../components/ExportButton'
+import { EmptyState, EmptyStateRow } from '../components/EmptyState'
 
 const PALETTE = ['#f5a623', '#2dd4bf', '#818cf8', '#fb7185', '#4ade80']
 
@@ -174,9 +175,12 @@ export default function Trends() {
         ) : trendingError ? (
           <FetchError message={trendingError} onRetry={refetchTrending} />
         ) : chartData.length === 0 ? (
-          <div className="h-60 flex items-center justify-center text-ink-400 font-mono text-xs">
-            No trend data available
-          </div>
+          <EmptyState
+            icon="📈"
+            title="NO TREND DATA"
+            message="Not enough data to show skill momentum yet. Check back after more postings are scraped."
+            className="h-60"
+          />
         ) : (
           <ResponsiveContainer width="100%" height={240}>
             <LineChart data={chartData} margin={{ top: 4, right: 16, bottom: 0, left: -10 }}>
@@ -230,8 +234,13 @@ export default function Trends() {
         ) : trendingError ? (
           <FetchError message={trendingError} onRetry={refetchTrending} />
         ) : risingSkills.length === 0 ? (
-          <div className="card p-8 text-center text-ink-400 font-mono text-xs">
-            No rising skills detected this week
+          <div className="card">
+            <EmptyState
+              icon="🚀"
+              title="NONE RISING"
+              message="No skills with >20% week-over-week growth detected this week."
+              className="h-36"
+            />
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -284,11 +293,12 @@ export default function Trends() {
                   </td>
                 </tr>
               ) : (emerging ?? []).length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-ink-400 font-mono text-xs">
-                    No emerging skills detected yet
-                  </td>
-                </tr>
+                <EmptyStateRow
+                  colSpan={6}
+                  icon="🌱"
+                  title="NOTHING EMERGING"
+                  message="No newly prominent skills detected in the last 6 weeks."
+                />
               ) : (
                 (emerging ?? []).map((row, i) => (
                   <tr
