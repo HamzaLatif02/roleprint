@@ -23,6 +23,7 @@ from sqlalchemy.orm import Session
 
 from roleprint.db.models import JobPosting
 from roleprint.db.session import SessionLocal
+from roleprint.scraper.adzuna_scraper import AdzunaScraper
 from roleprint.scraper.reed import ReedScraper
 from roleprint.scraper.remoteok import RemoteOKScraper
 
@@ -46,6 +47,9 @@ ROLE_CATEGORIES: List[str] = [
 # How many pages to scrape per role on Reed
 REED_PAGES_PER_ROLE = int(os.getenv("REED_PAGES_PER_ROLE", "3"))
 REED_LOCATION = os.getenv("REED_LOCATION", "United Kingdom")
+
+# How many pages to scrape per role on Adzuna
+ADZUNA_PAGES_PER_ROLE = int(os.getenv("ADZUNA_PAGES_PER_ROLE", "3"))
 
 
 # ── helpers ────────────────────────────────────────────────────────────────────
@@ -122,6 +126,38 @@ async def scrape_remoteok(session: Session) -> dict:
     return dict(counts)
 
 
+# ── Adzuna scrape ──────────────────────────────────────────────────────────────
+
+async def scrape_adzuna(session: Session) -> dict:
+    """Run the Adzuna scraper across all role categories.
+
+    Skipped gracefully if ``ADZUNA_APP_ID`` or ``ADZUNA_APP_KEY`` are unset.
+    """
+    import os
+
+    if not os.getenv("ADZUNA_APP_ID") or not os.getenv("ADZUNA_APP_KEY"):
+        log.warning("runner.adzuna.skipped", reason="ADZUNA_APP_ID/ADZUNA_APP_KEY not set")
+        return {}
+
+    counts: dict = defaultdict(int)
+
+    async with AdzunaScraper() as scraper:
+        for role in ROLE_CATEGORIES:
+            log.info("runner.adzuna.start", role=role)
+            try:
+                raw = await scraper.search(role, pages=ADZUNA_PAGES_PER_ROLE)
+                new = scraper.deduplicate(raw, session)
+                saved = _save_postings(new, session)
+                session.commit()
+                counts[role] = saved
+                log.info("runner.adzuna.done", role=role, fetched=len(raw), saved=saved)
+            except Exception as exc:
+                log.error("runner.adzuna.error", role=role, error=str(exc))
+                session.rollback()
+
+    return dict(counts)
+
+
 # ── orchestrator ───────────────────────────────────────────────────────────────
 
 async def run_all(session: Optional[Session] = None) -> dict:
@@ -137,17 +173,23 @@ async def run_all(session: Optional[Session] = None) -> dict:
     if own_session:
         session = SessionLocal()
 
-    summary: dict = {"reed": {}, "remoteok": {}}
+    summary: dict = {"reed": {}, "remoteok": {}, "adzuna": {}}
     try:
         log.info("runner.start", roles=len(ROLE_CATEGORIES))
 
         reed_counts = await scrape_reed(session)
         remoteok_counts = await scrape_remoteok(session)
+        adzuna_counts = await scrape_adzuna(session)
 
         summary["reed"] = reed_counts
         summary["remoteok"] = remoteok_counts
+        summary["adzuna"] = adzuna_counts
 
-        total = sum(reed_counts.values()) + sum(remoteok_counts.values())
+        total = (
+            sum(reed_counts.values())
+            + sum(remoteok_counts.values())
+            + sum(adzuna_counts.values())
+        )
         log.info("runner.complete", total_saved=total, summary=summary)
 
     except Exception as exc:

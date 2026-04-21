@@ -18,6 +18,9 @@
 #   SITE_URL            https://roleprint.xyz
 #   CORS_ORIGINS        https://roleprint.xyz,https://www.roleprint.xyz
 #   SCRAPE_INTERVAL_HRS 6
+#   ADZUNA_APP_ID       your Adzuna app ID (https://developer.adzuna.com/)
+#   ADZUNA_APP_KEY      your Adzuna app key
+#   ADZUNA_PAGES_PER_ROLE 3
 
 [build]
 builder = "DOCKERFILE"

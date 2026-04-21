@@ -1,0 +1,71 @@
+{
+  "results": [
+    {
+      "id": "4290123456",
+      "title": "Senior Data Analyst",
+      "redirect_url": "https://www.adzuna.co.uk/jobs/details/4290123456",
+      "company": {
+        "display_name": "Acme Analytics Ltd"
+      },
+      "location": {
+        "display_name": "London, Greater London"
+      },
+      "description": "We are seeking a Senior Data Analyst with strong Python and SQL skills. You will work with large datasets, build dashboards in Tableau, and collaborate with stakeholders.",
+      "created": "2026-04-15T09:30:00Z",
+      "salary_min": 55000,
+      "salary_max": 70000
+    },
+    {
+      "id": "4290123457",
+      "title": "Data Analyst – BI & Reporting",
+      "redirect_url": "https://www.adzuna.co.uk/jobs/details/4290123457",
+      "company": {
+        "display_name": "FinTech Solutions"
+      },
+      "location": {
+        "display_name": "Manchester, Greater Manchester"
+      },
+      "description": "Exciting opportunity for a Data Analyst to join our growing BI team. Experience with Power BI and Excel required.",
+      "created": "2026-04-14T14:00:00Z",
+      "salary_min": 40000,
+      "salary_max": 50000
+    },
+    {
+      "id": "4290123458",
+      "title": "Junior Data Analyst",
+      "redirect_url": "https://www.adzuna.co.uk/jobs/details/4290123458",
+      "company": {
+        "display_name": "StartUp Co"
+      },
+      "location": {
+        "display_name": "Remote"
+      },
+      "description": "Looking for a Junior Data Analyst to join our data team. Training provided. Knowledge of SQL a plus.",
+      "created": null,
+      "salary_min": 28000,
+      "salary_max": 35000
+    },
+    {
+      "id": "4290123459",
+      "title": "",
+      "redirect_url": "https://www.adzuna.co.uk/jobs/details/4290123459",
+      "company": {
+        "display_name": "Missing Title Corp"
+      },
+      "location": {
+        "display_name": "Birmingham"
+      },
+      "description": "This posting has no title and should be skipped.",
+      "created": "2026-04-13T08:00:00Z"
+    },
+    {
+      "id": "4290123460",
+      "title": "Data Analyst – No URL",
+      "redirect_url": "",
+      "company": null,
+      "location": null,
+      "description": null,
+      "created": "2026-04-12T10:00:00Z"
+    }
+  ]
+}
