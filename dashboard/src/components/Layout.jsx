@@ -14,7 +14,7 @@ const PAGE_TITLES = {
 }
 
 export function Layout({ children }) {
-  const { sidebarOpen, setSidebarOpen, closeSidebar, lastScraped, statsRefreshing, refetchStats } = useApp()
+  const { sidebarOpen, setSidebarOpen, closeSidebar, lastScraped } = useApp()
   const location = useLocation()
   const title = PAGE_TITLES[location.pathname] ?? 'Roleprint'
 
@@ -76,41 +76,20 @@ export function Layout({ children }) {
           </div>
 
           {/* Staleness indicator */}
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex items-center gap-1.5 min-w-0">
             {lastScraped ? (
-              <div className="flex items-center gap-1.5 min-w-0">
+              <>
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-signal animate-pulse shrink-0 hidden sm:block" />
                 <span className={`label-mono text-[9px] truncate hidden sm:block ${stalenessColor(lastScraped)}`}>
                   {getRelativeTime(lastScraped)}
                 </span>
-              </div>
+              </>
             ) : (
-              <div className="flex items-center gap-1.5">
+              <>
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-signal animate-pulse shrink-0" />
                 <span className="label-mono text-[9px] text-ink-400 hidden sm:block">LIVE</span>
-              </div>
+              </>
             )}
-            <button
-              onClick={refetchStats}
-              disabled={statsRefreshing}
-              aria-label="Refresh data timestamp"
-              className="p-1 rounded text-ink-500 hover:text-ink-200 transition-colors disabled:cursor-not-allowed"
-              title="Refresh timestamp"
-            >
-              <svg
-                width="12" height="12" viewBox="0 0 14 14" fill="none"
-                className={statsRefreshing ? 'animate-spin' : ''}
-              >
-                <path
-                  d="M13 7A6 6 0 1 1 7 1"
-                  stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
-                />
-                <path
-                  d="M7 1l2.5 2.5L7 6"
-                  stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-                />
-              </svg>
-            </button>
           </div>
         </header>
 
