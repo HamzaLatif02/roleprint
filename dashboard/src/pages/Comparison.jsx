@@ -113,8 +113,8 @@ export default function Comparison() {
 
       {/* Role selectors */}
       <div className="card p-5 mb-5">
-        <div className="flex flex-col sm:flex-row items-end gap-3">
-          <div className="flex-1">
+        <div className="flex flex-col items-center sm:flex-row sm:items-end gap-0 sm:gap-3">
+          <div className="w-full sm:flex-1">
             <label className="label-mono text-[9px] text-ink-400 block mb-1.5">ROLE A</label>
             <select
               value={roleA}
@@ -132,11 +132,11 @@ export default function Comparison() {
           </div>
 
           {/* VS divider */}
-          <div className="flex items-center justify-center w-10 h-9 shrink-0">
+          <div className="flex items-center justify-center w-full my-4 sm:w-10 sm:h-9 sm:my-0 sm:shrink-0">
             <span className="font-display text-xl text-ink-400 tracking-widest">VS</span>
           </div>
 
-          <div className="flex-1">
+          <div className="w-full sm:flex-1">
             <label className="label-mono text-[9px] text-ink-400 block mb-1.5">ROLE B</label>
             <select
               value={roleB}
@@ -156,7 +156,7 @@ export default function Comparison() {
           <button
             onClick={handleCompare}
             disabled={!canCompare}
-            className={`btn-primary shrink-0 h-9 ${!canCompare ? 'opacity-40 cursor-not-allowed' : ''}`}
+            className={`btn-primary w-full justify-center mt-4 sm:mt-0 sm:w-auto sm:shrink-0 sm:h-9 ${!canCompare ? 'opacity-40 cursor-not-allowed' : ''}`}
           >
             Analyze
           </button>
