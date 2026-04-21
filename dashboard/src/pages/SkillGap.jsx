@@ -194,6 +194,7 @@ export default function SkillGap() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [activeTab, setActiveTab] = useState('missing')
 
   // Persist on change
   useEffect(() => {
@@ -237,6 +238,7 @@ export default function SkillGap() {
     try {
       const data = await api.skillGap(selectedRole, skills)
       setResult(data)
+      setActiveTab('missing')
     } catch (err) {
       setError({
         type: err.type ?? (!navigator.onLine ? 'offline' : err.name === 'AbortError' ? 'timeout' : 'unknown'),
@@ -258,10 +260,10 @@ export default function SkillGap() {
     : '#fb7185'
 
   return (
-    <div className="p-5 lg:p-7 max-w-5xl mx-auto">
+    <div className="p-3 sm:p-5 lg:p-7 max-w-5xl mx-auto">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="font-display text-3xl tracking-widest text-gradient-amber mb-1">SKILL GAP</h1>
+      <div className="mb-5 sm:mb-6">
+        <h1 className="font-display text-2xl sm:text-3xl tracking-widest text-gradient-amber mb-1">SKILL GAP</h1>
         <p className="font-mono text-xs text-ink-400">
           Compare your skills against real job posting data
         </p>
@@ -328,11 +330,11 @@ export default function SkillGap() {
         )}
 
         {/* Analyse button */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <button
             onClick={handleAnalyse}
             disabled={!canAnalyse}
-            className={`btn-primary ${!canAnalyse ? 'opacity-40 cursor-not-allowed' : ''}`}
+            className={`btn-primary w-full sm:w-auto justify-center ${!canAnalyse ? 'opacity-40 cursor-not-allowed' : ''}`}
           >
             {loading ? (
               <span className="flex items-center gap-2">
@@ -431,27 +433,46 @@ export default function SkillGap() {
           {/* Three-column breakdown */}
           {(result.matched_skills.length > 0 || result.missing_skills.length > 0) && (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <SkillColumn
-                  title="✓ SKILLS YOU HAVE"
-                  count={`${result.matched_skills.length} matched`}
-                  skills={result.matched_skills}
-                  accentColor="#4ade80"
-                />
-                <SkillColumn
-                  title="✗ SKILLS TO LEARN"
-                  count={`${result.missing_skills.length} missing`}
-                  skills={result.missing_skills}
-                  accentColor="#fb7185"
-                />
-                <SkillColumn
-                  title="~ BONUS SKILLS"
-                  count={`${result.bonus_skills.length} bonus`}
-                  skills={result.bonus_skills}
-                  accentColor="#94a3b8"
-                  dimmed
-                />
+              {/* Mobile tab switcher */}
+              <div className="flex md:hidden border border-border rounded-lg overflow-hidden">
+                {[
+                  { id: 'matched', label: `Have (${result.matched_skills.length})`, color: '#4ade80' },
+                  { id: 'missing', label: `Learn (${result.missing_skills.length})`, color: '#fb7185' },
+                  { id: 'bonus',   label: `Bonus (${result.bonus_skills.length})`,   color: '#94a3b8' },
+                ].map((tab, i) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex-1 py-2.5 font-mono text-[10px] transition-colors border-r last:border-r-0 border-border ${
+                      activeTab === tab.id ? 'bg-void-700' : 'bg-void-800 text-ink-400 hover:text-ink-200'
+                    }`}
+                    style={activeTab === tab.id ? { color: tab.color } : {}}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
+
+              {/* Mobile: show active tab only */}
+              <div className="md:hidden">
+                {activeTab === 'matched' && (
+                  <SkillColumn title="✓ SKILLS YOU HAVE" count={`${result.matched_skills.length} matched`} skills={result.matched_skills} accentColor="#4ade80" />
+                )}
+                {activeTab === 'missing' && (
+                  <SkillColumn title="✗ SKILLS TO LEARN" count={`${result.missing_skills.length} missing`} skills={result.missing_skills} accentColor="#fb7185" />
+                )}
+                {activeTab === 'bonus' && (
+                  <SkillColumn title="~ BONUS SKILLS" count={`${result.bonus_skills.length} bonus`} skills={result.bonus_skills} accentColor="#94a3b8" dimmed />
+                )}
+              </div>
+
+              {/* Desktop: all 3 columns side by side */}
+              <div className="hidden md:grid md:grid-cols-3 gap-4">
+                <SkillColumn title="✓ SKILLS YOU HAVE" count={`${result.matched_skills.length} matched`} skills={result.matched_skills} accentColor="#4ade80" />
+                <SkillColumn title="✗ SKILLS TO LEARN" count={`${result.missing_skills.length} missing`} skills={result.missing_skills} accentColor="#fb7185" />
+                <SkillColumn title="~ BONUS SKILLS"    count={`${result.bonus_skills.length} bonus`}   skills={result.bonus_skills}   accentColor="#94a3b8" dimmed />
+              </div>
+
               <div className="flex justify-end pt-1">
                 <ExportButton
                   href={`/api/export/skills/gap?role_category=${encodeURIComponent(result.role_category)}&user_skills=${encodeURIComponent(skills.join(','))}`}

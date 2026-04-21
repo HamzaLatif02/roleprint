@@ -105,9 +105,9 @@ export default function Comparison() {
   const shared = result?.shared_skills ?? []
 
   return (
-    <div className="p-5 lg:p-7 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="font-display text-3xl tracking-widest text-gradient-amber mb-1">COMPARE</h1>
+    <div className="p-3 sm:p-5 lg:p-7 max-w-7xl mx-auto">
+      <div className="mb-5 sm:mb-6">
+        <h1 className="font-display text-2xl sm:text-3xl tracking-widest text-gradient-amber mb-1">COMPARE</h1>
         <p className="font-mono text-xs text-ink-400">Role-to-role skill overlap analysis</p>
       </div>
 
@@ -175,14 +175,14 @@ export default function Comparison() {
         <div className="animate-fade-in">
           {/* Score strip */}
           <div className="grid grid-cols-2 gap-3 mb-5">
-            <div className="card p-5 text-center border-glow-amber">
+            <div className="card p-3 sm:p-5 text-center border-glow-amber">
               <div className="label-mono text-[9px] text-ink-400 mb-2">SKILL OVERLAP</div>
-              <div className="font-display text-5xl text-amber-glow glow-amber">{overlap}%</div>
+              <div className="font-display text-3xl sm:text-5xl text-amber-glow glow-amber">{overlap}%</div>
               <div className="font-mono text-[10px] text-ink-400 mt-1">Jaccard similarity</div>
             </div>
-            <div className="card p-5 text-center">
+            <div className="card p-3 sm:p-5 text-center">
               <div className="label-mono text-[9px] text-ink-400 mb-2">COSINE SIMILARITY</div>
-              <div className="font-display text-5xl text-teal-signal">{similarity}%</div>
+              <div className="font-display text-3xl sm:text-5xl text-teal-signal">{similarity}%</div>
               <div className="font-mono text-[10px] text-ink-400 mt-1">vector similarity</div>
             </div>
           </div>

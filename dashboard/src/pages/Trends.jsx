@@ -1,12 +1,11 @@
 import { useCallback } from 'react'
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  BarChart, Bar, Cell,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
 import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
 import { useApp } from '../context/AppContext'
-import { SkeletonChart, SkeletonRow } from '../components/Skeleton'
+import { SkeletonChart } from '../components/Skeleton'
 import { ErrorState, ErrorStateRow } from '../components/ErrorState'
 import { ExportButton } from '../components/ExportButton'
 import { EmptyState, EmptyStateRow } from '../components/EmptyState'
@@ -52,20 +51,18 @@ function SparklineCard({ item, color }) {
 
   return (
     <div className="card card-hover p-4 group relative overflow-hidden">
-      {/* Accent line */}
       <div
         className="absolute top-0 left-0 right-0 h-0.5 opacity-50"
         style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}
       />
-
       <div className="flex items-start justify-between mb-3">
-        <div>
-          <div className="font-medium text-ink-100 group-hover:text-amber-glow transition-colors text-sm leading-tight">
+        <div className="min-w-0">
+          <div className="font-medium text-ink-100 group-hover:text-amber-glow transition-colors text-sm leading-tight truncate">
             {item.skill}
           </div>
-          <div className="font-mono text-[10px] text-ink-400 mt-0.5">{item.role_category}</div>
+          <div className="font-mono text-[10px] text-ink-400 mt-0.5 truncate">{item.role_category}</div>
         </div>
-        <span className={wow >= 0 ? 'badge-rising' : 'badge-falling'}>
+        <span className={`ml-2 shrink-0 ${wow >= 0 ? 'badge-rising' : 'badge-falling'}`}>
           {sign}{wow.toFixed(0)}%
         </span>
       </div>
@@ -77,7 +74,6 @@ function SparklineCard({ item, color }) {
           </div>
           <div className="label-mono text-[9px] text-ink-400">mentions</div>
         </div>
-        {/* Micro sparkline */}
         <div style={{ width: 60, height: 32 }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={sparkData}>
@@ -97,11 +93,7 @@ function SparklineCard({ item, color }) {
       <div className="mt-2 h-1 rounded-full overflow-hidden bg-void-600">
         <div
           className="h-full rounded-full transition-all duration-700"
-          style={{
-            width: `${Math.min(100, item.pct_of_postings * 100)}%`,
-            background: color,
-            opacity: 0.7,
-          }}
+          style={{ width: `${Math.min(100, item.pct_of_postings * 100)}%`, background: color, opacity: 0.7 }}
         />
       </div>
       <div className="label-mono text-[9px] text-ink-400 mt-1">
@@ -121,13 +113,11 @@ export default function Trends() {
   const fetchEmerging = useCallback(() => api.emerging(6), [])
   const { data: emerging, loading: emergingLoading, error: emergingError, refetch: refetchEmerging } = useApi(fetchEmerging)
 
-  // Top 5 rising skills for cards
   const risingSkills = (trending ?? [])
     .filter((t) => t.is_rising)
     .slice(0, 5)
     .map((t, i) => ({ ...t, color: PALETTE[i] }))
 
-  // Build a simple 2-point "trend" chart from current + estimated prev
   const top5Skills = (trending ?? []).slice(0, 5)
   const chartData = top5Skills.length > 0
     ? [
@@ -148,17 +138,17 @@ export default function Trends() {
     : []
 
   return (
-    <div className="p-5 lg:p-7 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="font-display text-3xl tracking-widest text-gradient-amber mb-1">TRENDS</h1>
+    <div className="p-3 sm:p-5 lg:p-7 max-w-7xl mx-auto">
+      <div className="mb-5 sm:mb-6">
+        <h1 className="font-display text-2xl sm:text-3xl tracking-widest text-gradient-amber mb-1">TRENDS</h1>
         <p className="font-mono text-xs text-ink-400">
           Skill momentum{roleFilter ? ` · ${roleFilter}` : ' · all roles'}
         </p>
       </div>
 
-      {/* Top 5 trend chart */}
-      <div className="card p-5 mb-5">
-        <div className="flex items-center justify-between mb-5">
+      {/* Skill Momentum chart */}
+      <div className="card p-3 sm:p-5 mb-4 sm:mb-5">
+        <div className="flex items-center justify-between mb-4 sm:mb-5">
           <div>
             <h2 className="font-display text-base tracking-widest text-ink-100">SKILL MOMENTUM</h2>
             <p className="font-mono text-[10px] text-ink-400 mt-0.5">
@@ -182,40 +172,52 @@ export default function Trends() {
             className="h-60"
           />
         ) : (
-          <ResponsiveContainer width="100%" height={240}>
-            <LineChart data={chartData} margin={{ top: 4, right: 16, bottom: 0, left: -10 }}>
-              <CartesianGrid stroke={grid} />
-              <XAxis
-                dataKey="week"
-                tick={{ fill: axis, fontSize: 11 }}
-                axisLine={{ stroke: grid }}
-                tickLine={{ stroke: grid }}
-              />
-              <YAxis
-                tick={{ fill: axis, fontSize: 11 }}
-                axisLine={{ stroke: grid }}
-                tickLine={{ stroke: grid }}
-              />
-              <Tooltip content={<TrendTooltip />} />
-              <Legend />
-              {top5Skills.map((s, i) => (
-                <Line
-                  key={s.skill}
-                  type="monotone"
-                  dataKey={s.skill}
-                  stroke={PALETTE[i]}
-                  strokeWidth={2}
-                  dot={{ fill: PALETTE[i], r: 4, strokeWidth: 0 }}
-                  activeDot={{ r: 6, strokeWidth: 0 }}
+          <>
+            <ResponsiveContainer width="100%" height={240}>
+              <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: -10 }}>
+                <CartesianGrid stroke={grid} />
+                <XAxis
+                  dataKey="week"
+                  tick={{ fill: axis, fontSize: 11 }}
+                  axisLine={{ stroke: grid }}
+                  tickLine={{ stroke: grid }}
                 />
+                <YAxis
+                  tick={{ fill: axis, fontSize: 11 }}
+                  axisLine={{ stroke: grid }}
+                  tickLine={{ stroke: grid }}
+                  width={36}
+                />
+                <Tooltip content={<TrendTooltip />} />
+                {top5Skills.map((s, i) => (
+                  <Line
+                    key={s.skill}
+                    type="monotone"
+                    dataKey={s.skill}
+                    stroke={PALETTE[i]}
+                    strokeWidth={2}
+                    dot={{ fill: PALETTE[i], r: 4, strokeWidth: 0 }}
+                    activeDot={{ r: 6, strokeWidth: 0 }}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+
+            {/* Custom compact legend — wraps on mobile */}
+            <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3 justify-center sm:justify-start">
+              {top5Skills.map((s, i) => (
+                <span key={s.skill} className="flex items-center gap-1.5 font-mono text-[10px] text-ink-300">
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: PALETTE[i] }} />
+                  {s.skill}
+                </span>
               ))}
-            </LineChart>
-          </ResponsiveContainer>
+            </div>
+          </>
         )}
       </div>
 
       {/* Rising skill cards */}
-      <div className="mb-5">
+      <div className="mb-4 sm:mb-5">
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-display text-base tracking-widest text-ink-100">RISING SKILLS</h2>
           <span className="label-mono text-[9px] text-ink-400">WoW &gt;20% growth</span>
@@ -255,7 +257,7 @@ export default function Trends() {
 
       {/* Emerging skills table */}
       <div className="card overflow-hidden">
-        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+        <div className="px-3 sm:px-5 py-4 border-b border-border flex items-center justify-between">
           <div>
             <h2 className="font-display text-base tracking-widest text-ink-100">EMERGING SKILLS</h2>
             <p className="font-mono text-[10px] text-ink-400 mt-0.5">newly prominent · last 6 weeks</p>
@@ -269,12 +271,12 @@ export default function Trends() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-void-700">
-                <th className="text-left px-5 py-3 label-mono text-[9px] font-normal text-ink-400">SKILL</th>
-                <th className="text-left px-4 py-3 label-mono text-[9px] font-normal text-ink-400">ROLE</th>
+                <th className="text-left px-3 sm:px-5 py-3 label-mono text-[9px] font-normal text-ink-400">SKILL</th>
+                <th className="text-left px-4 py-3 label-mono text-[9px] font-normal text-ink-400 hidden sm:table-cell">ROLE</th>
                 <th className="text-right px-4 py-3 label-mono text-[9px] font-normal text-ink-400">GROWTH</th>
-                <th className="text-right px-4 py-3 label-mono text-[9px] font-normal text-ink-400">NOW</th>
-                <th className="text-right px-4 py-3 label-mono text-[9px] font-normal text-ink-400">BEFORE</th>
-                <th className="text-right px-5 py-3 label-mono text-[9px] font-normal text-ink-400">WEEK</th>
+                <th className="text-right px-4 py-3 label-mono text-[9px] font-normal text-ink-400 hidden sm:table-cell">NOW</th>
+                <th className="text-right px-4 py-3 label-mono text-[9px] font-normal text-ink-400 hidden md:table-cell">BEFORE</th>
+                <th className="text-right px-3 sm:px-5 py-3 label-mono text-[9px] font-normal text-ink-400 hidden md:table-cell">WEEK</th>
               </tr>
             </thead>
             <tbody>
@@ -282,7 +284,14 @@ export default function Trends() {
                 Array.from({ length: 6 }, (_, i) => (
                   <tr key={i} className="border-b border-border">
                     {Array.from({ length: 6 }, (_, j) => (
-                      <td key={j} className="px-4 py-3">
+                      <td
+                        key={j}
+                        className={`px-4 py-3 ${
+                          j === 1 ? 'hidden sm:table-cell' :
+                          j === 3 ? 'hidden sm:table-cell' :
+                          j >= 4 ? 'hidden md:table-cell' : ''
+                        }`}
+                      >
                         <div className="skeleton h-3 rounded" style={{ width: j === 0 ? '80px' : '48px' }} />
                       </td>
                     ))}
@@ -302,18 +311,17 @@ export default function Trends() {
                   <tr
                     key={`${row.skill}:${row.role_category}:${i}`}
                     className="border-b border-border odd:bg-void-800 even:bg-void-900 hover:bg-void-700 transition-colors group"
-                    style={{ animationDelay: `${i * 40}ms` }}
                   >
-                    <td className="px-5 py-3 font-medium text-ink-100 group-hover:text-teal-signal transition-colors">
+                    <td className="px-3 sm:px-5 py-3 font-medium text-ink-100 group-hover:text-teal-signal transition-colors max-w-[140px] truncate">
                       {row.skill}
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-ink-400">{row.role_category}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-ink-400 hidden sm:table-cell">{row.role_category}</td>
                     <td className="px-4 py-3 text-right">
                       <span className="badge-rising">+{row.growth_pct?.toFixed(0) ?? '—'}%</span>
                     </td>
-                    <td className="px-4 py-3 text-right font-mono text-xs text-teal-signal">{row.current_count}</td>
-                    <td className="px-4 py-3 text-right font-mono text-xs text-ink-400">{row.old_count}</td>
-                    <td className="px-5 py-3 text-right font-mono text-xs text-ink-400">{row.current_week}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs text-teal-signal hidden sm:table-cell">{row.current_count}</td>
+                    <td className="px-4 py-3 text-right font-mono text-xs text-ink-400 hidden md:table-cell">{row.old_count}</td>
+                    <td className="px-3 sm:px-5 py-3 text-right font-mono text-xs text-ink-400 hidden md:table-cell">{row.current_week}</td>
                   </tr>
                 ))
               )}

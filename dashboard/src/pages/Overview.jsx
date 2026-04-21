@@ -5,6 +5,7 @@ import {
 import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
 import { useApp } from '../context/AppContext'
+import { useWindowWidth } from '../hooks/useWindowWidth'
 import { SkeletonStat, SkeletonChart } from '../components/Skeleton'
 import { ErrorState, ErrorStateRow } from '../components/ErrorState'
 import { ExportButton } from '../components/ExportButton'
@@ -16,13 +17,10 @@ function useChartColors() {
   return {
     axis: isDark ? '#565878' : '#4b5563',
     grid: isDark ? '#1e2238' : '#e2e5f0',
-    tooltipBg: isDark ? '#0e1020' : '#ffffff',
-    tooltipBorder: isDark ? '#2d3354' : '#e2e5f0',
   }
 }
 
 const AMBER = '#f5a623'
-const AMBER_DIM = '#c47d12'
 const TEAL = '#2dd4bf'
 
 function StatBar({ data, loading, error, refetch }) {
@@ -80,21 +78,23 @@ function StatBar({ data, loading, error, refetch }) {
       {stats.map((s) => (
         <div
           key={s.label}
-          className="card card-hover p-5 group"
+          className="card card-hover p-3 sm:p-5 group relative overflow-hidden"
           style={{ borderColor: `${s.color}20` }}
         >
-          <div className="label-mono text-[9px] mb-2" style={{ color: `${s.color}99` }}>
+          <div className="label-mono text-[9px] mb-1.5 sm:mb-2" style={{ color: `${s.color}99` }}>
             {s.label.toUpperCase()}
           </div>
           <div
-            className={`leading-none mb-1.5 ${s.mono ? 'font-mono text-xl font-bold' : 'font-display text-4xl'}`}
+            className={`leading-none mb-1 sm:mb-1.5 ${
+              s.mono ? 'font-mono text-base sm:text-xl font-bold' : 'font-display text-2xl sm:text-4xl'
+            }`}
             style={{ color: s.color, textShadow: `0 0 20px ${s.color}30` }}
           >
             {s.value ?? '—'}
           </div>
-          <div className="font-mono text-[10px] text-ink-400 truncate">{s.sub}</div>
+          <div className="font-mono text-[9px] sm:text-[10px] text-ink-400 truncate">{s.sub}</div>
           {s.sub2 && (
-            <div className="font-mono text-[9px] text-ink-500 truncate mt-0.5">{s.sub2}</div>
+            <div className="font-mono text-[9px] text-ink-500 truncate mt-0.5 hidden sm:block">{s.sub2}</div>
           )}
           <div
             className="absolute bottom-0 left-0 right-0 h-0.5 rounded-b-xl opacity-0 group-hover:opacity-100 transition-opacity"
@@ -121,6 +121,8 @@ function CustomTooltip({ active, payload, label }) {
 
 function SkillsChart({ data, loading, error, refetch, roleFilter }) {
   const { axis, grid } = useChartColors()
+  const width = useWindowWidth()
+  const isMobile = width < 640
 
   if (loading) return <SkeletonChart height={280} />
   if (error) return (
@@ -129,16 +131,30 @@ function SkillsChart({ data, loading, error, refetch, roleFilter }) {
     </div>
   )
 
-  const top10 = (data ?? []).slice(0, 10)
+  const allSkills = data ?? []
+  // Show fewer bars on mobile so each bar is readable
+  const chartData = allSkills.slice(0, isMobile ? 5 : 10)
 
   return (
-    <div className="card p-5">
-      <div className="flex items-center justify-between mb-5">
-        <div>
-          <h2 className="font-display text-base tracking-widest text-ink-100">TOP SKILLS</h2>
-          <p className="font-mono text-[10px] text-ink-400 mt-0.5">current week · by mention count</p>
+    <div className="card p-3 sm:p-5">
+      {/* Header */}
+      <div className="mb-4 sm:mb-5">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h2 className="font-display text-base tracking-widest text-ink-100">TOP SKILLS</h2>
+            <p className="font-mono text-[10px] text-ink-400 mt-0.5">current week · by mention count</p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="label-mono text-[9px] text-ink-400">
+              {chartData.length} of {allSkills.length}
+            </div>
+            <ExportButton
+              href={allSkills.length ? `/api/export/skills/trending${roleFilter ? `?role_category=${encodeURIComponent(roleFilter)}&weeks=4` : '?weeks=4'}` : null}
+            />
+          </div>
         </div>
-        <div className="flex items-center gap-3">
+        {/* Legend — below title on all screens */}
+        <div className="flex items-center gap-3 mt-2">
           <div className="flex items-center gap-1.5 label-mono text-[9px] text-ink-400">
             <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: AMBER }} />
             skill
@@ -147,16 +163,10 @@ function SkillsChart({ data, loading, error, refetch, roleFilter }) {
             <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ background: TEAL }} />
             rising &gt;20% WoW
           </div>
-          <div className="label-mono text-[9px] text-ink-400">
-            {top10.length} of {data?.length ?? 0}
-          </div>
-          <ExportButton
-            href={data?.length ? `/api/export/skills/trending${roleFilter ? `?role_category=${encodeURIComponent(roleFilter)}&weeks=4` : '?weeks=4'}` : null}
-          />
         </div>
       </div>
 
-      {top10.length === 0 ? (
+      {chartData.length === 0 ? (
         <EmptyState
           icon="📊"
           title="NO SKILLS YET"
@@ -164,25 +174,36 @@ function SkillsChart({ data, loading, error, refetch, roleFilter }) {
           className="h-60"
         />
       ) : (
-        <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={top10} margin={{ top: 0, right: 8, bottom: 0, left: -10 }} barCategoryGap="30%">
+        <ResponsiveContainer width="100%" height={isMobile ? 220 : 280}>
+          <BarChart
+            data={chartData}
+            margin={{ top: 0, right: 8, bottom: isMobile ? 8 : 0, left: -10 }}
+            barCategoryGap="30%"
+          >
             <CartesianGrid vertical={false} stroke={grid} />
             <XAxis
               dataKey="skill"
-              tick={{ angle: -30, textAnchor: 'end', dy: 8, fill: axis, fontSize: 11 }}
-              height={56}
+              tick={{
+                angle: -45,
+                textAnchor: 'end',
+                dy: 4,
+                fill: axis,
+                fontSize: isMobile ? 10 : 11,
+              }}
+              height={isMobile ? 64 : 56}
               interval={0}
               axisLine={{ stroke: grid }}
               tickLine={{ stroke: grid }}
             />
             <YAxis
-              tick={{ fill: axis, fontSize: 11 }}
+              tick={{ fill: axis, fontSize: isMobile ? 10 : 11 }}
               axisLine={{ stroke: grid }}
               tickLine={{ stroke: grid }}
+              width={isMobile ? 28 : 40}
             />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(245,166,35,0.04)' }} />
             <Bar dataKey="mention_count" radius={[3, 3, 0, 0]}>
-              {top10.map((entry) => (
+              {chartData.map((entry) => (
                 <Cell
                   key={entry.skill}
                   fill={entry.is_rising ? TEAL : AMBER}
@@ -202,13 +223,13 @@ function RisingPill({ item }) {
   const sign = wow > 0 ? '+' : ''
   return (
     <div className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2 min-w-0">
         <div className="w-1.5 h-1.5 rounded-full bg-teal-signal shrink-0" />
-        <span className="text-sm text-ink-100 font-medium">{item.skill}</span>
-        <span className="label-mono text-[9px] text-ink-400">{item.role_category}</span>
+        <span className="text-sm text-ink-100 font-medium truncate">{item.skill}</span>
+        <span className="label-mono text-[9px] text-ink-400 hidden sm:block shrink-0">{item.role_category}</span>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="font-mono text-xs text-ink-300">{item.mention_count}</span>
+      <div className="flex items-center gap-2 shrink-0 ml-2">
+        <span className="font-mono text-xs text-ink-300 hidden sm:block">{item.mention_count}</span>
         <span className={wow >= 0 ? 'badge-rising' : 'badge-falling'}>
           {sign}{wow.toFixed(0)}%
         </span>
@@ -229,10 +250,10 @@ export default function Overview() {
   const rising = (trending ?? []).filter((t) => t.is_rising).slice(0, 8)
 
   return (
-    <div className="p-5 lg:p-7 max-w-7xl mx-auto">
+    <div className="p-3 sm:p-5 lg:p-7 max-w-7xl mx-auto">
       {/* Page header */}
-      <div className="mb-6">
-        <h1 className="font-display text-3xl tracking-widest text-gradient-amber mb-1">OVERVIEW</h1>
+      <div className="mb-5 sm:mb-6">
+        <h1 className="font-display text-2xl sm:text-3xl tracking-widest text-gradient-amber mb-1">OVERVIEW</h1>
         <p className="font-mono text-xs text-ink-400">
           Job market snapshot{roleFilter ? ` · ${roleFilter}` : ' · all roles'}
         </p>
@@ -241,7 +262,7 @@ export default function Overview() {
       {/* Stats */}
       <StatBar data={stats} loading={statsLoading} error={statsError} refetch={refetchStats} />
 
-      {/* Global empty state — no data scraped yet */}
+      {/* Global empty state */}
       {!statsLoading && !statsError && stats?.total_postings === 0 && (
         <EmptyState
           icon="🌅"
@@ -252,22 +273,26 @@ export default function Overview() {
       )}
 
       {/* Charts row */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-        {/* Main bar chart — takes 2/3 */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
+        {/* Main bar chart */}
         <div className="xl:col-span-2">
-          <SkillsChart data={trending} loading={trendingLoading} error={trendingError} refetch={refetchTrending} roleFilter={roleFilter} />
+          <SkillsChart
+            data={trending}
+            loading={trendingLoading}
+            error={trendingError}
+            refetch={refetchTrending}
+            roleFilter={roleFilter}
+          />
         </div>
 
-        {/* Rising skills panel — 1/3 */}
-        <div className="card p-5">
+        {/* Rising skills panel */}
+        <div className="card p-3 sm:p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="font-display text-base tracking-widest text-ink-100">RISING</h2>
               <p className="font-mono text-[10px] text-ink-400 mt-0.5">wow &gt; 20% growth</p>
             </div>
-            <span className="badge-rising text-xs">
-              ↑ {rising.length}
-            </span>
+            <span className="badge-rising text-xs">↑ {rising.length}</span>
           </div>
 
           {trendingLoading ? (
@@ -298,9 +323,9 @@ export default function Overview() {
         </div>
       </div>
 
-      {/* Skill table — full width */}
-      <div className="card mt-5 overflow-hidden">
-        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+      {/* All Skills table */}
+      <div className="card mt-4 sm:mt-5 overflow-hidden">
+        <div className="px-3 sm:px-5 py-4 border-b border-border flex items-center justify-between">
           <h2 className="font-display text-base tracking-widest text-ink-100">ALL SKILLS</h2>
           <span className="label-mono text-[9px] text-ink-400">{(trending ?? []).length} skills tracked</span>
         </div>
@@ -308,11 +333,11 @@ export default function Overview() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-void-700">
-                <th className="text-left px-5 py-3 label-mono text-[9px] font-normal text-ink-400">SKILL</th>
-                <th className="text-left px-4 py-3 label-mono text-[9px] font-normal text-ink-400">ROLE</th>
+                <th className="text-left px-3 sm:px-5 py-3 label-mono text-[9px] font-normal text-ink-400">SKILL</th>
+                <th className="text-left px-4 py-3 label-mono text-[9px] font-normal text-ink-400 hidden sm:table-cell">ROLE</th>
                 <th className="text-right px-4 py-3 label-mono text-[9px] font-normal text-ink-400">MENTIONS</th>
-                <th className="text-right px-4 py-3 label-mono text-[9px] font-normal text-ink-400">PCT</th>
-                <th className="text-right px-5 py-3 label-mono text-[9px] font-normal text-ink-400">WoW</th>
+                <th className="text-right px-4 py-3 label-mono text-[9px] font-normal text-ink-400 hidden sm:table-cell">PCT</th>
+                <th className="text-right px-3 sm:px-5 py-3 label-mono text-[9px] font-normal text-ink-400">WoW</th>
               </tr>
             </thead>
             <tbody>
@@ -320,7 +345,7 @@ export default function Overview() {
                 Array.from({ length: 8 }, (_, i) => (
                   <tr key={i} className="border-b border-border">
                     {Array.from({ length: 5 }, (_, j) => (
-                      <td key={j} className="px-4 py-3">
+                      <td key={j} className={`px-4 py-3 ${j === 1 || j === 3 ? 'hidden sm:table-cell' : ''}`}>
                         <div className="skeleton h-3 rounded" style={{ width: j === 0 ? '80px' : j === 1 ? '100px' : '48px' }} />
                       </td>
                     ))}
@@ -345,15 +370,15 @@ export default function Overview() {
                     key={`${row.skill}:${row.role_category}`}
                     className="border-b border-border odd:bg-void-800 even:bg-void-900 hover:bg-void-700 transition-colors group"
                   >
-                    <td className="px-5 py-3 font-medium text-ink-100 group-hover:text-amber-glow transition-colors">
+                    <td className="px-3 sm:px-5 py-3 font-medium text-ink-100 group-hover:text-amber-glow transition-colors">
                       {row.skill}
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-ink-400">{row.role_category}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-ink-400 hidden sm:table-cell">{row.role_category}</td>
                     <td className="px-4 py-3 text-right font-mono text-xs text-ink-200">{row.mention_count}</td>
-                    <td className="px-4 py-3 text-right font-mono text-xs text-ink-300">
+                    <td className="px-4 py-3 text-right font-mono text-xs text-ink-300 hidden sm:table-cell">
                       {(row.pct_of_postings * 100).toFixed(1)}%
                     </td>
-                    <td className="px-5 py-3 text-right">
+                    <td className="px-3 sm:px-5 py-3 text-right">
                       <span className={wow > 20 ? 'badge-rising' : wow < -10 ? 'badge-falling' : 'badge-neutral'}>
                         {sign}{wow.toFixed(1)}%
                       </span>

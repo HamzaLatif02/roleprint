@@ -226,7 +226,7 @@ export default function Postings() {
   }
 
   return (
-    <div className="p-5 lg:p-7 max-w-7xl mx-auto">
+    <div className="p-3 sm:p-5 lg:p-7 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
         <h1 className="font-display text-3xl tracking-widest text-gradient-amber mb-1">POSTINGS</h1>

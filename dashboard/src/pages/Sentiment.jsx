@@ -89,9 +89,9 @@ export default function Sentiment() {
     : null
 
   return (
-    <div className="p-5 lg:p-7 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="font-display text-3xl tracking-widest text-gradient-amber mb-1">SENTIMENT</h1>
+    <div className="p-3 sm:p-5 lg:p-7 max-w-7xl mx-auto">
+      <div className="mb-5 sm:mb-6">
+        <h1 className="font-display text-2xl sm:text-3xl tracking-widest text-gradient-amber mb-1">SENTIMENT</h1>
         <p className="font-mono text-xs text-ink-400">
           Tone and urgency signals{roleFilter ? ` · ${roleFilter}` : ' · all roles'}
         </p>
