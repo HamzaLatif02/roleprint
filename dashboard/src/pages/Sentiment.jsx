@@ -6,6 +6,7 @@ import {
 import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
 import { useApp } from '../context/AppContext'
+import { useWindowWidth } from '../hooks/useWindowWidth'
 import { SkeletonChart } from '../components/Skeleton'
 import { ErrorState, ErrorStateRow } from '../components/ErrorState'
 import { EmptyState, EmptyStateRow } from '../components/EmptyState'
@@ -69,6 +70,8 @@ function SentimentBadge({ value }) {
 export default function Sentiment() {
   const { roleFilter } = useApp()
   const { axis, grid, zeroLine } = useChartColors()
+  const width = useWindowWidth()
+  const isMobile = width < 640
 
   const fetchSentiment = useCallback(
     () => api.sentiment(roleFilter, 12),
@@ -145,8 +148,8 @@ export default function Sentiment() {
       </div>
 
       {/* Main chart */}
-      <div className="card p-5 mb-5">
-        <div className="flex items-center justify-between mb-5">
+      <div className="card p-3 sm:p-5 mb-5">
+        <div className="flex items-center justify-between mb-4 sm:mb-5">
           <div>
             <h2 className="font-display text-base tracking-widest text-ink-100">SENTIMENT TIMELINE</h2>
             <p className="font-mono text-[10px] text-ink-400 mt-0.5">avg weekly tone · dashed = urgency signal</p>
@@ -175,8 +178,14 @@ export default function Sentiment() {
             className="h-60"
           />
         ) : (
-          <ResponsiveContainer width="100%" height={280}>
-            <ComposedChart data={weeks} margin={{ top: 4, right: 24, bottom: 0, left: -10 }}>
+          <ResponsiveContainer width="100%" height={isMobile ? 240 : 280}>
+            <ComposedChart
+              data={weeks}
+              margin={isMobile
+                ? { top: 4, right: 8, bottom: 0, left: -16 }
+                : { top: 4, right: 24, bottom: 0, left: -10 }
+              }
+            >
               <defs>
                 <linearGradient id="sentGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={TEAL} stopOpacity={0.25} />
@@ -191,24 +200,27 @@ export default function Sentiment() {
               <XAxis
                 dataKey="week"
                 tickFormatter={(v) => v.slice(5)}
-                tick={{ fill: axis, fontSize: 11 }}
+                tick={{ fill: axis, fontSize: isMobile ? 10 : 11 }}
                 axisLine={{ stroke: grid }}
                 tickLine={{ stroke: grid }}
               />
               <YAxis
                 yAxisId="left"
                 domain={[-1, 1]}
-                tick={{ fill: axis, fontSize: 11 }}
+                width={isMobile ? 28 : 40}
+                tick={{ fill: axis, fontSize: isMobile ? 10 : 11 }}
                 axisLine={{ stroke: grid }}
                 tickLine={{ stroke: grid }}
               />
-              <YAxis
-                yAxisId="right"
-                orientation="right"
-                tick={{ fill: axis, fontSize: 11 }}
-                axisLine={{ stroke: grid }}
-                tickLine={{ stroke: grid }}
-              />
+              {!isMobile && (
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  tick={{ fill: axis, fontSize: 11 }}
+                  axisLine={{ stroke: grid }}
+                  tickLine={{ stroke: grid }}
+                />
+              )}
               <Tooltip content={<SentimentTooltip />} />
               <ReferenceLine yAxisId="left" y={0} stroke={zeroLine} strokeDasharray="4 4" />
               <Area
@@ -222,7 +234,7 @@ export default function Sentiment() {
                 activeDot={{ r: 5, fill: TEAL, strokeWidth: 0 }}
               />
               <Line
-                yAxisId="right"
+                yAxisId={isMobile ? 'left' : 'right'}
                 type="monotone"
                 dataKey="urgency_score"
                 stroke={AMBER}
