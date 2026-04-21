@@ -222,7 +222,7 @@ export default function About() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl">
           {[
             { label: 'Scraper runs', value: 'Every 6 hours', color: '#f5a623' },
-            { label: 'NLP processing', value: 'Every 6 hours', sub: '1 hour after scraping', color: '#2dd4bf' },
+            { label: 'NLP processing', value: 'Every 7 hours', sub: '1 hour after scraping', color: '#2dd4bf' },
             { label: 'Dashboard data', value: 'Automatic', sub: 'After each processing run', color: '#818cf8' },
             { label: 'Skill trends', value: 'Weekly', sub: 'Recalculated every Monday', color: '#4ade80' },
           ].map((item) => (
@@ -300,7 +300,7 @@ export default function About() {
                 </a>
 
                 <a
-                  href="https://www.linkedin.com/in/hamzalatif02/"
+                  href="https://www.linkedin.com/in/latif-hamza/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono
