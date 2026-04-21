@@ -50,6 +50,12 @@ export const api = {
       body: JSON.stringify({ role_category: roleCategory, user_skills: userSkills }),
     }),
 
+  postings: (roleCategory, page = 1, pageSize = 20) => {
+    const params = new URLSearchParams({ page, page_size: pageSize })
+    if (roleCategory) params.set('role_category', roleCategory)
+    return apiFetch(`/api/postings/recent?${params}`)
+  },
+
   topics: (roleCategory) => {
     const params = new URLSearchParams()
     if (roleCategory) params.set('role_category', roleCategory)

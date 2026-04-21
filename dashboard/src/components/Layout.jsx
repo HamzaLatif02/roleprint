@@ -10,6 +10,7 @@ const PAGE_TITLES = {
   '/trends': 'Trends',
   '/compare': 'Compare',
   '/sentiment': 'Sentiment',
+  '/postings': 'Postings',
   '/skill-gap': 'Skill Gap',
 }
 

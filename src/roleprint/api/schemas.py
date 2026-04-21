@@ -99,6 +99,16 @@ class PostingItem(BaseModel):
     entities: Dict[str, Any] = Field(default_factory=dict)
 
 
+class PaginatedPostings(BaseModel):
+    data: List[PostingItem]
+    page: int = Field(ge=1)
+    page_size: int = Field(ge=1)
+    total_count: int = Field(ge=0)
+    total_pages: int = Field(ge=0)
+    has_next: bool
+    has_prev: bool
+
+
 # ── /api/stats/summary ────────────────────────────────────────────────────────
 
 class StatsSummary(BaseModel):
