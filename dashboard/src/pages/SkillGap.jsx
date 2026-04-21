@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
-import { FetchError } from '../components/ErrorBoundary'
+import { ErrorState } from '../components/ErrorState'
 import { ExportButton } from '../components/ExportButton'
 import { EmptyState } from '../components/EmptyState'
 import { toTitleCase } from '../utils'
@@ -238,7 +238,13 @@ export default function SkillGap() {
       const data = await api.skillGap(selectedRole, skills)
       setResult(data)
     } catch (err) {
-      setError(err.message ?? 'Unknown error')
+      setError({
+        type: err.type ?? (!navigator.onLine ? 'offline' : err.name === 'AbortError' ? 'timeout' : 'unknown'),
+        message: err.message ?? 'Unknown error',
+        statusCode: err.statusCode ?? null,
+        url: err.url ?? '/api/skills/gap',
+        timestamp: new Date(),
+      })
     } finally {
       setLoading(false)
     }
@@ -350,9 +356,7 @@ export default function SkillGap() {
 
       {/* Error */}
       {error && !loading && (
-        <div className="mb-5">
-          <FetchError message={error} onRetry={handleAnalyse} />
-        </div>
+        <ErrorState error={error} onRetry={handleAnalyse} className="h-48" />
       )}
 
       {/* Loading skeleton */}

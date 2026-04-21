@@ -6,7 +6,7 @@ import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
 import { useApp } from '../context/AppContext'
 import { SkeletonStat, SkeletonChart } from '../components/Skeleton'
-import { FetchError } from '../components/ErrorBoundary'
+import { ErrorState, ErrorStateRow } from '../components/ErrorState'
 import { ExportButton } from '../components/ExportButton'
 import { EmptyState, EmptyStateRow } from '../components/EmptyState'
 import { getRelativeTime } from '../utils'
@@ -68,7 +68,11 @@ function StatBar({ data, loading, error, refetch }) {
     )
   }
   if (error) {
-    return <FetchError message={error} onRetry={refetch} />
+    return (
+      <div className="mb-6">
+        <ErrorState error={error} onRetry={refetch} className="h-40" />
+      </div>
+    )
   }
 
   return (
@@ -120,8 +124,8 @@ function SkillsChart({ data, loading, error, refetch, roleFilter }) {
 
   if (loading) return <SkeletonChart height={280} />
   if (error) return (
-    <div className="card p-5">
-      <FetchError message={error} onRetry={refetch} />
+    <div className="card overflow-hidden">
+      <ErrorState error={error} onRetry={refetch} className="h-72" />
     </div>
   )
 
@@ -276,7 +280,7 @@ export default function Overview() {
               ))}
             </div>
           ) : trendingError ? (
-            <FetchError message={trendingError} onRetry={refetchTrending} />
+            <ErrorState error={trendingError} onRetry={refetchTrending} className="h-40" />
           ) : rising.length === 0 ? (
             <EmptyState
               icon="📈"
@@ -322,6 +326,8 @@ export default function Overview() {
                     ))}
                   </tr>
                 ))
+              ) : trendingError ? (
+                <ErrorStateRow colSpan={5} error={trendingError} onRetry={refetchTrending} />
               ) : (trending ?? []).length === 0 ? (
                 <EmptyStateRow
                   colSpan={5}

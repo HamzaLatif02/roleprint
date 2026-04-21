@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
 import { useApp } from '../context/AppContext'
-import { FetchError } from '../components/ErrorBoundary'
+import { ErrorState } from '../components/ErrorState'
 import { toTitleCase } from '../utils'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -247,9 +247,7 @@ export default function Postings() {
 
         {/* Error state */}
         {error && !loading && (
-          <div className="px-5 py-8">
-            <FetchError message={error} onRetry={refetch} />
-          </div>
+          <ErrorState error={error} onRetry={refetch} className="h-64" />
         )}
 
         {/* Table */}

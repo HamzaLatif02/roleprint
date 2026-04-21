@@ -107,6 +107,16 @@
     @apply inline-flex items-center gap-1 rounded px-1.5 py-0.5 font-mono text-xs font-bold text-ink-300 bg-void-600 border border-border;
   }
 
+  /* Error card — rose-tinted panel replacing failed charts/tables */
+  .error-card {
+    @apply rounded-xl border border-rose-signal/20 bg-rose-faint;
+  }
+
+  html.light .error-card {
+    background: #fff5f5;
+    border-color: rgba(240, 81, 81, 0.2);
+  }
+
   /* Light mode badge overrides — dark faint backgrounds don't work on white */
   html.light .badge-rising {
     background: #ecfdf5;

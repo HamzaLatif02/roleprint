@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { useApp } from '../context/AppContext'
 import { ErrorBoundary } from './ErrorBoundary'
+import { ConnectionBanner } from './ConnectionBanner'
 import { getRelativeTime, stalenessColor } from '../utils'
 
 const PAGE_TITLES = {
@@ -93,6 +94,9 @@ export function Layout({ children }) {
             )}
           </div>
         </header>
+
+        {/* Connection status banner */}
+        <ConnectionBanner />
 
         {/* Page scroll area */}
         <main className="flex-1 overflow-y-auto grid-bg">

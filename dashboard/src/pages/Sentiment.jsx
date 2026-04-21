@@ -7,7 +7,7 @@ import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
 import { useApp } from '../context/AppContext'
 import { SkeletonChart } from '../components/Skeleton'
-import { FetchError } from '../components/ErrorBoundary'
+import { ErrorState, ErrorStateRow } from '../components/ErrorState'
 import { EmptyState, EmptyStateRow } from '../components/EmptyState'
 
 const AMBER = '#f5a623'
@@ -166,7 +166,7 @@ export default function Sentiment() {
         {loading ? (
           <div className="skeleton w-full rounded-lg" style={{ height: 280 }} />
         ) : error ? (
-          <FetchError message={error} onRetry={refetch} />
+          <ErrorState error={error} onRetry={refetch} className="h-60" />
         ) : weeks.length === 0 ? (
           <EmptyState
             icon="〰️"
@@ -262,33 +262,36 @@ export default function Sentiment() {
                     ))}
                   </tr>
                 ))
-              ) : [...weeks].reverse().map((row, i) => (
-                <tr
-                  key={row.week}
-                  className="border-b border-border odd:bg-void-800 even:bg-void-900 hover:bg-void-700 transition-colors"
-                >
-                  <td className="px-5 py-3 font-mono text-xs text-ink-300">{row.week}</td>
-                  <td className="px-4 py-3 text-right">
-                    <SentimentBadge value={row.avg_sentiment} />
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <span
-                      className="font-mono text-xs font-bold"
-                      style={{ color: row.urgency_score > 0 ? AMBER : 'inherit' }}
-                    >
-                      {row.urgency_score}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-right font-mono text-xs text-ink-300">{row.posting_count}</td>
-                </tr>
-              ))}
-              {!loading && weeks.length === 0 && (
+              ) : error ? (
+                <ErrorStateRow colSpan={4} error={error} onRetry={refetch} />
+              ) : weeks.length === 0 ? (
                 <EmptyStateRow
                   colSpan={4}
                   icon="〰️"
                   title="NO WEEKLY DATA"
                   message="No sentiment records found for this selection."
                 />
+              ) : (
+                [...weeks].reverse().map((row) => (
+                  <tr
+                    key={row.week}
+                    className="border-b border-border odd:bg-void-800 even:bg-void-900 hover:bg-void-700 transition-colors"
+                  >
+                    <td className="px-5 py-3 font-mono text-xs text-ink-300">{row.week}</td>
+                    <td className="px-4 py-3 text-right">
+                      <SentimentBadge value={row.avg_sentiment} />
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <span
+                        className="font-mono text-xs font-bold"
+                        style={{ color: row.urgency_score > 0 ? AMBER : 'inherit' }}
+                      >
+                        {row.urgency_score}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3 text-right font-mono text-xs text-ink-300">{row.posting_count}</td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>

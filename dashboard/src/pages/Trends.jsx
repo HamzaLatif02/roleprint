@@ -7,7 +7,7 @@ import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
 import { useApp } from '../context/AppContext'
 import { SkeletonChart, SkeletonRow } from '../components/Skeleton'
-import { FetchError } from '../components/ErrorBoundary'
+import { ErrorState, ErrorStateRow } from '../components/ErrorState'
 import { ExportButton } from '../components/ExportButton'
 import { EmptyState, EmptyStateRow } from '../components/EmptyState'
 
@@ -173,7 +173,7 @@ export default function Trends() {
         {trendingLoading ? (
           <div className="skeleton h-60 w-full rounded-lg" />
         ) : trendingError ? (
-          <FetchError message={trendingError} onRetry={refetchTrending} />
+          <ErrorState error={trendingError} onRetry={refetchTrending} className="h-60" />
         ) : chartData.length === 0 ? (
           <EmptyState
             icon="📈"
@@ -232,7 +232,9 @@ export default function Trends() {
             ))}
           </div>
         ) : trendingError ? (
-          <FetchError message={trendingError} onRetry={refetchTrending} />
+          <div className="card">
+            <ErrorState error={trendingError} onRetry={refetchTrending} className="h-36" />
+          </div>
         ) : risingSkills.length === 0 ? (
           <div className="card">
             <EmptyState
@@ -287,11 +289,7 @@ export default function Trends() {
                   </tr>
                 ))
               ) : emergingError ? (
-                <tr>
-                  <td colSpan={6} className="px-5 py-8">
-                    <FetchError message={emergingError} onRetry={refetchEmerging} />
-                  </td>
-                </tr>
+                <ErrorStateRow colSpan={6} error={emergingError} onRetry={refetchEmerging} />
               ) : (emerging ?? []).length === 0 ? (
                 <EmptyStateRow
                   colSpan={6}

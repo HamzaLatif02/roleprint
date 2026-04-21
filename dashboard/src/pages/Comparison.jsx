@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
 import { SkeletonChart } from '../components/Skeleton'
-import { FetchError } from '../components/ErrorBoundary'
+import { ErrorState } from '../components/ErrorState'
 import { EmptyState } from '../components/EmptyState'
 import { toTitleCase } from '../utils'
 
@@ -165,7 +165,11 @@ export default function Comparison() {
 
       {/* Results */}
       {loading && <SkeletonChart height={400} />}
-      {error && !loading && <FetchError message={error} onRetry={refetch} />}
+      {error && !loading && (
+        <div className="card overflow-hidden">
+          <ErrorState error={error} onRetry={refetch} className="h-64" />
+        </div>
+      )}
 
       {result && !loading && (
         <div className="animate-fade-in">
