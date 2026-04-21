@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { useApp } from '../context/AppContext'
 import { ErrorBoundary } from './ErrorBoundary'
@@ -13,6 +13,7 @@ const PAGE_TITLES = {
   '/sentiment': 'Sentiment',
   '/postings': 'Postings',
   '/skill-gap': 'Skill Gap',
+  '/about': 'About',
 }
 
 export function Layout({ children }) {
@@ -105,6 +106,30 @@ export function Layout({ children }) {
               {children}
             </div>
           </ErrorBoundary>
+
+          {/* Site footer */}
+          <footer className="border-t border-border px-5 py-3 flex flex-wrap items-center justify-between gap-2">
+            <span className="font-mono text-[10px] text-ink-500">© 2026 Roleprint</span>
+            <div className="flex items-center gap-4">
+              <span className="font-mono text-[10px] text-ink-500 hidden sm:block">
+                Data updates every 6 hours
+              </span>
+              <Link
+                to="/about"
+                className="font-mono text-[10px] text-ink-400 hover:text-amber-glow transition-colors"
+              >
+                About
+              </Link>
+              <a
+                href="https://github.com/HamzaLatif02/roleprint"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-[10px] text-ink-400 hover:text-amber-glow transition-colors"
+              >
+                GitHub
+              </a>
+            </div>
+          </footer>
         </main>
       </div>
     </div>

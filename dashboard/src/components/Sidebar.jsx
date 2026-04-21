@@ -78,6 +78,18 @@ const NAV = [
       </svg>
     ),
   },
+  {
+    path: '/about',
+    label: 'About',
+    color: '#94a3b8',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.4"/>
+        <path d="M8 7v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <circle cx="8" cy="4.5" r="0.75" fill="currentColor"/>
+      </svg>
+    ),
+  },
 ]
 
 export function Sidebar() {

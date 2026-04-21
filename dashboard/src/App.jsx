@@ -11,6 +11,7 @@ const Comparison = lazy(() => import('./pages/Comparison'))
 const Sentiment = lazy(() => import('./pages/Sentiment'))
 const SkillGap = lazy(() => import('./pages/SkillGap'))
 const Postings = lazy(() => import('./pages/Postings'))
+const About = lazy(() => import('./pages/About'))
 
 function PageFallback() {
   return (
@@ -39,6 +40,7 @@ export default function App() {
               <Route path="/sentiment" element={<Sentiment />} />
               <Route path="/postings" element={<Postings />} />
               <Route path="/skill-gap" element={<SkillGap />} />
+              <Route path="/about" element={<About />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
