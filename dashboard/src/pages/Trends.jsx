@@ -8,6 +8,7 @@ import { api } from '../api/client'
 import { useApp } from '../context/AppContext'
 import { SkeletonChart, SkeletonRow } from '../components/Skeleton'
 import { FetchError } from '../components/ErrorBoundary'
+import { ExportButton } from '../components/ExportButton'
 
 const PALETTE = ['#f5a623', '#2dd4bf', '#818cf8', '#fb7185', '#4ade80']
 
@@ -163,6 +164,9 @@ export default function Trends() {
               top 5 skills · previous vs current week
             </p>
           </div>
+          <ExportButton
+            href={trending?.length ? `/api/export/skills/trending${roleFilter ? `?role_category=${encodeURIComponent(roleFilter)}&weeks=8` : '?weeks=8'}` : null}
+          />
         </div>
 
         {trendingLoading ? (

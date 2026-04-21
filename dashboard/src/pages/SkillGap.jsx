@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import { useApi } from '../hooks/useApi'
 import { api } from '../api/client'
 import { FetchError } from '../components/ErrorBoundary'
+import { ExportButton } from '../components/ExportButton'
 import { toTitleCase } from '../utils'
 
 const LS_KEY = 'roleprint:skill-gap:skills'
@@ -422,27 +423,35 @@ export default function SkillGap() {
 
           {/* Three-column breakdown */}
           {(result.matched_skills.length > 0 || result.missing_skills.length > 0) && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <SkillColumn
-                title="✓ SKILLS YOU HAVE"
-                count={`${result.matched_skills.length} matched`}
-                skills={result.matched_skills}
-                accentColor="#4ade80"
-              />
-              <SkillColumn
-                title="✗ SKILLS TO LEARN"
-                count={`${result.missing_skills.length} missing`}
-                skills={result.missing_skills}
-                accentColor="#fb7185"
-              />
-              <SkillColumn
-                title="~ BONUS SKILLS"
-                count={`${result.bonus_skills.length} bonus`}
-                skills={result.bonus_skills}
-                accentColor="#94a3b8"
-                dimmed
-              />
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <SkillColumn
+                  title="✓ SKILLS YOU HAVE"
+                  count={`${result.matched_skills.length} matched`}
+                  skills={result.matched_skills}
+                  accentColor="#4ade80"
+                />
+                <SkillColumn
+                  title="✗ SKILLS TO LEARN"
+                  count={`${result.missing_skills.length} missing`}
+                  skills={result.missing_skills}
+                  accentColor="#fb7185"
+                />
+                <SkillColumn
+                  title="~ BONUS SKILLS"
+                  count={`${result.bonus_skills.length} bonus`}
+                  skills={result.bonus_skills}
+                  accentColor="#94a3b8"
+                  dimmed
+                />
+              </div>
+              <div className="flex justify-end pt-1">
+                <ExportButton
+                  href={`/api/export/skills/gap?role_category=${encodeURIComponent(result.role_category)}&user_skills=${encodeURIComponent(skills.join(','))}`}
+                  label="Export Results"
+                />
+              </div>
+            </>
           )}
         </div>
       )}

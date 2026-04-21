@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from roleprint.api import cache
 from roleprint.api.routers import (  # noqa: E402
+    export,
     postings,
     roles,
     sentiment,
@@ -71,6 +72,7 @@ def create_app() -> FastAPI:
     )
 
     # Routers
+    app.include_router(export.router)
     app.include_router(skills.router)
     app.include_router(topics.router)
     app.include_router(sentiment.router)

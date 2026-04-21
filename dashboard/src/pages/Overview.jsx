@@ -7,6 +7,7 @@ import { api } from '../api/client'
 import { useApp } from '../context/AppContext'
 import { SkeletonStat, SkeletonChart } from '../components/Skeleton'
 import { FetchError } from '../components/ErrorBoundary'
+import { ExportButton } from '../components/ExportButton'
 
 function useChartColors() {
   const isDark = document.documentElement.classList.contains('dark')
@@ -105,7 +106,7 @@ function CustomTooltip({ active, payload, label }) {
   )
 }
 
-function SkillsChart({ data, loading, error, refetch }) {
+function SkillsChart({ data, loading, error, refetch, roleFilter }) {
   const { axis, grid } = useChartColors()
 
   if (loading) return <SkeletonChart height={280} />
@@ -136,6 +137,9 @@ function SkillsChart({ data, loading, error, refetch }) {
           <div className="label-mono text-[9px] text-ink-400">
             {top10.length} of {data?.length ?? 0}
           </div>
+          <ExportButton
+            href={data?.length ? `/api/export/skills/trending${roleFilter ? `?role_category=${encodeURIComponent(roleFilter)}&weeks=4` : '?weeks=4'}` : null}
+          />
         </div>
       </div>
 
@@ -225,7 +229,7 @@ export default function Overview() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
         {/* Main bar chart — takes 2/3 */}
         <div className="xl:col-span-2">
-          <SkillsChart data={trending} loading={trendingLoading} error={trendingError} refetch={refetchTrending} />
+          <SkillsChart data={trending} loading={trendingLoading} error={trendingError} refetch={refetchTrending} roleFilter={roleFilter} />
         </div>
 
         {/* Rising skills panel — 1/3 */}
