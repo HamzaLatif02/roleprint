@@ -17,7 +17,7 @@ class SkillTrendItem(BaseModel):
     skill: str
     role_category: str
     mention_count: int
-    pct_of_postings: float = Field(ge=0.0, le=1.0)
+    pct_of_postings: float = Field(ge=0.0, description="Fraction of postings mentioning this skill (0–1)")
     wow_change: float = Field(description="Week-over-week % change")
     is_rising: bool = Field(description="True when wow_change > 20 %")
 

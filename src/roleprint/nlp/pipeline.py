@@ -18,7 +18,7 @@ from uuid import uuid4
 
 import structlog
 from dotenv import load_dotenv
-from sqlalchemy import select
+from sqlalchemy import func as sa_func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -116,8 +116,24 @@ def _upsert_skill_trend(
 ) -> None:
     """Create or update a SkillTrend row.
 
+    pct_of_postings is calculated as mention_count / true_weekly_total where
+    true_weekly_total is the count of ALL postings for (role_category, week_start)
+    in job_postings — not just the current batch. This prevents values > 1
+    when the pipeline runs multiple batches across the same week.
+
     SQLAlchemy-level merge compatible with both SQLite (tests) and PostgreSQL.
     """
+    # Query the actual number of postings for this role/week, not just the batch.
+    from datetime import time as dt_time
+    week_end = week_start + timedelta(days=7)
+    true_total: int = session.scalar(
+        select(sa_func.count(JobPosting.id)).where(
+            JobPosting.role_category == role_category,
+            JobPosting.scraped_at >= datetime.combine(week_start, dt_time.min),
+            JobPosting.scraped_at < datetime.combine(week_end, dt_time.min),
+        )
+    ) or total_this_week  # fall back to batch size if query returns 0 (e.g. tests)
+
     existing = session.scalar(
         select(SkillTrend).where(
             SkillTrend.skill == skill,
@@ -127,10 +143,10 @@ def _upsert_skill_trend(
     )
     if existing:
         existing.mention_count += delta_count
-        pct = existing.mention_count / total_this_week if total_this_week > 0 else 0.0
+        pct = existing.mention_count / true_total if true_total > 0 else 0.0
         existing.pct_of_postings = round(pct, 4)
     else:
-        pct = delta_count / total_this_week if total_this_week > 0 else 0.0
+        pct = delta_count / true_total if true_total > 0 else 0.0
         session.add(SkillTrend(
             skill=skill,
             role_category=role_category,
