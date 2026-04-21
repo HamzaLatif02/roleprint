@@ -64,7 +64,7 @@ Every new posting passes through five stages:
 After each NLP batch, `skill_trends` rows are upserted with weekly `mention_count` and `pct_of_postings`. Week-over-week change and Jaccard/cosine comparisons are computed in Python for SQLite + Postgres portability.
 
 ### Dashboard
-Four views built with React 18, Recharts, and Tailwind CSS (dark/light mode):
+Five views built with React 18, Recharts, and Tailwind CSS (dark/light mode):
 
 | Page | Key charts |
 |------|-----------|
@@ -72,6 +72,29 @@ Four views built with React 18, Recharts, and Tailwind CSS (dark/light mode):
 | Trends | Momentum LineChart · sparkline cards with WoW badges · emerging table |
 | Compare | Venn circles · Jaccard % + cosine similarity · unique/shared skill pills |
 | Sentiment | ComposedChart (area + dashed urgency line) · weekly breakdown table |
+| Skill Gap | Score ring · three-column breakdown (matched / missing / bonus) |
+
+## Features
+
+### Skill Gap Analysis
+
+The **Skill Gap** page (`/skill-gap`) lets you benchmark your own skills against real job posting demand:
+
+1. **Select a target role** — e.g. *Data Analyst*, *ML Engineer*
+2. **Add your current skills** — type a skill and press Enter; skills are saved to `localStorage` and survive page refresh
+3. **Click Analyse Gap** — calls `POST /api/skills/gap`
+
+The API fetches the top 30 in-demand skills for the chosen role from the latest week of `skill_trends` data and returns:
+
+| Field | Description |
+|-------|-------------|
+| `matched_skills` | Skills you listed that are in the top 30, with demand % |
+| `missing_skills` | Top-30 skills you lack, sorted by demand (highest priority first) |
+| `bonus_skills` | Skills you have that appear in postings but outside the top 30 |
+| `match_score` | % of the top 30 skills covered (0–100) |
+| `total_postings_analysed` | Number of postings the skill data was derived from |
+
+The match score is colour-coded — green (≥75%), amber (40–75%), red (<40%) — so you can see at a glance how competitive your profile is for the role.
 
 ---
 

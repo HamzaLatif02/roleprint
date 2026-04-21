@@ -44,6 +44,12 @@ export const api = {
     return apiFetch(`/api/sentiment/timeline?${params}`)
   },
 
+  skillGap: (roleCategory, userSkills) =>
+    apiFetch('/api/skills/gap', {
+      method: 'POST',
+      body: JSON.stringify({ role_category: roleCategory, user_skills: userSkills }),
+    }),
+
   topics: (roleCategory) => {
     const params = new URLSearchParams()
     if (roleCategory) params.set('role_category', roleCategory)

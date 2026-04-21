@@ -9,6 +9,7 @@ const Overview = lazy(() => import('./pages/Overview'))
 const Trends = lazy(() => import('./pages/Trends'))
 const Comparison = lazy(() => import('./pages/Comparison'))
 const Sentiment = lazy(() => import('./pages/Sentiment'))
+const SkillGap = lazy(() => import('./pages/SkillGap'))
 
 function PageFallback() {
   return (
@@ -35,6 +36,7 @@ export default function App() {
               <Route path="/trends" element={<Trends />} />
               <Route path="/compare" element={<Comparison />} />
               <Route path="/sentiment" element={<Sentiment />} />
+              <Route path="/skill-gap" element={<SkillGap />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>

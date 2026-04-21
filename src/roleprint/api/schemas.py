@@ -111,6 +111,28 @@ class StatsSummary(BaseModel):
     sources: List[str] = Field(default_factory=list)
 
 
+# ── /api/skills/gap ──────────────────────────────────────────────────────────
+
+class SkillGapRequest(BaseModel):
+    role_category: str = Field(description="Role to analyse, e.g. 'data analyst'")
+    user_skills: List[str] = Field(description="Skills the user already has")
+
+
+class SkillGapSkillItem(BaseModel):
+    skill: str
+    pct: float = Field(description="Demand % — share of postings that mention this skill (0-100)")
+    status: str = Field(description="'matched', 'missing', or 'bonus'")
+
+
+class SkillGapResponse(BaseModel):
+    role_category: str
+    match_score: float = Field(ge=0.0, le=100.0, description="% of top-30 skills the user has")
+    matched_skills: List[SkillGapSkillItem]
+    missing_skills: List[SkillGapSkillItem]
+    bonus_skills: List[SkillGapSkillItem]
+    total_postings_analysed: int
+
+
 # ── /health ───────────────────────────────────────────────────────────────────
 
 class HealthResponse(BaseModel):

@@ -52,6 +52,19 @@ const NAV = [
       </svg>
     ),
   },
+  {
+    path: '/skill-gap',
+    label: 'Skill Gap',
+    color: '#4ade80',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.4"/>
+        <path d="M8 4.5v3.5l2.5 1.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M11.5 1.5L14 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+        <path d="M4.5 1.5L2 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
 ]
 
 export function Sidebar() {

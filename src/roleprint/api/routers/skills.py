@@ -11,7 +11,15 @@ from sqlalchemy.orm import Session
 
 from roleprint.api import cache
 from roleprint.api.deps import get_session
-from roleprint.api.schemas import EmergingSkillItem, RoleSkillProfile, SkillCompareResponse, SkillTrendItem
+from roleprint.api.schemas import (
+    EmergingSkillItem,
+    RoleSkillProfile,
+    SkillCompareResponse,
+    SkillGapRequest,
+    SkillGapResponse,
+    SkillGapSkillItem,
+    SkillTrendItem,
+)
 from roleprint.db.models import SkillTrend
 from roleprint.nlp.trends import emerging_skills, role_similarity
 
@@ -172,6 +180,98 @@ def compare_roles(
     }
     cache.set(key, result, ttl=_CACHE_TTL)
     return result
+
+
+# ── POST /api/skills/gap ─────────────────────────────────────────────────────
+
+@router.post("/gap", response_model=SkillGapResponse)
+def analyse_skill_gap(
+    body: SkillGapRequest,
+    session: Session = Depends(get_session),
+):
+    """Compare a user's skills against the top 30 in-demand skills for a role.
+
+    Returns three lists:
+    - ``matched_skills``: user skills that appear in the role's top 30
+    - ``missing_skills``: top-30 skills the user lacks, sorted by demand (highest first)
+    - ``bonus_skills``: user skills that appear in job postings but outside the top 30
+
+    Also returns a ``match_score`` (% of top 30 covered) and
+    ``total_postings_analysed`` for the role this week.
+    """
+    role = body.role_category.strip().lower()
+    user_skills_lower = {s.strip().lower() for s in body.user_skills if s.strip()}
+
+    _empty = SkillGapResponse(
+        role_category=role,
+        match_score=0.0,
+        matched_skills=[],
+        missing_skills=[],
+        bonus_skills=[],
+        total_postings_analysed=0,
+    )
+
+    # Latest data week
+    latest = _get_latest_week(session)
+    if not latest:
+        return _empty
+
+    # All skill rows for this role in the latest week, ordered by demand
+    all_rows = list(session.scalars(
+        select(SkillTrend)
+        .where(SkillTrend.week_start == latest, SkillTrend.role_category == role)
+        .order_by(SkillTrend.mention_count.desc())
+    ))
+    if not all_rows:
+        return _empty
+
+    top30 = all_rows[:30]
+    top30_lower: set = {r.skill.lower() for r in top30}
+
+    # Estimate total postings from the top skill's counts
+    top_row = all_rows[0]
+    total_postings = (
+        round(top_row.mention_count / top_row.pct_of_postings)
+        if top_row.pct_of_postings > 0
+        else 0
+    )
+
+    matched: list = []
+    missing: list = []
+
+    for row in top30:
+        pct = round(row.pct_of_postings * 100, 1)
+        item = SkillGapSkillItem(skill=row.skill, pct=pct, status="")
+        if row.skill.lower() in user_skills_lower:
+            item.status = "matched"
+            matched.append(item)
+        else:
+            item.status = "missing"
+            missing.append(item)
+
+    # Bonus: user skills that appear in postings but are outside the top 30
+    beyond_index = {r.skill.lower(): r for r in all_rows[30:]}
+    bonus: list = []
+    for user_skill in user_skills_lower:
+        if user_skill not in top30_lower and user_skill in beyond_index:
+            row = beyond_index[user_skill]
+            bonus.append(SkillGapSkillItem(
+                skill=row.skill,
+                pct=round(row.pct_of_postings * 100, 1),
+                status="bonus",
+            ))
+    bonus.sort(key=lambda x: -x.pct)
+
+    match_score = round(len(matched) / len(top30) * 100, 1) if top30 else 0.0
+
+    return SkillGapResponse(
+        role_category=role,
+        match_score=match_score,
+        matched_skills=matched,
+        missing_skills=missing,
+        bonus_skills=bonus,
+        total_postings_analysed=total_postings,
+    )
 
 
 # ── GET /api/skills/emerging ─────────────────────────────────────────────────
