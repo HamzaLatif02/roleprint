@@ -34,9 +34,9 @@
     --void-500: #e4e6f2;
     --void-400: #d5d8ed;
 
-    --color-border: #e5e7eb;        /* gray-200 — standard borders */
-    --color-border-bright: #d1d5db; /* gray-300 — prominent borders */
-    --color-border-glow: #9ca3af;   /* gray-400 — glow/focus borders */
+    --color-border: rgba(229,231,235,0.5);   /* gray-200/50 — subtle borders */
+    --color-border-bright: rgba(209,213,219,0.6); /* gray-300/60 — hover borders */
+    --color-border-glow: #9ca3af;            /* gray-400 — glow/focus borders */
 
     /* True grays for readable text on white */
     --ink-100: #111827;   /* gray-900 — headings, primary text */
@@ -115,6 +115,19 @@
   html.light .error-card {
     background: #fff5f5;
     border-color: rgba(240, 81, 81, 0.2);
+  }
+
+  /* Cards use a softer shadow in light mode — the default 0.4 opacity is too heavy on white */
+  html.light .card {
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(229,231,235,0.5);
+  }
+
+  /* Skill item rows in SkillColumn: faint accent tint is invisible on white — bump opacity */
+  html.light .skill-item-row {
+    background: rgba(0,0,0,0.03) !important;
+  }
+  html.light .skill-item-row:hover {
+    background: rgba(0,0,0,0.055) !important;
   }
 
   /* Light mode badge overrides — dark faint backgrounds don't work on white */

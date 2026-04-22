@@ -103,7 +103,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="px-5 pt-6 pb-5 border-b border-border">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-lg bg-gray-900 flex items-center justify-center overflow-hidden shrink-0">
+          <div className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-900 flex items-center justify-center overflow-hidden shrink-0 p-1">
             <img src="/logo.png" alt="Roleprint logo" className="w-full h-full object-contain" />
           </div>
           <div>

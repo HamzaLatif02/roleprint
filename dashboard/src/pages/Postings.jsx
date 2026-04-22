@@ -88,7 +88,7 @@ function PaginationBar({ page, totalPages, totalCount, pageSize, onPage, onPageS
     'min-w-[32px] h-8 flex items-center justify-center rounded-lg font-mono text-xs ' +
     'border transition-all duration-100 disabled:opacity-40 disabled:cursor-not-allowed'
   const btnInactive = btnBase + ' border-border text-ink-400 hover:border-border-bright hover:text-ink-200 bg-transparent'
-  const btnActive   = btnBase + ' border-amber-dim bg-amber-muted text-amber-glow'
+  const btnActive   = btnBase + ' border-amber-300/60 dark:border-amber-dim bg-amber-100 dark:bg-amber-muted text-amber-700 dark:text-amber-glow'
   const btnEllipsis = btnBase + ' border-transparent text-ink-500 cursor-default'
 
   return (

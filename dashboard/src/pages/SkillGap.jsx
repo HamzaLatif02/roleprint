@@ -107,7 +107,7 @@ function SkillColumn({ title, count, skills, accentColor, dimmed = false }) {
           skills.map((item) => (
             <div
               key={item.skill}
-              className="flex items-center justify-between px-3 py-2 rounded-lg"
+              className="skill-item-row flex items-center justify-between px-3 py-2 rounded-lg transition-colors"
               style={{ background: `${accentColor}08` }}
             >
               <span className={`text-sm font-medium ${dimmed ? 'text-ink-400' : 'text-ink-100'}`}>
@@ -402,17 +402,17 @@ export default function SkillGap() {
 
               {/* Quick stat pills */}
               <div className="flex md:flex-col gap-2 shrink-0">
-                <div className="text-center px-4 py-2 rounded-lg bg-void-700 border border-border">
-                  <div className="font-display text-2xl text-green-400">{result.matched_skills.length}</div>
-                  <div className="label-mono text-[9px] text-ink-500">matched</div>
+                <div className="text-center px-4 py-2 rounded-lg bg-green-50 dark:bg-void-700 border border-green-200/60 dark:border-border">
+                  <div className="font-display text-2xl text-green-600 dark:text-green-400">{result.matched_skills.length}</div>
+                  <div className="label-mono text-[9px] text-green-700/70 dark:text-ink-500">matched</div>
                 </div>
-                <div className="text-center px-4 py-2 rounded-lg bg-void-700 border border-border">
-                  <div className="font-display text-2xl text-rose-400">{result.missing_skills.length}</div>
-                  <div className="label-mono text-[9px] text-ink-500">missing</div>
+                <div className="text-center px-4 py-2 rounded-lg bg-red-50 dark:bg-void-700 border border-red-200/60 dark:border-border">
+                  <div className="font-display text-2xl text-red-600 dark:text-rose-400">{result.missing_skills.length}</div>
+                  <div className="label-mono text-[9px] text-red-700/70 dark:text-ink-500">missing</div>
                 </div>
-                <div className="text-center px-4 py-2 rounded-lg bg-void-700 border border-border">
-                  <div className="font-display text-2xl text-ink-300">{result.bonus_skills.length}</div>
-                  <div className="label-mono text-[9px] text-ink-500">bonus</div>
+                <div className="text-center px-4 py-2 rounded-lg bg-gray-100 dark:bg-void-700 border border-gray-200/60 dark:border-border">
+                  <div className="font-display text-2xl text-gray-500 dark:text-ink-300">{result.bonus_skills.length}</div>
+                  <div className="label-mono text-[9px] text-gray-500/70 dark:text-ink-500">bonus</div>
                 </div>
               </div>
             </div>

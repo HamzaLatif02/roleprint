@@ -108,17 +108,19 @@ function Divider() {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+const SECTION_CARD = 'bg-white dark:bg-void-800 rounded-xl shadow-sm border border-gray-100/50 dark:border-border p-6 mb-6'
+
 export default function About() {
   return (
     <div className="p-5 lg:p-10 max-w-4xl mx-auto">
       {/* ── Page header ── */}
-      <div className="mb-10">
+      <div className="mb-8">
         <h1 className="font-display text-3xl tracking-widest text-gradient-amber mb-1">ABOUT</h1>
         <p className="font-mono text-xs text-ink-400">How Roleprint works</p>
       </div>
 
       {/* ── 1. What is Roleprint ── */}
-      <section aria-labelledby="what-heading">
+      <section aria-labelledby="what-heading" className={SECTION_CARD}>
         <h2 id="what-heading" className="font-display text-xl tracking-widest text-ink-100 mb-4">
           WHAT IS ROLEPRINT?
         </h2>
@@ -134,10 +136,8 @@ export default function About() {
         </p>
       </section>
 
-      <Divider />
-
       {/* ── 2. How it works — pipeline ── */}
-      <section aria-labelledby="pipeline-heading">
+      <section aria-labelledby="pipeline-heading" className={SECTION_CARD}>
         <h2 id="pipeline-heading" className="font-display text-xl tracking-widest text-ink-100 mb-2">
           HOW IT WORKS
         </h2>
@@ -168,14 +168,12 @@ export default function About() {
         </div>
       </section>
 
-      <Divider />
-
       {/* ── 3. Data sources ── */}
-      <section aria-labelledby="sources-heading">
+      <section aria-labelledby="sources-heading" className={SECTION_CARD}>
         <h2 id="sources-heading" className="font-display text-xl tracking-widest text-ink-100 mb-2">
           DATA SOURCES
         </h2>
-        <p className="font-mono text-xs text-ink-400 mb-8">
+        <p className="font-mono text-xs text-ink-400 mb-6">
           Three independent sources for broad market coverage
         </p>
 
@@ -211,11 +209,9 @@ export default function About() {
         </div>
       </section>
 
-      <Divider />
-
       {/* ── 4. Update frequency ── */}
-      <section aria-labelledby="frequency-heading">
-        <h2 id="frequency-heading" className="font-display text-xl tracking-widest text-ink-100 mb-8">
+      <section aria-labelledby="frequency-heading" className={SECTION_CARD}>
+        <h2 id="frequency-heading" className="font-display text-xl tracking-widest text-ink-100 mb-6">
           UPDATE FREQUENCY
         </h2>
 
@@ -238,11 +234,9 @@ export default function About() {
         </div>
       </section>
 
-      <Divider />
-
       {/* ── 5. Tech stack ── */}
-      <section aria-labelledby="stack-heading">
-        <h2 id="stack-heading" className="font-display text-xl tracking-widest text-ink-100 mb-8">
+      <section aria-labelledby="stack-heading" className={SECTION_CARD}>
+        <h2 id="stack-heading" className="font-display text-xl tracking-widest text-ink-100 mb-6">
           TECH STACK
         </h2>
 
@@ -261,59 +255,55 @@ export default function About() {
         </div>
       </section>
 
-      <Divider />
-
       {/* ── 6. Built by ── */}
-      <section aria-labelledby="built-by-heading" className="pb-6">
+      <section aria-labelledby="built-by-heading" className={SECTION_CARD + ' pb-6'}>
         <h2 id="built-by-heading" className="font-display text-xl tracking-widest text-ink-100 mb-6">
           BUILT BY
         </h2>
 
-        <div className="card p-6 max-w-lg">
-          <div className="flex items-start gap-4">
-            {/* Avatar placeholder */}
-            <div className="w-12 h-12 rounded-xl bg-amber-muted border border-amber-dim/30 flex items-center justify-center shrink-0">
-              <span className="font-display text-amber-glow text-lg">HL</span>
-            </div>
+        <div className="flex items-start gap-4">
+          {/* Avatar placeholder */}
+          <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-muted border border-amber-200/60 dark:border-amber-dim/30 flex items-center justify-center shrink-0">
+            <span className="font-display text-amber-600 dark:text-amber-glow text-lg">HL</span>
+          </div>
 
-            <div className="flex-1 min-w-0">
-              <div className="font-display text-lg tracking-widest text-amber-glow mb-0.5">HAMZA LATIF</div>
-              <p className="font-sans text-xs text-ink-300 leading-relaxed mb-4">
-                Built as a portfolio project to demonstrate full-stack data engineering and NLP skills.
-                The entire pipeline — from scraping to dashboard — was designed and built from scratch.
-              </p>
+          <div className="flex-1 min-w-0">
+            <div className="font-display text-lg tracking-widest text-amber-glow mb-0.5">HAMZA LATIF</div>
+            <p className="font-sans text-xs text-ink-300 leading-relaxed mb-4">
+              Built as a portfolio project to demonstrate full-stack data engineering and NLP skills.
+              The entire pipeline — from scraping to dashboard — was designed and built from scratch.
+            </p>
 
-              <div className="flex flex-wrap gap-2">
-                <a
-                  href="https://github.com/HamzaLatif02/roleprint"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono
-                             border border-border text-ink-300 hover:text-ink-100 hover:border-border-bright
-                             transition-colors"
-                >
-                  {/* GitHub icon */}
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-                  </svg>
-                  GitHub
-                </a>
+            <div className="flex flex-wrap gap-2">
+              <a
+                href="https://github.com/HamzaLatif02/roleprint"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono
+                           border border-border text-ink-300 hover:text-ink-100 hover:border-border-bright
+                           transition-colors"
+              >
+                {/* GitHub icon */}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                </svg>
+                GitHub
+              </a>
 
-                <a
-                  href="https://www.linkedin.com/in/latif-hamza/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono
-                             border border-border text-ink-300 hover:text-ink-100 hover:border-border-bright
-                             transition-colors"
-                >
-                  {/* LinkedIn icon */}
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                  LinkedIn
-                </a>
-              </div>
+              <a
+                href="https://www.linkedin.com/in/latif-hamza/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono
+                           border border-border text-ink-300 hover:text-ink-100 hover:border-border-bright
+                           transition-colors"
+              >
+                {/* LinkedIn icon */}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                </svg>
+                LinkedIn
+              </a>
             </div>
           </div>
         </div>

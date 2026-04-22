@@ -60,7 +60,7 @@ function SkillTag({ skill, highlight = false }) {
     <span
       className={`inline-flex items-center rounded-md px-2 py-0.5 font-mono text-xs m-0.5 transition-all ${
         highlight
-          ? 'bg-amber-faint border border-amber-muted text-amber-glow'
+          ? 'bg-amber-100 dark:bg-amber-faint border border-amber-300/60 dark:border-amber-muted text-amber-800 dark:text-amber-glow'
           : 'bg-void-600 border border-border text-ink-300'
       }`}
     >
