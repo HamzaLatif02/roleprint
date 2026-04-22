@@ -18,6 +18,7 @@ log = structlog.get_logger(__name__)
 # Job 1 — Scrape
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def scrape_job() -> None:
     """Run the full scrape pipeline across all role categories.
 
@@ -32,8 +33,11 @@ def scrape_job() -> None:
     try:
         summary = asyncio.run(run_all())
         total = sum(
-            v for source_counts in summary.values()
-            for v in (source_counts.values() if isinstance(source_counts, dict) else [source_counts])
+            v
+            for source_counts in summary.values()
+            for v in (
+                source_counts.values() if isinstance(source_counts, dict) else [source_counts]
+            )
         )
         log.info("scrape_job.complete", total_saved=total, summary=summary)
     except Exception:
@@ -43,6 +47,7 @@ def scrape_job() -> None:
 # ─────────────────────────────────────────────────────────────────────────────
 # Job 2 — NLP processing
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def process_job() -> None:
     """Run the NLP pipeline on all unprocessed job postings.

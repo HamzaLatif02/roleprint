@@ -54,6 +54,7 @@ ADZUNA_PAGES_PER_ROLE = int(os.getenv("ADZUNA_PAGES_PER_ROLE", "3"))
 
 # ── helpers ────────────────────────────────────────────────────────────────────
 
+
 def _save_postings(postings: List[dict], session: Session) -> int:
     """Bulk-insert postings, skipping duplicates.  Returns rows inserted."""
     inserted = 0
@@ -82,6 +83,7 @@ def _save_postings(postings: List[dict], session: Session) -> int:
 
 # ── Reed scrape ────────────────────────────────────────────────────────────────
 
+
 async def scrape_reed(session: Session) -> dict:
     """Run the Reed scraper across all role categories."""
     counts: dict = defaultdict(int)
@@ -105,6 +107,7 @@ async def scrape_reed(session: Session) -> dict:
 
 # ── RemoteOK scrape ────────────────────────────────────────────────────────────
 
+
 async def scrape_remoteok(session: Session) -> dict:
     """Run the RemoteOK scraper across all role categories."""
     counts: dict = defaultdict(int)
@@ -127,6 +130,7 @@ async def scrape_remoteok(session: Session) -> dict:
 
 
 # ── Adzuna scrape ──────────────────────────────────────────────────────────────
+
 
 async def scrape_adzuna(session: Session) -> dict:
     """Run the Adzuna scraper across all role categories.
@@ -160,6 +164,7 @@ async def scrape_adzuna(session: Session) -> dict:
 
 # ── orchestrator ───────────────────────────────────────────────────────────────
 
+
 async def run_all(session: Optional[Session] = None) -> dict:
     """Run both scrapers and return a summary dict.
 
@@ -186,9 +191,7 @@ async def run_all(session: Optional[Session] = None) -> dict:
         summary["adzuna"] = adzuna_counts
 
         total = (
-            sum(reed_counts.values())
-            + sum(remoteok_counts.values())
-            + sum(adzuna_counts.values())
+            sum(reed_counts.values()) + sum(remoteok_counts.values()) + sum(adzuna_counts.values())
         )
         log.info("runner.complete", total_saved=total, summary=summary)
 

@@ -21,14 +21,15 @@ from roleprint.db.models import JobPosting, ProcessedPosting, SkillTrend
 log = structlog.get_logger(__name__)
 
 # Thresholds
-_RISING_THRESHOLD_PCT = 20.0       # week-over-week growth to be "rising"
-_EMERGING_MAX_OLD_PCT = 0.02       # max pct_of_postings in the old week
-_EMERGING_MIN_CURRENT = 3          # minimum current mention_count
+_RISING_THRESHOLD_PCT = 20.0  # week-over-week growth to be "rising"
+_EMERGING_MAX_OLD_PCT = 0.02  # max pct_of_postings in the old week
+_EMERGING_MIN_CURRENT = 3  # minimum current mention_count
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 1. Week-over-week change
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def week_over_week_change(
     skill: str,
@@ -54,15 +55,17 @@ def week_over_week_change(
         - ``current_week``    – ``date`` of the current week_start.
         - ``previous_week``   – ``date`` of the prior week_start, or ``None``.
     """
-    rows = list(session.scalars(
-        select(SkillTrend)
-        .where(
-            SkillTrend.skill == skill,
-            SkillTrend.role_category == role_category,
+    rows = list(
+        session.scalars(
+            select(SkillTrend)
+            .where(
+                SkillTrend.skill == skill,
+                SkillTrend.role_category == role_category,
+            )
+            .order_by(SkillTrend.week_start.desc())
+            .limit(2)
         )
-        .order_by(SkillTrend.week_start.desc())
-        .limit(2)
-    ))
+    )
 
     if not rows:
         return {
@@ -110,25 +113,28 @@ def rising_skills(
         enriched with a ``"skill"`` key, sorted by ``change_pct`` desc.
     """
     # Find distinct skills that have data in the two most recent weeks
-    latest_weeks = list(session.scalars(
-        select(SkillTrend.week_start)
-        .where(SkillTrend.role_category == role_category)
-        .distinct()
-        .order_by(SkillTrend.week_start.desc())
-        .limit(2)
-    ))
+    latest_weeks = list(
+        session.scalars(
+            select(SkillTrend.week_start)
+            .where(SkillTrend.role_category == role_category)
+            .distinct()
+            .order_by(SkillTrend.week_start.desc())
+            .limit(2)
+        )
+    )
 
     if not latest_weeks:
         return []
 
     current_week = latest_weeks[0]
-    skills_this_week = list(session.scalars(
-        select(SkillTrend.skill)
-        .where(
-            SkillTrend.role_category == role_category,
-            SkillTrend.week_start == current_week,
+    skills_this_week = list(
+        session.scalars(
+            select(SkillTrend.skill).where(
+                SkillTrend.role_category == role_category,
+                SkillTrend.week_start == current_week,
+            )
         )
-    ))
+    )
 
     results = []
     for skill in skills_this_week:
@@ -143,6 +149,7 @@ def rising_skills(
 # ─────────────────────────────────────────────────────────────────────────────
 # 2. Skill co-occurrence
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def skill_cooccurrence(
     role_category: str,
@@ -173,11 +180,13 @@ def skill_cooccurrence(
     from scipy.sparse import lil_matrix, csr_matrix  # type: ignore[import]
 
     # Fetch skill lists from all processed postings for this role
-    skill_lists: List[List[str]] = list(session.scalars(
-        select(ProcessedPosting.skills_extracted)
-        .join(JobPosting, ProcessedPosting.posting_id == JobPosting.id)
-        .where(JobPosting.role_category == role_category)
-    ))
+    skill_lists: List[List[str]] = list(
+        session.scalars(
+            select(ProcessedPosting.skills_extracted)
+            .join(JobPosting, ProcessedPosting.posting_id == JobPosting.id)
+            .where(JobPosting.role_category == role_category)
+        )
+    )
 
     if not skill_lists:
         return {"skills": [], "top_pairs": [], "matrix": []}
@@ -209,11 +218,13 @@ def skill_cooccurrence(
         for j in range(i + 1, n_skills):
             count = int(cooc[i, j])
             if count >= min_count:
-                pairs.append({
-                    "skill_a": all_skills[i],
-                    "skill_b": all_skills[j],
-                    "count": count,
-                })
+                pairs.append(
+                    {
+                        "skill_a": all_skills[i],
+                        "skill_b": all_skills[j],
+                        "count": count,
+                    }
+                )
 
     pairs.sort(key=lambda x: x["count"], reverse=True)
 
@@ -236,6 +247,7 @@ def skill_cooccurrence(
 # 3. Role similarity
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def role_similarity(
     role_a: str,
     role_b: str,
@@ -255,10 +267,9 @@ def role_similarity(
     Returns:
         Float in [0, 1] — 1.0 = identical skill profiles, 0.0 = no overlap.
     """
+
     def _skill_vector(role: str) -> Dict[str, float]:
-        rows = list(session.scalars(
-            select(SkillTrend).where(SkillTrend.role_category == role)
-        ))
+        rows = list(session.scalars(select(SkillTrend).where(SkillTrend.role_category == role)))
         if not rows:
             return {}
         # Average pct_of_postings per skill (in case of multiple weeks)
@@ -318,6 +329,7 @@ def role_similarity_matrix(
 # 4. Emerging skills
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def emerging_skills(
     session: Session,
     lookback_weeks: int = 4,
@@ -357,9 +369,9 @@ def emerging_skills(
     lookback_start = latest_week - timedelta(weeks=lookback_weeks)
 
     # Fetch current-week rows
-    current_rows = list(session.scalars(
-        select(SkillTrend).where(SkillTrend.week_start == latest_week)
-    ))
+    current_rows = list(
+        session.scalars(select(SkillTrend).where(SkillTrend.week_start == latest_week))
+    )
 
     # For each (skill, role), find the MAX pct and the row at exactly lookback_start
     # across the whole lookback window (exclusive of current week).
@@ -381,14 +393,13 @@ def emerging_skills(
     ).all()
 
     historical_index: Dict[Tuple[str, str], float] = {
-        (r.skill, r.role_category): r.max_pct
-        for r in historical_rows
+        (r.skill, r.role_category): r.max_pct for r in historical_rows
     }
 
     # Also fetch the exact lookback_start row to use its count for growth calculation
-    old_count_rows = list(session.scalars(
-        select(SkillTrend).where(SkillTrend.week_start == lookback_start)
-    ))
+    old_count_rows = list(
+        session.scalars(select(SkillTrend).where(SkillTrend.week_start == lookback_start))
+    )
     old_count_index: Dict[Tuple[str, str], int] = {
         (r.skill, r.role_category): r.mention_count for r in old_count_rows
     }
@@ -412,14 +423,16 @@ def emerging_skills(
         else:
             growth_pct = (row.mention_count - old_count) / old_count * 100.0
 
-        emerging.append({
-            "skill": row.skill,
-            "role_category": row.role_category,
-            "growth_pct": round(growth_pct, 1),
-            "current_count": row.mention_count,
-            "old_count": old_count,
-            "current_week": str(row.week_start),
-        })
+        emerging.append(
+            {
+                "skill": row.skill,
+                "role_category": row.role_category,
+                "growth_pct": round(growth_pct, 1),
+                "current_count": row.mention_count,
+                "old_count": old_count,
+                "current_week": str(row.week_start),
+            }
+        )
 
     emerging.sort(key=lambda x: x["growth_pct"], reverse=True)
 

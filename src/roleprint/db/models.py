@@ -29,9 +29,7 @@ class JobPosting(Base):
 
     __tablename__ = "job_postings"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     source: Mapped[str] = mapped_column(String(50), nullable=False)
     role_category: Mapped[str] = mapped_column(String(100), nullable=False)
     title: Mapped[str] = mapped_column(Text, nullable=False)
@@ -72,9 +70,7 @@ class ProcessedPosting(Base):
 
     __tablename__ = "processed_postings"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     posting_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("job_postings.id", ondelete="CASCADE"),
@@ -106,9 +102,7 @@ class SkillTrend(Base):
 
     __tablename__ = "skill_trends"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     skill: Mapped[str] = mapped_column(String(100), nullable=False)
     role_category: Mapped[str] = mapped_column(String(100), nullable=False)
     week_start: Mapped[date] = mapped_column(Date, nullable=False)
@@ -124,6 +118,5 @@ class SkillTrend(Base):
 
     def __repr__(self) -> str:
         return (
-            f"<SkillTrend skill={self.skill!r} role={self.role_category!r}"
-            f" week={self.week_start}>"
+            f"<SkillTrend skill={self.skill!r} role={self.role_category!r} week={self.week_start}>"
         )

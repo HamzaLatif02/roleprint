@@ -27,13 +27,14 @@ from roleprint.nlp.trends import (
 
 # ── Reference dates ───────────────────────────────────────────────────────────
 
-TODAY = date(2026, 4, 13)           # a Monday, for stable arithmetic
-CURR = TODAY                        # current week_start
-PREV = TODAY - timedelta(weeks=1)   # previous week
-OLD4 = TODAY - timedelta(weeks=4)   # four weeks back
+TODAY = date(2026, 4, 13)  # a Monday, for stable arithmetic
+CURR = TODAY  # current week_start
+PREV = TODAY - timedelta(weeks=1)  # previous week
+OLD4 = TODAY - timedelta(weeks=4)  # four weeks back
 
 
 # ── DB fixture ────────────────────────────────────────────────────────────────
+
 
 @pytest.fixture(scope="module")
 def db() -> Session:
@@ -84,47 +85,41 @@ def _seed(s: Session) -> None:
     # ── skill_trends rows ─────────────────────────────────────────────────────
     trends = [
         # data analyst — current week
-        _trend("data analyst", "Python",                CURR, 42, 0.84),
-        _trend("data analyst", "SQL",                   CURR, 38, 0.76),
-        _trend("data analyst", "dbt",                   CURR, 19, 0.38),
-        _trend("data analyst", "Snowflake",             CURR, 17, 0.34),
-        _trend("data analyst", "stakeholder management",CURR, 31, 0.62),
-        _trend("data analyst", "agile",                 CURR, 22, 0.44),
-        _trend("data analyst", "LLM",                   CURR,  8, 0.16),
-
+        _trend("data analyst", "Python", CURR, 42, 0.84),
+        _trend("data analyst", "SQL", CURR, 38, 0.76),
+        _trend("data analyst", "dbt", CURR, 19, 0.38),
+        _trend("data analyst", "Snowflake", CURR, 17, 0.34),
+        _trend("data analyst", "stakeholder management", CURR, 31, 0.62),
+        _trend("data analyst", "agile", CURR, 22, 0.44),
+        _trend("data analyst", "LLM", CURR, 8, 0.16),
         # data analyst — previous week
-        _trend("data analyst", "Python",                PREV, 30, 0.60),
-        _trend("data analyst", "SQL",                   PREV, 38, 0.76),
-        _trend("data analyst", "dbt",                   PREV, 10, 0.20),
-        _trend("data analyst", "stakeholder management",PREV, 30, 0.60),
-
+        _trend("data analyst", "Python", PREV, 30, 0.60),
+        _trend("data analyst", "SQL", PREV, 38, 0.76),
+        _trend("data analyst", "dbt", PREV, 10, 0.20),
+        _trend("data analyst", "stakeholder management", PREV, 30, 0.60),
         # data analyst — 4-weeks-ago (for emerging)
-        _trend("data analyst", "LLM",                   OLD4,  1, 0.02),
-
+        _trend("data analyst", "LLM", OLD4, 1, 0.02),
         # ml engineer — current week (shares Python with data analyst)
-        _trend("ml engineer", "Python",                 CURR, 48, 0.96),
-        _trend("ml engineer", "PyTorch",                CURR, 35, 0.70),
-        _trend("ml engineer", "Kubernetes",             CURR, 22, 0.44),
-        _trend("ml engineer", "MLflow",                 CURR, 14, 0.28),
-        _trend("ml engineer", "LangChain",              CURR, 11, 0.22),
-
+        _trend("ml engineer", "Python", CURR, 48, 0.96),
+        _trend("ml engineer", "PyTorch", CURR, 35, 0.70),
+        _trend("ml engineer", "Kubernetes", CURR, 22, 0.44),
+        _trend("ml engineer", "MLflow", CURR, 14, 0.28),
+        _trend("ml engineer", "LangChain", CURR, 11, 0.22),
         # ml engineer — previous week
-        _trend("ml engineer", "Python",                 PREV, 40, 0.80),
-        _trend("ml engineer", "PyTorch",                PREV, 28, 0.56),
-        _trend("ml engineer", "LangChain",              PREV,  3, 0.06),
-
+        _trend("ml engineer", "Python", PREV, 40, 0.80),
+        _trend("ml engineer", "PyTorch", PREV, 28, 0.56),
+        _trend("ml engineer", "LangChain", PREV, 3, 0.06),
         # devops — very different profile (for low similarity test)
-        _trend("devops", "Terraform",                   CURR, 30, 0.80),
-        _trend("devops", "Kubernetes",                  CURR, 28, 0.74),
-        _trend("devops", "Helm",                        CURR, 18, 0.48),
-        _trend("devops", "Prometheus",                  CURR, 15, 0.40),
-
+        _trend("devops", "Terraform", CURR, 30, 0.80),
+        _trend("devops", "Kubernetes", CURR, 28, 0.74),
+        _trend("devops", "Helm", CURR, 18, 0.48),
+        _trend("devops", "Prometheus", CURR, 15, 0.40),
         # data scientist — highly similar to data analyst
-        _trend("data scientist", "Python",              CURR, 45, 0.90),
-        _trend("data scientist", "SQL",                 CURR, 32, 0.64),
-        _trend("data scientist", "stakeholder management",CURR,28, 0.56),
-        _trend("data scientist", "agile",               CURR, 18, 0.36),
-        _trend("data scientist", "PyTorch",             CURR, 25, 0.50),
+        _trend("data scientist", "Python", CURR, 45, 0.90),
+        _trend("data scientist", "SQL", CURR, 32, 0.64),
+        _trend("data scientist", "stakeholder management", CURR, 28, 0.56),
+        _trend("data scientist", "agile", CURR, 18, 0.36),
+        _trend("data scientist", "PyTorch", CURR, 25, 0.50),
     ]
     s.add_all(trends)
     s.flush()
@@ -155,13 +150,21 @@ def _seed(s: Session) -> None:
 # 1. week_over_week_change
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 class TestWeekOverWeekChange:
     def test_returns_required_keys(self, db):
         result = week_over_week_change("Python", "data analyst", db)
-        assert all(k in result for k in (
-            "change_pct", "is_rising", "current_count",
-            "previous_count", "current_week", "previous_week",
-        ))
+        assert all(
+            k in result
+            for k in (
+                "change_pct",
+                "is_rising",
+                "current_count",
+                "previous_count",
+                "current_week",
+                "previous_week",
+            )
+        )
 
     def test_positive_growth(self, db):
         # Python: 30 → 42  = +40 %
@@ -231,6 +234,7 @@ class TestRisingSkills:
 # 2. skill_cooccurrence
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 class TestSkillCooccurrence:
     def test_returns_required_keys(self, db):
         result = skill_cooccurrence("data analyst", db)
@@ -285,6 +289,7 @@ class TestSkillCooccurrence:
 # ─────────────────────────────────────────────────────────────────────────────
 # 3. role_similarity
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestRoleSimilarity:
     def test_identical_role_returns_one(self, db):
@@ -352,6 +357,7 @@ class TestRoleSimilarityMatrix:
 # 4. emerging_skills
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 class TestEmergingSkills:
     def test_returns_list(self, db):
         result = emerging_skills(db, lookback_weeks=4)
@@ -407,6 +413,5 @@ class TestEmergingSkills:
         # Python has old_pct=0.84 — way above max_old_pct, must not appear
         result = emerging_skills(db, lookback_weeks=4)
         assert not any(
-            r["skill"] == "Python" and r["role_category"] == "data analyst"
-            for r in result
+            r["skill"] == "Python" and r["role_category"] == "data analyst" for r in result
         )

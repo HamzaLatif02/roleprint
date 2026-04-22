@@ -43,6 +43,7 @@ def _get_analyzer():
     global _analyzer
     if _analyzer is None:
         import nltk
+
         try:
             from nltk.sentiment.vader import SentimentIntensityAnalyzer
         except LookupError:
@@ -55,6 +56,7 @@ def _get_analyzer():
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
+
 
 def analyse(text: str) -> Dict[str, float]:
     """Compute sentiment and urgency signals for a job description.

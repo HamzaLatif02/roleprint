@@ -38,6 +38,7 @@ from roleprint.nlp.pipeline import (
 # Shared DB fixture
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 @pytest.fixture(scope="module")
 def db():
     engine = create_engine("sqlite:///:memory:", echo=False)
@@ -65,6 +66,7 @@ def _make_posting(role: str, text: str, source: str = "reed") -> JobPosting:
 # 1. cleaner.py
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 class TestCleaner:
     def test_strip_html_tags(self):
         html = "<p>We need <strong>Python</strong> and <em>SQL</em> skills.</p>"
@@ -89,7 +91,9 @@ class TestCleaner:
         assert "equal opportunities" not in out.lower()
 
     def test_removes_right_to_work_clause(self):
-        text = "You must have the right to work in the United Kingdom. Strong Python skills required."
+        text = (
+            "You must have the right to work in the United Kingdom. Strong Python skills required."
+        )
         out = cleaner.remove_boilerplate(text)
         assert "right to work" not in out.lower()
         # Preserves the important part
@@ -136,6 +140,7 @@ class TestCleaner:
 # 2. skill_extractor.py
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 class TestSkillExtractor:
     def test_extracts_single_word_technical_skill(self):
         skills = skill_extractor.extract_skills("Must know Python and SQL.")
@@ -175,15 +180,31 @@ class TestSkillExtractor:
 
     def test_swe_skills(self):
         skills = skill_extractor.extract_skills(SWE_JD)
-        expected = ["Python", "TypeScript", "Docker", "Kubernetes", "Kafka",
-                    "PostgreSQL", "Redis", "Terraform", "GitHub Actions"]
+        expected = [
+            "Python",
+            "TypeScript",
+            "Docker",
+            "Kubernetes",
+            "Kafka",
+            "PostgreSQL",
+            "Redis",
+            "Terraform",
+            "GitHub Actions",
+        ]
         for s in expected:
             assert s in skills, f"Expected '{s}' in SWE skills"
 
     def test_pm_skills(self):
         skills = skill_extractor.extract_skills(PM_JD)
-        expected = ["SQL", "agile", "scrum", "A/B testing", "stakeholder management",
-                    "roadmap", "OKRs"]
+        expected = [
+            "SQL",
+            "agile",
+            "scrum",
+            "A/B testing",
+            "stakeholder management",
+            "roadmap",
+            "OKRs",
+        ]
         for s in expected:
             assert s in skills, f"Expected '{s}' in PM skills"
 
@@ -235,6 +256,7 @@ class TestSkillExtractor:
 # ─────────────────────────────────────────────────────────────────────────────
 # 3. sentiment.py
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestSentiment:
     def test_returns_all_keys(self):
@@ -326,16 +348,12 @@ class TestNER:
         assert result["products"] == []
 
     def test_deduplicates_entities(self):
-        mock_nlp = _make_mock_nlp([
-            ("London", "GPE"), ("London", "GPE"), ("TechCorp", "ORG")
-        ])
+        mock_nlp = _make_mock_nlp([("London", "GPE"), ("London", "GPE"), ("TechCorp", "ORG")])
         result = ner.extract_entities("London London TechCorp", nlp=mock_nlp)
         assert result["locations"].count("London") == 1
 
     def test_returns_sorted_lists(self):
-        mock_nlp = _make_mock_nlp([
-            ("Zurich", "GPE"), ("Amsterdam", "GPE"), ("Berlin", "GPE")
-        ])
+        mock_nlp = _make_mock_nlp([("Zurich", "GPE"), ("Amsterdam", "GPE"), ("Berlin", "GPE")])
         result = ner.extract_entities("text", nlp=mock_nlp)
         assert result["locations"] == sorted(result["locations"])
 
@@ -362,6 +380,7 @@ class TestNER:
 # 5. topic_model.py
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 class TestTopicModel:
     def setup_method(self):
         topic_model.reset()
@@ -384,10 +403,13 @@ class TestTopicModel:
         mock_model = MagicMock()
         mock_model.transform.return_value = ([0, 1], [0.9, 0.7])
         import pandas as pd
-        mock_model.get_topic_info.return_value = pd.DataFrame({
-            "Topic": [0, 1],
-            "Name": ["data analysis", "machine learning"],
-        })
+
+        mock_model.get_topic_info.return_value = pd.DataFrame(
+            {
+                "Topic": [0, 1],
+                "Name": ["data analysis", "machine learning"],
+            }
+        )
         texts = ["data SQL analysis", "machine learning pytorch"]
         results = topic_model.assign_topics(texts, model=mock_model)
         assert len(results) == 2
@@ -405,6 +427,7 @@ class TestTopicModel:
 # ─────────────────────────────────────────────────────────────────────────────
 # 6. pipeline.py integration
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestPipeline:
     def test_process_posting_returns_required_keys(self):
@@ -470,9 +493,9 @@ class TestPipeline:
 
         assert posting.is_processed is True
         proc = db.scalar(
-            __import__("sqlalchemy").select(ProcessedPosting).where(
-                ProcessedPosting.posting_id == posting.id
-            )
+            __import__("sqlalchemy")
+            .select(ProcessedPosting)
+            .where(ProcessedPosting.posting_id == posting.id)
         )
         assert proc is not None
         assert proc.sentiment_score == 0.3
@@ -493,9 +516,10 @@ class TestPipeline:
         db.commit()
 
         from sqlalchemy import select as sa_select
-        trends = list(db.scalars(
-            sa_select(SkillTrend).where(SkillTrend.role_category == "ml engineer")
-        ))
+
+        trends = list(
+            db.scalars(sa_select(SkillTrend).where(SkillTrend.role_category == "ml engineer"))
+        )
         skill_names = {t.skill for t in trends}
         assert "Python" in skill_names
         assert "Docker" in skill_names
@@ -504,8 +528,11 @@ class TestPipeline:
         # Insert initial trend
         ws = _week_start(datetime(2026, 4, 14, tzinfo=timezone.utc))
         initial = SkillTrend(
-            skill="Python", role_category="test_role",
-            week_start=ws, mention_count=5, pct_of_postings=0.5,
+            skill="Python",
+            role_category="test_role",
+            week_start=ws,
+            mention_count=5,
+            pct_of_postings=0.5,
         )
         db.add(initial)
         db.commit()
@@ -525,6 +552,7 @@ class TestPipeline:
         db.commit()
 
         from sqlalchemy import select as sa_select
+
         trend = db.scalar(
             sa_select(SkillTrend).where(
                 SkillTrend.skill == "Python",

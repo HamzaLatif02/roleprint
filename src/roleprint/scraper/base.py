@@ -65,9 +65,7 @@ class BaseJobScraper(ABC):
         candidate_urls = {p["url"] for p in postings}
 
         existing_urls: set = set(
-            session.scalars(
-                select(JobPosting.url).where(JobPosting.url.in_(candidate_urls))
-            )
+            session.scalars(select(JobPosting.url).where(JobPosting.url.in_(candidate_urls)))
         )
 
         new_postings = [p for p in postings if p["url"] not in existing_urls]

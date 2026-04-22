@@ -41,31 +41,42 @@ def get_stats_summary(
 
     if role:
         # ── Filtered stats ────────────────────────────────────────────────
-        total = session.scalar(
-            select(sa_func.count(JobPosting.id))
-            .where(JobPosting.role_category == role)
-        ) or 0
-
-        processed = session.scalar(
-            select(sa_func.count(ProcessedPosting.id))
-            .join(JobPosting, JobPosting.id == ProcessedPosting.posting_id)
-            .where(JobPosting.role_category == role)
-        ) or 0
-
-        last_updated = session.scalar(
-            select(sa_func.max(JobPosting.scraped_at))
-            .where(JobPosting.role_category == role)
+        total = (
+            session.scalar(
+                select(sa_func.count(JobPosting.id)).where(JobPosting.role_category == role)
+            )
+            or 0
         )
 
-        weeks_of_data = session.scalar(
-            select(sa_func.count(distinct(SkillTrend.week_start)))
-            .where(SkillTrend.role_category == role)
-        ) or 0
+        processed = (
+            session.scalar(
+                select(sa_func.count(ProcessedPosting.id))
+                .join(JobPosting, JobPosting.id == ProcessedPosting.posting_id)
+                .where(JobPosting.role_category == role)
+            )
+            or 0
+        )
 
-        source_rows = list(session.scalars(
-            select(distinct(JobPosting.source))
-            .where(JobPosting.role_category == role, JobPosting.source.isnot(None))
-        ))
+        last_updated = session.scalar(
+            select(sa_func.max(JobPosting.scraped_at)).where(JobPosting.role_category == role)
+        )
+
+        weeks_of_data = (
+            session.scalar(
+                select(sa_func.count(distinct(SkillTrend.week_start))).where(
+                    SkillTrend.role_category == role
+                )
+            )
+            or 0
+        )
+
+        source_rows = list(
+            session.scalars(
+                select(distinct(JobPosting.source)).where(
+                    JobPosting.role_category == role, JobPosting.source.isnot(None)
+                )
+            )
+        )
 
         last_scraped_str = str(last_updated) if last_updated else None
         result = {
@@ -85,17 +96,17 @@ def get_stats_summary(
 
         last_updated = session.scalar(select(sa_func.max(JobPosting.scraped_at)))
 
-        roles_tracked = session.scalar(
-            select(sa_func.count(distinct(JobPosting.role_category)))
-        ) or 0
+        roles_tracked = (
+            session.scalar(select(sa_func.count(distinct(JobPosting.role_category)))) or 0
+        )
 
-        weeks_of_data = session.scalar(
-            select(sa_func.count(distinct(SkillTrend.week_start)))
-        ) or 0
+        weeks_of_data = session.scalar(select(sa_func.count(distinct(SkillTrend.week_start)))) or 0
 
-        source_rows = list(session.scalars(
-            select(distinct(JobPosting.source)).where(JobPosting.source.isnot(None))
-        ))
+        source_rows = list(
+            session.scalars(
+                select(distinct(JobPosting.source)).where(JobPosting.source.isnot(None))
+            )
+        )
 
         last_scraped_str = str(last_updated) if last_updated else None
         result = {

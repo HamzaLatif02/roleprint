@@ -43,8 +43,7 @@ _BOILERPLATE_PATTERNS: list = [
 ]
 
 _COMPILED_BOILERPLATE = [
-    re.compile(pat, re.IGNORECASE | re.DOTALL)
-    for pat in _BOILERPLATE_PATTERNS
+    re.compile(pat, re.IGNORECASE | re.DOTALL) for pat in _BOILERPLATE_PATTERNS
 ]
 
 # Collapse 3+ newlines to 2
@@ -56,6 +55,7 @@ _BULLET_CHARS = re.compile(r"[•·▪▸►‣⁃✓✗✘★☆]")
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
+
 
 def strip_html(text: str) -> str:
     """Remove all HTML/XML tags and decode entities.
@@ -101,11 +101,14 @@ def normalise_unicode(text: str) -> str:
     """Replace fancy quotes/dashes and normalise to NFC unicode form."""
     # Smart quotes → plain quotes
     replacements = {
-        "\u2018": "'", "\u2019": "'",   # left/right single quotation marks
-        "\u201c": '"', "\u201d": '"',   # left/right double quotation marks
-        "\u2013": "-", "\u2014": "-",   # en-dash, em-dash
-        "\u00a0": " ",                  # non-breaking space
-        "\u2022": "-",                  # bullet
+        "\u2018": "'",
+        "\u2019": "'",  # left/right single quotation marks
+        "\u201c": '"',
+        "\u201d": '"',  # left/right double quotation marks
+        "\u2013": "-",
+        "\u2014": "-",  # en-dash, em-dash
+        "\u00a0": " ",  # non-breaking space
+        "\u2022": "-",  # bullet
     }
     for src, dst in replacements.items():
         text = text.replace(src, dst)

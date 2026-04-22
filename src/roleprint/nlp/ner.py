@@ -25,10 +25,31 @@ _KEPT_LABELS = {"ORG", "GPE", "PRODUCT", "LOC"}
 # Known tech tools/frameworks that spaCy mis-labels or misses entirely.
 # These are injected as synthetic ORG entities.
 _TECH_OVERRIDE_PATTERNS = [
-    "Python", "SQL", "dbt", "Spark", "Kafka", "Airflow", "Kubernetes",
-    "Docker", "Terraform", "React", "TypeScript", "PostgreSQL", "Snowflake",
-    "Databricks", "Redis", "FastAPI", "Django", "Flask", "PyTorch",
-    "TensorFlow", "scikit-learn", "pandas", "NumPy", "Tableau", "Power BI",
+    "Python",
+    "SQL",
+    "dbt",
+    "Spark",
+    "Kafka",
+    "Airflow",
+    "Kubernetes",
+    "Docker",
+    "Terraform",
+    "React",
+    "TypeScript",
+    "PostgreSQL",
+    "Snowflake",
+    "Databricks",
+    "Redis",
+    "FastAPI",
+    "Django",
+    "Flask",
+    "PyTorch",
+    "TensorFlow",
+    "scikit-learn",
+    "pandas",
+    "NumPy",
+    "Tableau",
+    "Power BI",
 ]
 
 # ── spaCy loader ──────────────────────────────────────────────────────────────
@@ -41,6 +62,7 @@ def get_nlp() -> Any:
     global _nlp
     if _nlp is None:
         import spacy
+
         try:
             _nlp = spacy.load("en_core_web_sm")
             log.debug("ner.model_loaded", model="en_core_web_sm")
@@ -53,6 +75,7 @@ def get_nlp() -> Any:
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
+
 
 def extract_entities(
     text: str,

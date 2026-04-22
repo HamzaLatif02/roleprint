@@ -35,6 +35,7 @@ BATCH_SIZE = int(os.getenv("NLP_BATCH_SIZE", "50"))
 
 # ── Individual posting processor ─────────────────────────────────────────────
 
+
 def process_posting(
     posting: JobPosting,
     nlp: Optional[Any] = None,
@@ -86,6 +87,7 @@ def process_posting(
 
 # ── Database write helpers ────────────────────────────────────────────────────
 
+
 def _write_result(session: Session, posting: JobPosting, result: Dict) -> None:
     """Insert a ``ProcessedPosting`` row and mark the source as processed."""
     proc = ProcessedPosting(
@@ -125,14 +127,18 @@ def _upsert_skill_trend(
     """
     # Query the actual number of postings for this role/week, not just the batch.
     from datetime import time as dt_time
+
     week_end = week_start + timedelta(days=7)
-    true_total: int = session.scalar(
-        select(sa_func.count(JobPosting.id)).where(
-            JobPosting.role_category == role_category,
-            JobPosting.scraped_at >= datetime.combine(week_start, dt_time.min),
-            JobPosting.scraped_at < datetime.combine(week_end, dt_time.min),
+    true_total: int = (
+        session.scalar(
+            select(sa_func.count(JobPosting.id)).where(
+                JobPosting.role_category == role_category,
+                JobPosting.scraped_at >= datetime.combine(week_start, dt_time.min),
+                JobPosting.scraped_at < datetime.combine(week_end, dt_time.min),
+            )
         )
-    ) or total_this_week  # fall back to batch size if query returns 0 (e.g. tests)
+        or total_this_week
+    )  # fall back to batch size if query returns 0 (e.g. tests)
 
     existing = session.scalar(
         select(SkillTrend).where(
@@ -147,13 +153,15 @@ def _upsert_skill_trend(
         existing.pct_of_postings = round(pct, 4)
     else:
         pct = delta_count / true_total if true_total > 0 else 0.0
-        session.add(SkillTrend(
-            skill=skill,
-            role_category=role_category,
-            week_start=week_start,
-            mention_count=delta_count,
-            pct_of_postings=round(pct, 4),
-        ))
+        session.add(
+            SkillTrend(
+                skill=skill,
+                role_category=role_category,
+                week_start=week_start,
+                mention_count=delta_count,
+                pct_of_postings=round(pct, 4),
+            )
+        )
 
 
 def _update_skill_trends(session: Session, batch_results: List[Tuple[JobPosting, Dict]]) -> None:
@@ -178,6 +186,7 @@ def _update_skill_trends(session: Session, batch_results: List[Tuple[JobPosting,
 
 
 # ── Batch runner ──────────────────────────────────────────────────────────────
+
 
 def run_batch(
     session: Session,

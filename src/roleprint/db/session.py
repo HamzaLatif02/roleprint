@@ -23,6 +23,7 @@ def _get_engine() -> Engine:
         # pooling; also set a statement timeout as a safety net.
         if "pooler.supabase.com" in url or ":6543" in url:
             from sqlalchemy.pool import NullPool
+
             _engine = create_engine(
                 url,
                 poolclass=NullPool,
@@ -42,9 +43,7 @@ def SessionLocal() -> Session:  # type: ignore[override]
     """Return a new SQLAlchemy Session bound to the configured database."""
     global _SessionLocal
     if _SessionLocal is None:
-        _SessionLocal = sessionmaker(
-            bind=_get_engine(), autocommit=False, autoflush=False
-        )
+        _SessionLocal = sessionmaker(bind=_get_engine(), autocommit=False, autoflush=False)
     return _SessionLocal()
 
 

@@ -74,9 +74,7 @@ class AdzunaScraper(BaseJobScraper):
         is already scoped to GB; it is not forwarded as a query param.
         """
         if self._client is None:
-            raise RuntimeError(
-                "Use 'async with AdzunaScraper() as s:' context manager."
-            )
+            raise RuntimeError("Use 'async with AdzunaScraper() as s:' context manager.")
 
         results: List[dict] = []
 
@@ -153,9 +151,7 @@ class AdzunaScraper(BaseJobScraper):
         created = raw.get("created")
         if created:
             try:
-                posted_at = datetime.fromisoformat(
-                    created.rstrip("Z")
-                ).replace(tzinfo=timezone.utc)
+                posted_at = datetime.fromisoformat(created.rstrip("Z")).replace(tzinfo=timezone.utc)
             except (ValueError, AttributeError):
                 pass
 
@@ -171,9 +167,7 @@ class AdzunaScraper(BaseJobScraper):
 
     # ── private helpers ───────────────────────────────────────────────────────
 
-    async def _fetch(
-        self, url: str, params: dict
-    ) -> Optional[dict]:
+    async def _fetch(self, url: str, params: dict) -> Optional[dict]:
         """GET *url* with *params*, exponential backoff on 429."""
         assert self._client is not None
 
@@ -185,7 +179,7 @@ class AdzunaScraper(BaseJobScraper):
                     return resp.json()
 
                 if resp.status_code == 429:
-                    wait = _BACKOFF_BASE ** attempt + random.uniform(0, _JITTER_MAX)
+                    wait = _BACKOFF_BASE**attempt + random.uniform(0, _JITTER_MAX)
                     log.warning(
                         "adzuna.rate_limited",
                         attempt=attempt,
@@ -203,7 +197,7 @@ class AdzunaScraper(BaseJobScraper):
                 return None
 
             except httpx.RequestError as exc:
-                wait = _BACKOFF_BASE ** attempt + random.uniform(0, _JITTER_MAX)
+                wait = _BACKOFF_BASE**attempt + random.uniform(0, _JITTER_MAX)
                 log.warning(
                     "adzuna.request_error",
                     error=str(exc),

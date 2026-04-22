@@ -20,6 +20,7 @@ _VOCAB_PATH = Path(__file__).parent / "skills_vocab.json"
 
 # ── Vocabulary loading ────────────────────────────────────────────────────────
 
+
 def load_vocab(path: Path = _VOCAB_PATH) -> dict:
     """Load skills vocabulary from JSON.
 
@@ -91,6 +92,7 @@ def _ensure_loaded() -> None:
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
+
 
 def extract_skills(
     text: str,

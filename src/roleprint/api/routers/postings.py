@@ -70,21 +70,25 @@ def get_recent_postings(
 
     data = []
     for row in rows:
-        data.append({
-            "id": str(row.id),
-            "title": row.title or "",
-            "company": row.company or "",
-            "location": row.location or "",
-            "url": row.url or "",
-            "source": row.source or "",
-            "role_category": row.role_category or "",
-            "scraped_at": str(row.scraped_at),
-            "posted_at": str(row.posted_at) if row.posted_at else None,
-            "skills": row.skills_extracted or [],
-            "sentiment_score": float(row.sentiment_score) if row.sentiment_score is not None else None,
-            "topics": row.topics or {},
-            "entities": row.entities or {},
-        })
+        data.append(
+            {
+                "id": str(row.id),
+                "title": row.title or "",
+                "company": row.company or "",
+                "location": row.location or "",
+                "url": row.url or "",
+                "source": row.source or "",
+                "role_category": row.role_category or "",
+                "scraped_at": str(row.scraped_at),
+                "posted_at": str(row.posted_at) if row.posted_at else None,
+                "skills": row.skills_extracted or [],
+                "sentiment_score": float(row.sentiment_score)
+                if row.sentiment_score is not None
+                else None,
+                "topics": row.topics or {},
+                "entities": row.entities or {},
+            }
+        )
 
     return {
         "data": data,

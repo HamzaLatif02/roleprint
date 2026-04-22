@@ -180,7 +180,7 @@ class RemoteOKScraper(BaseJobScraper):
                     return self._cache
 
                 if resp.status_code in (429, 503):
-                    wait = _BACKOFF_BASE ** attempt + random.uniform(0, _JITTER_MAX)
+                    wait = _BACKOFF_BASE**attempt + random.uniform(0, _JITTER_MAX)
                     log.warning(
                         "remoteok.rate_limited",
                         status=resp.status_code,
@@ -194,7 +194,7 @@ class RemoteOKScraper(BaseJobScraper):
                 return []
 
             except (httpx.RequestError, ValueError) as exc:
-                wait = _BACKOFF_BASE ** attempt + random.uniform(0, _JITTER_MAX)
+                wait = _BACKOFF_BASE**attempt + random.uniform(0, _JITTER_MAX)
                 log.warning("remoteok.request_error", error=str(exc), attempt=attempt)
                 await asyncio.sleep(wait)
 
@@ -217,4 +217,5 @@ class RemoteOKScraper(BaseJobScraper):
 def BeautifulSoup_strip(html: str) -> str:
     """Strip HTML tags from a string using BeautifulSoup."""
     from bs4 import BeautifulSoup
+
     return BeautifulSoup(html, "html.parser").get_text(" ", strip=True)

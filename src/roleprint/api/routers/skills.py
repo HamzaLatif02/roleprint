@@ -32,6 +32,7 @@ _CACHE_TTL = 300  # 5 minutes
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 
+
 def _get_latest_week(session: Session):
     return session.scalar(
         select(SkillTrend.week_start).order_by(SkillTrend.week_start.desc()).limit(1)
@@ -64,10 +65,7 @@ def _build_trending(
     prev_stmt = select(SkillTrend).where(SkillTrend.week_start == prev_week)
     if role_category:
         prev_stmt = prev_stmt.where(SkillTrend.role_category == role_category)
-    prev_index = {
-        (r.skill, r.role_category): r.mention_count
-        for r in session.scalars(prev_stmt)
-    }
+    prev_index = {(r.skill, r.role_category): r.mention_count for r in session.scalars(prev_stmt)}
 
     results = []
     for row in current_rows:
@@ -77,14 +75,16 @@ def _build_trending(
         else:
             wow = (row.mention_count - prev_count) / prev_count * 100.0
 
-        results.append({
-            "skill": row.skill,
-            "role_category": row.role_category,
-            "mention_count": row.mention_count,
-            "pct_of_postings": row.pct_of_postings,
-            "wow_change": round(wow, 1),
-            "is_rising": wow > 20.0,
-        })
+        results.append(
+            {
+                "skill": row.skill,
+                "role_category": row.role_category,
+                "mention_count": row.mention_count,
+                "pct_of_postings": row.pct_of_postings,
+                "wow_change": round(wow, 1),
+                "is_rising": wow > 20.0,
+            }
+        )
     return results
 
 
@@ -92,9 +92,7 @@ def _get_skill_vector(session: Session, role: str) -> dict:
     """skill → max pct_of_postings across all weeks."""
     from collections import defaultdict
 
-    rows = list(session.scalars(
-        select(SkillTrend).where(SkillTrend.role_category == role)
-    ))
+    rows = list(session.scalars(select(SkillTrend).where(SkillTrend.role_category == role)))
     acc: dict = defaultdict(list)
     for r in rows:
         acc[r.skill].append(r.pct_of_postings)
@@ -102,6 +100,7 @@ def _get_skill_vector(session: Session, role: str) -> dict:
 
 
 # ── GET /api/skills/trending ─────────────────────────────────────────────────
+
 
 @router.get("/trending", response_model=List[SkillTrendItem])
 def get_trending(
@@ -123,6 +122,7 @@ def get_trending(
 
 
 # ── GET /api/skills/trending/paged ──────────────────────────────────────────
+
 
 @router.get("/trending/paged", response_model=SkillTrendPage)
 def get_trending_paged(
@@ -162,6 +162,7 @@ def get_trending_paged(
 
 
 # ── GET /api/skills/compare ──────────────────────────────────────────────────
+
 
 @router.get("/compare", response_model=SkillCompareResponse)
 def compare_roles(
@@ -214,7 +215,9 @@ def compare_roles(
         "roles": role_list,
         "overlap_pct": overlap_pct,
         "similarity_score": sim,
-        "shared_skills": sorted(intersection, key=lambda s: -max(vectors[r].get(s, 0) for r in role_list)),
+        "shared_skills": sorted(
+            intersection, key=lambda s: -max(vectors[r].get(s, 0) for r in role_list)
+        ),
         "role_profiles": profiles,
     }
     cache.set(key, result, ttl=_CACHE_TTL)
@@ -222,6 +225,7 @@ def compare_roles(
 
 
 # ── POST /api/skills/gap ─────────────────────────────────────────────────────
+
 
 @router.post("/gap", response_model=SkillGapResponse)
 def analyse_skill_gap(
@@ -256,11 +260,13 @@ def analyse_skill_gap(
         return _empty
 
     # All skill rows for this role in the latest week, ordered by demand
-    all_rows = list(session.scalars(
-        select(SkillTrend)
-        .where(SkillTrend.week_start == latest, SkillTrend.role_category == role)
-        .order_by(SkillTrend.mention_count.desc())
-    ))
+    all_rows = list(
+        session.scalars(
+            select(SkillTrend)
+            .where(SkillTrend.week_start == latest, SkillTrend.role_category == role)
+            .order_by(SkillTrend.mention_count.desc())
+        )
+    )
     if not all_rows:
         return _empty
 
@@ -270,9 +276,7 @@ def analyse_skill_gap(
     # Estimate total postings from the top skill's counts
     top_row = all_rows[0]
     total_postings = (
-        round(top_row.mention_count / top_row.pct_of_postings)
-        if top_row.pct_of_postings > 0
-        else 0
+        round(top_row.mention_count / top_row.pct_of_postings) if top_row.pct_of_postings > 0 else 0
     )
 
     matched: list = []
@@ -294,11 +298,13 @@ def analyse_skill_gap(
     for user_skill in user_skills_lower:
         if user_skill not in top30_lower and user_skill in beyond_index:
             row = beyond_index[user_skill]
-            bonus.append(SkillGapSkillItem(
-                skill=row.skill,
-                pct=round(row.pct_of_postings * 100, 1),
-                status="bonus",
-            ))
+            bonus.append(
+                SkillGapSkillItem(
+                    skill=row.skill,
+                    pct=round(row.pct_of_postings * 100, 1),
+                    status="bonus",
+                )
+            )
     bonus.sort(key=lambda x: -x.pct)
 
     match_score = round(len(matched) / len(top30) * 100, 1) if top30 else 0.0
@@ -314,6 +320,7 @@ def analyse_skill_gap(
 
 
 # ── GET /api/skills/emerging ─────────────────────────────────────────────────
+
 
 @router.get("/emerging", response_model=List[EmergingSkillItem])
 def get_emerging(

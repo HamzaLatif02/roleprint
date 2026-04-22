@@ -42,9 +42,7 @@ def get_sentiment_timeline(
     # Find the most recent week
     from sqlalchemy import func as sa_func
 
-    latest_scraped = session.scalar(
-        select(sa_func.max(JobPosting.scraped_at))
-    )
+    latest_scraped = session.scalar(select(sa_func.max(JobPosting.scraped_at)))
     if not latest_scraped:
         return []
 
@@ -77,12 +75,14 @@ def get_sentiment_timeline(
     for week in sorted(weekly.keys()):
         data = weekly[week]
         avg = sum(data["scores"]) / len(data["scores"])
-        result.append({
-            "week": week,
-            "avg_sentiment": round(avg, 4),
-            "urgency_score": data["urgency"],
-            "posting_count": data["count"],
-        })
+        result.append(
+            {
+                "week": week,
+                "avg_sentiment": round(avg, 4),
+                "urgency_score": data["urgency"],
+                "posting_count": data["count"],
+            }
+        )
 
     cache.set(key, result, ttl=_CACHE_TTL)
     return result

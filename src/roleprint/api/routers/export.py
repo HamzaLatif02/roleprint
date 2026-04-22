@@ -17,7 +17,14 @@ from roleprint.db.models import SkillTrend
 
 router = APIRouter(prefix="/api/export", tags=["export"])
 
-_COLUMNS_TRENDING = ["skill", "role_category", "week_start", "mention_count", "pct_of_postings", "wow_change"]
+_COLUMNS_TRENDING = [
+    "skill",
+    "role_category",
+    "week_start",
+    "mention_count",
+    "pct_of_postings",
+    "wow_change",
+]
 _COLUMNS_GAP = ["skill", "status", "demand_pct", "role_category"]
 
 
@@ -48,13 +55,16 @@ def _csv_response(rows: list[list], columns: list[str], filename: str) -> Stream
 
 # ── GET /api/export/skills/trending ──────────────────────────────────────────
 
+
 @router.get(
     "/skills/trending",
     summary="Export trending skills as CSV",
     response_description="CSV file with columns: skill, role_category, week_start, mention_count, pct_of_postings, wow_change",
 )
 def export_trending(
-    role_category: Optional[str] = Query(None, description="Filter to one role category; omit for all roles"),
+    role_category: Optional[str] = Query(
+        None, description="Filter to one role category; omit for all roles"
+    ),
     weeks: int = Query(4, ge=1, le=52, description="Number of recent weeks to include"),
     session: Session = Depends(get_session),
 ):
@@ -92,10 +102,7 @@ def export_trending(
     prev_stmt = select(SkillTrend).where(SkillTrend.week_start == prev_week)
     if role:
         prev_stmt = prev_stmt.where(SkillTrend.role_category == role)
-    prev_index = {
-        (r.skill, r.role_category): r.mention_count
-        for r in session.scalars(prev_stmt)
-    }
+    prev_index = {(r.skill, r.role_category): r.mention_count for r in session.scalars(prev_stmt)}
 
     csv_rows = []
     for row in current_rows:
@@ -105,19 +112,22 @@ def export_trending(
         else:
             wow = (row.mention_count - prev_count) / prev_count * 100.0
 
-        csv_rows.append([
-            row.skill,
-            row.role_category,
-            str(row.week_start),
-            row.mention_count,
-            round(row.pct_of_postings, 4),
-            round(wow, 1),
-        ])
+        csv_rows.append(
+            [
+                row.skill,
+                row.role_category,
+                str(row.week_start),
+                row.mention_count,
+                round(row.pct_of_postings, 4),
+                round(wow, 1),
+            ]
+        )
 
     return _csv_response(csv_rows, _COLUMNS_TRENDING, filename)
 
 
 # ── GET /api/export/skills/gap ────────────────────────────────────────────────
+
 
 @router.get(
     "/skills/gap",
@@ -126,7 +136,9 @@ def export_trending(
 )
 def export_gap(
     role_category: str = Query(..., description="Role to analyse, e.g. 'data analyst'"),
-    user_skills: str = Query(..., description="Comma-separated list of user skills, e.g. 'python,sql,excel'"),
+    user_skills: str = Query(
+        ..., description="Comma-separated list of user skills, e.g. 'python,sql,excel'"
+    ),
     session: Session = Depends(get_session),
 ):
     """Download a skill gap analysis as a CSV file.
@@ -146,11 +158,13 @@ def export_gap(
     if not latest:
         return _csv_response([], _COLUMNS_GAP, filename)
 
-    all_rows = list(session.scalars(
-        select(SkillTrend)
-        .where(SkillTrend.week_start == latest, SkillTrend.role_category == role)
-        .order_by(SkillTrend.mention_count.desc())
-    ))
+    all_rows = list(
+        session.scalars(
+            select(SkillTrend)
+            .where(SkillTrend.week_start == latest, SkillTrend.role_category == role)
+            .order_by(SkillTrend.mention_count.desc())
+        )
+    )
     if not all_rows:
         return _csv_response([], _COLUMNS_GAP, filename)
 

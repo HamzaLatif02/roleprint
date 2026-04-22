@@ -17,6 +17,7 @@ from roleprint.db.models import JobPosting, SkillTrend
 
 # ── 1. Unprocessed postings ───────────────────────────────────────────────────
 
+
 def get_unprocessed_postings(
     session: Session,
     *,
@@ -42,6 +43,7 @@ def get_unprocessed_postings(
 
 
 # ── 2. Skill trends by role category ─────────────────────────────────────────
+
 
 def get_skill_trends_by_role(
     session: Session,
@@ -71,6 +73,7 @@ def get_skill_trends_by_role(
 
 # ── 3. Single posting with its NLP result ────────────────────────────────────
 
+
 def get_posting_with_analysis(
     session: Session,
     posting_id: UUID,
@@ -88,6 +91,7 @@ def get_posting_with_analysis(
 
 
 # ── 4. Recent postings for a role category ────────────────────────────────────
+
 
 def get_recent_postings_by_role(
     session: Session,
@@ -117,6 +121,7 @@ def get_recent_postings_by_role(
 
 
 # ── 5. Top skills across all roles for a date range ──────────────────────────
+
 
 def get_top_skills_overall(
     session: Session,

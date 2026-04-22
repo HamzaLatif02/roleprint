@@ -39,6 +39,7 @@ _ROOT = Path(__file__).resolve().parents[4]
 
 # ── Gold-standard loading ─────────────────────────────────────────────────────
 
+
 def load_gold(path: Path) -> tuple[list[str], list[set[str]]]:
     """Return (texts, gold_skill_sets) from skill_labels.csv.
 
@@ -56,10 +57,12 @@ def load_gold(path: Path) -> tuple[list[str], list[set[str]]]:
 
 # ── Extractor A: vocab regex (mirrors production SkillExtractor) ──────────────
 
+
 def _build_vocab_extractor():
     """Return a callable that extracts skills using the production regex."""
     try:
         from roleprint.nlp.skill_extractor import SkillExtractor  # type: ignore[import]
+
         extractor = SkillExtractor()
 
         def _extract(text: str) -> set[str]:
@@ -78,6 +81,7 @@ def _build_vocab_extractor():
 
 # ── Extractor B: spaCy noun-chunk heuristic ───────────────────────────────────
 
+
 def _build_spacy_extractor(skill_keywords: Optional[set[str]] = None):
     """Return a callable that extracts skills via spaCy noun chunks.
 
@@ -89,20 +93,59 @@ def _build_spacy_extractor(skill_keywords: Optional[set[str]] = None):
     4. Normalise: strip leading determiners ("a", "an", "the", "our").
     """
     _SEED_KEYWORDS = {
-        "python", "sql", "spark", "kafka", "airflow", "pytorch", "tensorflow",
-        "kubernetes", "docker", "aws", "gcp", "azure", "react", "fastapi",
-        "postgresql", "redis", "mongodb", "dbt", "snowflake", "tableau",
-        "pandas", "numpy", "scikit", "mlops", "terraform", "typescript",
-        "graphql", "looker", "bigquery", "databricks", "linux", "go", "rust",
-        "nlp", "bert", "transformers", "sagemaker", "redshift", "power bi",
-        "devops", "agile", "scrum", "okr",
+        "python",
+        "sql",
+        "spark",
+        "kafka",
+        "airflow",
+        "pytorch",
+        "tensorflow",
+        "kubernetes",
+        "docker",
+        "aws",
+        "gcp",
+        "azure",
+        "react",
+        "fastapi",
+        "postgresql",
+        "redis",
+        "mongodb",
+        "dbt",
+        "snowflake",
+        "tableau",
+        "pandas",
+        "numpy",
+        "scikit",
+        "mlops",
+        "terraform",
+        "typescript",
+        "graphql",
+        "looker",
+        "bigquery",
+        "databricks",
+        "linux",
+        "go",
+        "rust",
+        "nlp",
+        "bert",
+        "transformers",
+        "sagemaker",
+        "redshift",
+        "power bi",
+        "devops",
+        "agile",
+        "scrum",
+        "okr",
     }
     keywords = skill_keywords if skill_keywords is not None else _SEED_KEYWORDS
 
     try:
         import spacy  # type: ignore[import]
     except ImportError:
-        print("  [extractor B] spaCy not installed — pip install spacy && python -m spacy download en_core_web_sm", file=sys.stderr)
+        print(
+            "  [extractor B] spaCy not installed — pip install spacy && python -m spacy download en_core_web_sm",
+            file=sys.stderr,
+        )
 
         def _no_spacy(text: str) -> set[str]:  # noqa: ARG001
             return set()
@@ -112,7 +155,10 @@ def _build_spacy_extractor(skill_keywords: Optional[set[str]] = None):
     try:
         nlp = spacy.load("en_core_web_sm")
     except OSError:
-        print("  [extractor B] en_core_web_sm not found — python -m spacy download en_core_web_sm", file=sys.stderr)
+        print(
+            "  [extractor B] en_core_web_sm not found — python -m spacy download en_core_web_sm",
+            file=sys.stderr,
+        )
 
         def _no_model(text: str) -> set[str]:  # noqa: ARG001
             return set()
@@ -140,6 +186,7 @@ def _build_spacy_extractor(skill_keywords: Optional[set[str]] = None):
 
 
 # ── Metrics ───────────────────────────────────────────────────────────────────
+
 
 def _prf(gold_sets: list[set[str]], pred_sets: list[set[str]]) -> dict[str, float]:
     """Macro-averaged precision, recall, F1 over all examples."""
@@ -177,6 +224,7 @@ def _micro_prf(gold_sets: list[set[str]], pred_sets: list[set[str]]) -> dict[str
 
 
 # ── Main entry point ──────────────────────────────────────────────────────────
+
 
 def run_ab_test(labels_path: Optional[Path] = None) -> dict[str, dict]:
     """Run the A/B comparison and return results dict.
@@ -220,12 +268,12 @@ def _print_results(results: dict[str, dict]) -> None:
     print(f"{'Skill Extractor A/B Test':^64}")
     print("═" * 64)
     print(f"\n  {'Extractor':<28} {'Precision':>10} {'Recall':>8} {'F1':>8}")
-    print(f"  {'─'*28} {'─'*10} {'─'*8} {'─'*8}")
+    print(f"  {'─' * 28} {'─' * 10} {'─' * 8} {'─' * 8}")
     for name, r in results.items():
         print(f"  {name:<28} {r['precision']:>10.3f} {r['recall']:>8.3f} {r['f1']:>8.3f}")
     print()
     print("  Micro-averaged:")
-    print(f"  {'─'*28} {'─'*10} {'─'*8} {'─'*8}")
+    print(f"  {'─' * 28} {'─' * 10} {'─' * 8} {'─' * 8}")
     for name, r in results.items():
         m = r["micro"]
         print(f"  {name:<28} {m['precision']:>10.3f} {m['recall']:>8.3f} {m['f1']:>8.3f}")
@@ -297,9 +345,7 @@ def main() -> None:
         print(header)
         print("  " + "─" * (len(header) - 2))
         for i, (gold, a, b) in enumerate(zip(gold_sets, pred_a, pred_b), 1):
-            print(
-                f"  {i:>3}  {str(sorted(gold)):<40} {str(sorted(a)):<40} {str(sorted(b)):<40}"
-            )
+            print(f"  {i:>3}  {str(sorted(gold)):<40} {str(sorted(a)):<40} {str(sorted(b)):<40}")
 
     results = {
         "A (vocab regex)": {

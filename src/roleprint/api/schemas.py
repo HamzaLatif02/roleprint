@@ -13,11 +13,14 @@ from pydantic import BaseModel, Field
 
 # ── /api/skills/trending ──────────────────────────────────────────────────────
 
+
 class SkillTrendItem(BaseModel):
     skill: str
     role_category: str
     mention_count: int
-    pct_of_postings: float = Field(ge=0.0, description="Fraction of postings mentioning this skill (0–1)")
+    pct_of_postings: float = Field(
+        ge=0.0, description="Fraction of postings mentioning this skill (0–1)"
+    )
     wow_change: float = Field(description="Week-over-week % change")
     is_rising: bool = Field(description="True when wow_change > 20 %")
 
@@ -34,6 +37,7 @@ class SkillTrendPage(BaseModel):
 
 # ── /api/skills/compare ───────────────────────────────────────────────────────
 
+
 class RoleSkillProfile(BaseModel):
     top_skills: List[str] = Field(description="Top skills by pct_of_postings")
     unique_skills: List[str] = Field(description="Skills not present in the other role")
@@ -42,11 +46,13 @@ class RoleSkillProfile(BaseModel):
 class SkillCompareResponse(BaseModel):
     roles: List[str]
     overlap_pct: float = Field(
-        ge=0.0, le=100.0,
+        ge=0.0,
+        le=100.0,
         description="Jaccard similarity × 100 across skill sets",
     )
     similarity_score: float = Field(
-        ge=0.0, le=1.0,
+        ge=0.0,
+        le=1.0,
         description="Cosine similarity of pct_of_postings vectors",
     )
     shared_skills: List[str]
@@ -54,6 +60,7 @@ class SkillCompareResponse(BaseModel):
 
 
 # ── /api/topics ───────────────────────────────────────────────────────────────
+
 
 class TopicItem(BaseModel):
     topic_id: int
@@ -64,6 +71,7 @@ class TopicItem(BaseModel):
 
 # ── /api/sentiment/timeline ───────────────────────────────────────────────────
 
+
 class SentimentWeek(BaseModel):
     week: str = Field(description="ISO date string of the Monday week-start")
     avg_sentiment: float = Field(ge=-1.0, le=1.0)
@@ -73,6 +81,7 @@ class SentimentWeek(BaseModel):
 
 # ── /api/roles ────────────────────────────────────────────────────────────────
 
+
 class RoleItem(BaseModel):
     role_category: str
     posting_count: int
@@ -81,6 +90,7 @@ class RoleItem(BaseModel):
 
 
 # ── /api/skills/emerging ─────────────────────────────────────────────────────
+
 
 class EmergingSkillItem(BaseModel):
     skill: str
@@ -92,6 +102,7 @@ class EmergingSkillItem(BaseModel):
 
 
 # ── /api/postings/recent ─────────────────────────────────────────────────────
+
 
 class PostingItem(BaseModel):
     id: str
@@ -121,6 +132,7 @@ class PaginatedPostings(BaseModel):
 
 # ── /api/stats/summary ────────────────────────────────────────────────────────
 
+
 class StatsSummary(BaseModel):
     total_postings: int
     processed_postings: int
@@ -136,6 +148,7 @@ class StatsSummary(BaseModel):
 
 
 # ── /api/skills/gap ──────────────────────────────────────────────────────────
+
 
 class SkillGapRequest(BaseModel):
     role_category: str = Field(description="Role to analyse, e.g. 'data analyst'")
@@ -158,6 +171,7 @@ class SkillGapResponse(BaseModel):
 
 
 # ── /health ───────────────────────────────────────────────────────────────────
+
 
 class HealthResponse(BaseModel):
     status: str = Field(description="'ok' or 'degraded'")

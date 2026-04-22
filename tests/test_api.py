@@ -163,9 +163,11 @@ def client(seeded_session):
     app.dependency_overrides[get_session] = override_session
 
     # Patch cache so nothing tries to reach Redis
-    with patch("roleprint.api.cache.get", return_value=None), \
-         patch("roleprint.api.cache.set"), \
-         patch("roleprint.api.cache.is_available", return_value=False):
+    with (
+        patch("roleprint.api.cache.get", return_value=None),
+        patch("roleprint.api.cache.set"),
+        patch("roleprint.api.cache.is_available", return_value=False),
+    ):
         with TestClient(app, raise_server_exceptions=True) as c:
             yield c
 
@@ -227,7 +229,14 @@ def test_trending_filter_by_role(client):
 def test_trending_fields(client):
     resp = client.get("/api/skills/trending?role_category=data+analyst")
     item = resp.json()[0]
-    for field in ("skill", "role_category", "mention_count", "pct_of_postings", "wow_change", "is_rising"):
+    for field in (
+        "skill",
+        "role_category",
+        "mention_count",
+        "pct_of_postings",
+        "wow_change",
+        "is_rising",
+    ):
         assert field in item
 
 
@@ -334,8 +343,19 @@ def test_recent_postings_fields(client):
     data = resp.json()
     assert len(data) > 0
     item = data[0]
-    for field in ("id", "title", "company", "location", "url", "source",
-                  "role_category", "scraped_at", "skills", "topics", "entities"):
+    for field in (
+        "id",
+        "title",
+        "company",
+        "location",
+        "url",
+        "source",
+        "role_category",
+        "scraped_at",
+        "skills",
+        "topics",
+        "entities",
+    ):
         assert field in item
 
 
@@ -364,8 +384,14 @@ def test_stats_summary_fields(client):
     resp = client.get("/api/stats/summary")
     assert resp.status_code == 200
     body = resp.json()
-    for field in ("total_postings", "processed_postings", "unprocessed_postings",
-                  "roles_tracked", "weeks_of_data", "sources"):
+    for field in (
+        "total_postings",
+        "processed_postings",
+        "unprocessed_postings",
+        "roles_tracked",
+        "weeks_of_data",
+        "sources",
+    ):
         assert field in body
 
 

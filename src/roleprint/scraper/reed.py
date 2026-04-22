@@ -24,7 +24,7 @@ _ROBOTS_URL = "https://www.reed.co.uk/robots.txt"
 
 # Backoff config
 _MAX_RETRIES = 3
-_BACKOFF_BASE = 2.0   # seconds; doubles each retry
+_BACKOFF_BASE = 2.0  # seconds; doubles each retry
 _JITTER_MAX = 1.0
 
 
@@ -140,9 +140,14 @@ class ReedScraper(BaseJobScraper):
             or article.find("span", class_=lambda c: c and "recruiter" in c.lower() if c else False)
             # Reed now uses /jobs/{company-slug}/p{id} pattern for employer links
             or next(
-                (a for a in article.find_all("a")
-                 if a.get("href", "").startswith("/jobs/") and "/p" in a.get("href", "")
-                 and a.get("data-qa") != "job-card-title" and a.get_text(strip=True)),
+                (
+                    a
+                    for a in article.find_all("a")
+                    if a.get("href", "").startswith("/jobs/")
+                    and "/p" in a.get("href", "")
+                    and a.get("data-qa") != "job-card-title"
+                    and a.get_text(strip=True)
+                ),
                 None,
             )
         )
@@ -150,9 +155,11 @@ class ReedScraper(BaseJobScraper):
 
         # ── location ──────────────────────────────────────────────────────────
         location_tag = article.find(
-            lambda t: t.name == "li"
-            and t.get("class")
-            and any("location" in c.lower() for c in t.get("class", []))
+            lambda t: (
+                t.name == "li"
+                and t.get("class")
+                and any("location" in c.lower() for c in t.get("class", []))
+            )
         )
         if location_tag is None:
             # fall back: second <li> in the metadata list
@@ -165,17 +172,19 @@ class ReedScraper(BaseJobScraper):
         posted_at: Optional[datetime] = None
         if time_tag and time_tag.get("datetime"):
             try:
-                posted_at = datetime.fromisoformat(
-                    time_tag["datetime"].rstrip("Z")
-                ).replace(tzinfo=timezone.utc)
+                posted_at = datetime.fromisoformat(time_tag["datetime"].rstrip("Z")).replace(
+                    tzinfo=timezone.utc
+                )
             except ValueError:
                 pass
 
         # ── description / raw_text ────────────────────────────────────────────
         desc_tag = article.find(
-            lambda t: t.name in ("div", "p")
-            and t.get("class")
-            and any("description" in c.lower() for c in t.get("class", []))
+            lambda t: (
+                t.name in ("div", "p")
+                and t.get("class")
+                and any("description" in c.lower() for c in t.get("class", []))
+            )
         )
         raw_text = desc_tag.get_text(" ", strip=True) if desc_tag else ""
 
@@ -205,7 +214,7 @@ class ReedScraper(BaseJobScraper):
                     return resp.text
 
                 if resp.status_code in (429, 503):
-                    wait = _BACKOFF_BASE ** attempt + random.uniform(0, _JITTER_MAX)
+                    wait = _BACKOFF_BASE**attempt + random.uniform(0, _JITTER_MAX)
                     log.warning(
                         "reed.rate_limited",
                         status=resp.status_code,
@@ -220,7 +229,7 @@ class ReedScraper(BaseJobScraper):
                 return None
 
             except httpx.RequestError as exc:
-                wait = _BACKOFF_BASE ** attempt + random.uniform(0, _JITTER_MAX)
+                wait = _BACKOFF_BASE**attempt + random.uniform(0, _JITTER_MAX)
                 log.warning(
                     "reed.request_error",
                     error=str(exc),

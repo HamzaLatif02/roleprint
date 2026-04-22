@@ -34,9 +34,8 @@ def get_topics(
     if (hit := cache.get(key)) is not None:
         return hit
 
-    stmt = (
-        select(ProcessedPosting.topics)
-        .join(JobPosting, ProcessedPosting.posting_id == JobPosting.id)
+    stmt = select(ProcessedPosting.topics).join(
+        JobPosting, ProcessedPosting.posting_id == JobPosting.id
     )
     if role_category:
         stmt = stmt.where(JobPosting.role_category == role_category)
@@ -60,12 +59,14 @@ def get_topics(
         avg_prob = sum(data["probs"]) / len(data["probs"]) if data["probs"] else 0.0
         # Keywords are derived from the label string (BERTopic uses underscore-joined words)
         keywords = [w for w in label.replace("_", " ").split() if w not in ("-1",)]
-        result.append({
-            "topic_id": data["topic_id"],
-            "topic_label": label,
-            "posting_count": data["count"],
-            "avg_probability": round(avg_prob, 3),
-        })
+        result.append(
+            {
+                "topic_id": data["topic_id"],
+                "topic_label": label,
+                "posting_count": data["count"],
+                "avg_probability": round(avg_prob, 3),
+            }
+        )
 
     cache.set(key, result, ttl=_CACHE_TTL)
     return result

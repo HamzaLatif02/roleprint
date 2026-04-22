@@ -21,7 +21,7 @@ log = structlog.get_logger(__name__)
 
 _MODEL_PATH = Path("models/topic_model.pkl")
 _EMBEDDING_MODEL = "all-MiniLM-L6-v2"
-MIN_DOCS = 50          # minimum corpus size to train
+MIN_DOCS = 50  # minimum corpus size to train
 _EMPTY_TOPIC: Dict = {}
 
 # ── Model cache ───────────────────────────────────────────────────────────────
@@ -50,6 +50,7 @@ def _save(model: Any) -> None:
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
+
 
 def train(docs: List[str]) -> Optional[Any]:
     """Train a BERTopic model on *docs* and save it to disk.
@@ -137,11 +138,13 @@ def assign_topics(
 
         results = []
         for tid, prob in zip(topic_ids, probs):
-            results.append({
-                "topic_id": int(tid),
-                "topic_label": id_to_label.get(int(tid), "unknown"),
-                "probability": round(float(prob), 4),
-            })
+            results.append(
+                {
+                    "topic_id": int(tid),
+                    "topic_label": id_to_label.get(int(tid), "unknown"),
+                    "probability": round(float(prob), 4),
+                }
+            )
         return results
 
     except Exception as exc:

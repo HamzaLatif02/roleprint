@@ -67,9 +67,7 @@ def build_scheduler() -> BlockingScheduler:
 
     # Job 1 — Scrape (every N hours, starting at 00:00 UTC)
     # hours=6 → fires at 0, 6, 12, 18
-    scrape_hours_list = ",".join(
-        str(h % 24) for h in range(0, 24, scrape_hours)
-    )
+    scrape_hours_list = ",".join(str(h % 24) for h in range(0, 24, scrape_hours))
     scheduler.add_job(
         scrape_job,
         trigger=CronTrigger(hour=scrape_hours_list, minute=0, timezone="UTC"),
@@ -85,9 +83,7 @@ def build_scheduler() -> BlockingScheduler:
     )
 
     # Job 2 — NLP processing (same cadence, process_delay hours later)
-    process_hours_list = ",".join(
-        str((h + process_delay) % 24) for h in range(0, 24, scrape_hours)
-    )
+    process_hours_list = ",".join(str((h + process_delay) % 24) for h in range(0, 24, scrape_hours))
     scheduler.add_job(
         process_job,
         trigger=CronTrigger(hour=process_hours_list, minute=0, timezone="UTC"),

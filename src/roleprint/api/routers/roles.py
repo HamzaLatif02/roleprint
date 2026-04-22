@@ -29,10 +29,9 @@ def get_roles(session: Session = Depends(get_session)):
         return hit
 
     # Total postings per role
-    total_stmt = (
-        select(JobPosting.role_category, sa_func.count(JobPosting.id).label("total"))
-        .group_by(JobPosting.role_category)
-    )
+    total_stmt = select(
+        JobPosting.role_category, sa_func.count(JobPosting.id).label("total")
+    ).group_by(JobPosting.role_category)
     total_rows = {row.role_category: row.total for row in session.execute(total_stmt)}
 
     # Processed postings per role (via join)
@@ -46,12 +45,14 @@ def get_roles(session: Session = Depends(get_session)):
     result = []
     for role, total in sorted(total_rows.items(), key=lambda x: -x[1]):
         processed = processed_rows.get(role, 0)
-        result.append({
-            "role_category": role,
-            "posting_count": total,
-            "processed_count": processed,
-            "unprocessed_count": total - processed,
-        })
+        result.append(
+            {
+                "role_category": role,
+                "posting_count": total,
+                "processed_count": processed,
+                "unprocessed_count": total - processed,
+            }
+        )
 
     cache.set(key, result, ttl=_CACHE_TTL)
     return result
