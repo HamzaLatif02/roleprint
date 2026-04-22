@@ -333,16 +333,16 @@ def test_sentiment_timeline_fields(client):
 def test_recent_postings_default_limit(client):
     resp = client.get("/api/postings/recent")
     assert resp.status_code == 200
-    data = resp.json()
-    assert isinstance(data, list)
-    assert len(data) <= 20
+    envelope = resp.json()
+    assert "data" in envelope
+    assert len(envelope["data"]) <= 20
 
 
 def test_recent_postings_fields(client):
     resp = client.get("/api/postings/recent")
-    data = resp.json()
-    assert len(data) > 0
-    item = data[0]
+    envelope = resp.json()
+    assert len(envelope["data"]) > 0
+    item = envelope["data"][0]
     for field in (
         "id",
         "title",
@@ -362,18 +362,18 @@ def test_recent_postings_fields(client):
 def test_recent_postings_filter_by_role(client):
     resp = client.get("/api/postings/recent?role_category=data+analyst")
     assert resp.status_code == 200
-    data = resp.json()
+    data = resp.json()["data"]
     assert all(item["role_category"] == "data analyst" for item in data)
 
 
 def test_recent_postings_limit_param(client):
-    resp = client.get("/api/postings/recent?limit=1")
+    resp = client.get("/api/postings/recent?page_size=1")
     assert resp.status_code == 200
-    assert len(resp.json()) <= 1
+    assert len(resp.json()["data"]) <= 1
 
 
 def test_recent_postings_limit_too_large(client):
-    resp = client.get("/api/postings/recent?limit=999")
+    resp = client.get("/api/postings/recent?page_size=999")
     assert resp.status_code == 422
 
 

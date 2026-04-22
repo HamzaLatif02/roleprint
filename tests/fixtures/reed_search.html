@@ -6,7 +6,7 @@
   <div id="search-results">
 
     <!-- Card 1: Full details -->
-    <article data-job-id="54321001" class="job-result-card">
+    <article data-job-id="54321001" data-qa="job-card" class="job-result-card">
       <div class="job-result-card__content">
         <div class="job-result-card__details">
           <h2 class="job-result-card__title">
@@ -43,7 +43,7 @@
     </article>
 
     <!-- Card 2: ML Engineer role, no posted_at datetime attribute -->
-    <article data-job-id="54321002" class="job-result-card">
+    <article data-job-id="54321002" data-qa="job-card" class="job-result-card">
       <div class="job-result-card__content">
         <div class="job-result-card__details">
           <h2 class="job-result-card__title">
@@ -76,7 +76,7 @@
     </article>
 
     <!-- Card 3: Missing company link — tests fallback -->
-    <article data-job-id="54321003" class="job-result-card">
+    <article data-job-id="54321003" data-qa="job-card" class="job-result-card">
       <div class="job-result-card__content">
         <div class="job-result-card__details">
           <h2 class="job-result-card__title">
@@ -106,7 +106,7 @@
     </article>
 
     <!-- Card 4: No title link href — should be skipped by parser -->
-    <article data-job-id="54321004" class="job-result-card">
+    <article data-job-id="54321004" data-qa="job-card" class="job-result-card">
       <div class="job-result-card__content">
         <div class="job-result-card__details">
           <h2 class="job-result-card__title">
