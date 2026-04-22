@@ -237,7 +237,7 @@ cd dashboard && npm install && npm run dev
 | `REDIS_URL` | Yes | Redis connection URL for API response caching |
 | `ADZUNA_APP_ID` | Yes | Adzuna API app ID — register at [developer.adzuna.com](https://developer.adzuna.com) |
 | `ADZUNA_APP_KEY` | Yes | Adzuna API key |
-| `SCRAPE_INTERVAL_HOURS` | No | Scraper run cadence in hours. Default: `6` |
+| `SCRAPE_INTERVAL_HRS` | No | Scraper run cadence in hours. Default: `6` |
 | `PROCESS_DELAY_HRS` | No | Hours after scrape before NLP run. Default: `1` |
 | `CORS_ORIGINS` | No | Comma-separated allowed origins. Default: `*` (restrict in production) |
 | `VITE_API_BASE_URL` | Yes (frontend) | Railway API URL used by the React dashboard build |
