@@ -37,19 +37,16 @@ function VennOverlap({ pct }) {
             background: 'rgba(245,166,35,0.08)',
           }}
         />
-        {/* Overlap region label */}
+        {/* Overlap region — visual shading only, no label */}
         <div
-          className="absolute flex flex-col items-center justify-center"
+          className="absolute"
           style={{
             left: gap / 2 + 12,
             width: overlap,
             height: circleSize,
             zIndex: 2,
           }}
-        >
-          <div className="font-display text-2xl text-amber-glow glow-amber leading-none">{pct}%</div>
-          <div className="label-mono text-[8px] text-ink-400 mt-0.5">overlap</div>
-        </div>
+        />
       </div>
     </div>
   )
@@ -193,7 +190,20 @@ export default function Comparison() {
             <p className="font-mono text-[10px] text-ink-400 mb-4">{shared.length} shared skills</p>
 
             <div className="flex flex-col lg:flex-row items-center gap-6">
-              <VennOverlap pct={overlap} />
+              <div className="flex flex-col items-center">
+                <div className="text-center mb-4">
+                  <p className="font-display text-4xl font-bold text-gray-900 dark:text-ink-100 glow-amber" style={{ color: '#f5a623' }}>
+                    {overlap}%
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-ink-400 mt-1">
+                    skill overlap between{' '}
+                    <span className="text-gray-700 dark:text-ink-300">{toTitleCase(compareRoles?.[0])}</span>
+                    {' '}and{' '}
+                    <span className="text-gray-700 dark:text-ink-300">{toTitleCase(compareRoles?.[1])}</span>
+                  </p>
+                </div>
+                <VennOverlap pct={overlap} />
+              </div>
 
               <div className="flex-1 flex flex-wrap gap-1">
                 {shared.length === 0 ? (
