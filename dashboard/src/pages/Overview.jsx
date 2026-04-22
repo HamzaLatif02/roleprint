@@ -136,9 +136,9 @@ function SkillsChart({ data, loading, error, refetch, roleFilter }) {
   const chartData = allSkills.slice(0, isMobile ? 5 : 10)
 
   return (
-    <div className="card p-3 sm:p-5">
+    <div className="card p-3 sm:p-5 h-full flex flex-col">
       {/* Header */}
-      <div className="mb-4 sm:mb-5">
+      <div className="mb-4 sm:mb-5 shrink-0">
         <div className="flex items-start justify-between gap-2">
           <div>
             <h2 className="font-display text-base tracking-widest text-ink-100">TOP SKILLS</h2>
@@ -174,45 +174,47 @@ function SkillsChart({ data, loading, error, refetch, roleFilter }) {
           className="h-60"
         />
       ) : (
-        <ResponsiveContainer width="100%" height={isMobile ? 220 : 280}>
-          <BarChart
-            data={chartData}
-            margin={{ top: 0, right: 8, bottom: isMobile ? 8 : 0, left: -10 }}
-            barCategoryGap="30%"
-          >
-            <CartesianGrid vertical={false} stroke={grid} />
-            <XAxis
-              dataKey="skill"
-              tick={{
-                angle: -45,
-                textAnchor: 'end',
-                dy: 4,
-                fill: axis,
-                fontSize: isMobile ? 10 : 11,
-              }}
-              height={isMobile ? 64 : 56}
-              interval={0}
-              axisLine={{ stroke: grid }}
-              tickLine={{ stroke: grid }}
-            />
-            <YAxis
-              tick={{ fill: axis, fontSize: isMobile ? 10 : 11 }}
-              axisLine={{ stroke: grid }}
-              tickLine={{ stroke: grid }}
-              width={isMobile ? 28 : 40}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(245,166,35,0.04)' }} />
-            <Bar dataKey="mention_count" radius={[3, 3, 0, 0]}>
-              {chartData.map((entry) => (
-                <Cell
-                  key={entry.skill}
-                  fill={entry.is_rising ? TEAL : AMBER}
-                  fillOpacity={0.85}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="flex-1 min-h-[260px] sm:min-h-[300px] overflow-visible">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={chartData}
+              margin={{ top: 4, right: 8, bottom: 60, left: -10 }}
+              barCategoryGap="30%"
+            >
+              <CartesianGrid vertical={false} stroke={grid} />
+              <XAxis
+                dataKey="skill"
+                tick={{
+                  angle: -45,
+                  textAnchor: 'end',
+                  dy: 4,
+                  fill: axis,
+                  fontSize: isMobile ? 10 : 11,
+                }}
+                height={70}
+                interval={0}
+                axisLine={{ stroke: grid }}
+                tickLine={{ stroke: grid }}
+              />
+              <YAxis
+                tick={{ fill: axis, fontSize: isMobile ? 10 : 11 }}
+                axisLine={{ stroke: grid }}
+                tickLine={{ stroke: grid }}
+                width={isMobile ? 28 : 40}
+              />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(245,166,35,0.04)' }} />
+              <Bar dataKey="mention_count" radius={[3, 3, 0, 0]}>
+                {chartData.map((entry) => (
+                  <Cell
+                    key={entry.skill}
+                    fill={entry.is_rising ? TEAL : AMBER}
+                    fillOpacity={0.85}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       )}
     </div>
   )
@@ -273,9 +275,9 @@ export default function Overview() {
       )}
 
       {/* Charts row */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5 xl:items-stretch">
         {/* Main bar chart */}
-        <div className="xl:col-span-2">
+        <div className="xl:col-span-2 flex flex-col">
           <SkillsChart
             data={trending}
             loading={trendingLoading}
