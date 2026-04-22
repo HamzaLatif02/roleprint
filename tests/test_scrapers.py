@@ -7,9 +7,8 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import timezone
+from datetime import UTC
 from pathlib import Path
-from typing import List
 from unittest.mock import MagicMock
 
 import pytest
@@ -42,12 +41,12 @@ def reed_html() -> str:
 
 
 @pytest.fixture(scope="module")
-def remoteok_payload() -> List[dict]:
+def remoteok_payload() -> list[dict]:
     return json.loads((FIXTURES / "remoteok_api.json").read_text())
 
 
 @pytest.fixture(scope="module")
-def reed_cards(reed_html) -> List[str]:
+def reed_cards(reed_html) -> list[str]:
     """Extract individual <article> card HTML strings from the fixture page."""
     soup = BeautifulSoup(reed_html, "html.parser")
     return [str(card) for card in soup.find_all("article", attrs={"data-job-id": True})]
@@ -108,7 +107,7 @@ class TestReedParser:
         result = self.scraper.parse_posting(reed_cards[0])
         assert result is not None
         assert result["posted_at"] is not None
-        assert result["posted_at"].tzinfo == timezone.utc
+        assert result["posted_at"].tzinfo == UTC
         assert result["posted_at"].year == 2026
         assert result["posted_at"].month == 4
 
@@ -189,7 +188,7 @@ class TestRemoteOKParser:
         result = self.scraper.parse_posting(remoteok_payload[1])
         assert result is not None
         assert result["posted_at"] is not None
-        assert result["posted_at"].tzinfo == timezone.utc
+        assert result["posted_at"].tzinfo == UTC
         assert result["posted_at"].year == 2026
 
     def test_posted_at_none_when_epoch_null(self, remoteok_payload):
@@ -289,7 +288,7 @@ class TestAdzunaParser:
         result = self.scraper.parse_posting(adzuna_payload["results"][0])
         assert result is not None
         assert result["posted_at"] is not None
-        assert result["posted_at"].tzinfo == timezone.utc
+        assert result["posted_at"].tzinfo == UTC
         assert result["posted_at"].year == 2026
         assert result["posted_at"].month == 4
 
@@ -365,7 +364,6 @@ class TestAdzunaParser:
 
     def test_search_sets_role_category(self, adzuna_payload, monkeypatch):
         """search() should attach role_category to every parsed posting."""
-        import os
 
         monkeypatch.setenv("ADZUNA_APP_ID", "test_id")
         monkeypatch.setenv("ADZUNA_APP_KEY", "test_key")

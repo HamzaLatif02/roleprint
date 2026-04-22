@@ -10,7 +10,7 @@ import json
 import re
 from collections import Counter
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import structlog
 
@@ -31,9 +31,9 @@ def load_vocab(path: Path = _VOCAB_PATH) -> dict:
         return json.load(fh)
 
 
-def flatten_vocab(vocab: dict) -> List[str]:
+def flatten_vocab(vocab: dict) -> list[str]:
     """Return a flat list of all skill strings from the vocabulary."""
-    skills: List[str] = []
+    skills: list[str] = []
     # Technical skills are nested by sub-category
     for category_skills in vocab.get("technical", {}).values():
         skills.extend(category_skills)
@@ -42,7 +42,7 @@ def flatten_vocab(vocab: dict) -> List[str]:
     return skills
 
 
-def build_patterns(skills: List[str]) -> List[Tuple[str, re.Pattern]]:
+def build_patterns(skills: list[str]) -> list[tuple[str, re.Pattern]]:
     """Compile one regex pattern per skill.
 
     Patterns use word-boundary anchors (``\\b``) to avoid partial matches.
@@ -64,7 +64,7 @@ def build_patterns(skills: List[str]) -> List[Tuple[str, re.Pattern]]:
     # Sort longest first to prefer specific matches
     unique.sort(key=len, reverse=True)
 
-    patterns: List[Tuple[str, re.Pattern]] = []
+    patterns: list[tuple[str, re.Pattern]] = []
     for skill in unique:
         escaped = re.escape(skill)
         # Word boundary on both sides; also match at end of punctuation
@@ -79,8 +79,8 @@ def build_patterns(skills: List[str]) -> List[Tuple[str, re.Pattern]]:
 
 # ── Module-level singletons (loaded once) ────────────────────────────────────
 
-_vocab: Optional[dict] = None
-_patterns: Optional[List[Tuple[str, re.Pattern]]] = None
+_vocab: dict | None = None
+_patterns: list[tuple[str, re.Pattern]] | None = None
 
 
 def _ensure_loaded() -> None:
@@ -98,7 +98,7 @@ def extract_skills(
     text: str,
     nlp: Any = None,
     min_count: int = 1,
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """Extract skills mentioned in *text*.
 
     Combines two approaches:
@@ -167,7 +167,7 @@ def _spacy_noun_chunk_match(text: str, nlp: Any) -> Counter:
     return counts
 
 
-def categorise_skills(skills: Dict[str, int], vocab: Optional[dict] = None) -> Dict[str, list]:
+def categorise_skills(skills: dict[str, int], vocab: dict | None = None) -> dict[str, list]:
     """Split extracted skills into ``technical`` and ``soft`` buckets.
 
     Args:
@@ -184,8 +184,8 @@ def categorise_skills(skills: Dict[str, int], vocab: Optional[dict] = None) -> D
     assert vocab is not None
 
     soft_set = {s.lower() for s in vocab.get("soft", [])}
-    technical: List[str] = []
-    soft: List[str] = []
+    technical: list[str] = []
+    soft: list[str] = []
 
     for skill in skills:
         if skill.lower() in soft_set:

@@ -7,8 +7,7 @@ SkillTrend and ProcessedPosting rows so results are deterministic.
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime, timedelta, timezone
-from typing import List
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 from sqlalchemy import create_engine
@@ -45,7 +44,7 @@ def db() -> Session:
         yield session
 
 
-def _make_posting(session: Session, role: str, skills: List[str]) -> JobPosting:
+def _make_posting(session: Session, role: str, skills: list[str]) -> JobPosting:
     p = JobPosting(
         source="test",
         role_category=role,
@@ -54,7 +53,7 @@ def _make_posting(session: Session, role: str, skills: List[str]) -> JobPosting:
         location="London",
         raw_text=" ".join(skills),
         url=f"https://example.com/{uuid.uuid4()}",
-        scraped_at=datetime(2026, 4, 13, tzinfo=timezone.utc),
+        scraped_at=datetime(2026, 4, 13, tzinfo=UTC),
         is_processed=True,
     )
     session.add(p)
@@ -65,7 +64,7 @@ def _make_posting(session: Session, role: str, skills: List[str]) -> JobPosting:
         sentiment_score=0.1,
         topics={},
         entities={},
-        processed_at=datetime(2026, 4, 13, tzinfo=timezone.utc),
+        processed_at=datetime(2026, 4, 13, tzinfo=UTC),
     )
     session.add(pp)
     return p

@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from typing import List
-
 from fastapi import APIRouter, Depends
-from sqlalchemy import func as sa_func, select
+from sqlalchemy import func as sa_func
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from roleprint.api import cache
@@ -18,7 +17,7 @@ router = APIRouter(prefix="/api/roles", tags=["roles"])
 _CACHE_TTL = 300
 
 
-@router.get("", response_model=List[RoleItem])
+@router.get("", response_model=list[RoleItem])
 def get_roles(session: Session = Depends(get_session)):
     """Return all tracked role categories with posting and processing counts.
 

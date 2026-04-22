@@ -33,7 +33,6 @@ import argparse
 import csv
 import sys
 from pathlib import Path
-from typing import Optional
 
 _ROOT = Path(__file__).resolve().parents[4]
 
@@ -82,7 +81,7 @@ def _build_vocab_extractor():
 # ── Extractor B: spaCy noun-chunk heuristic ───────────────────────────────────
 
 
-def _build_spacy_extractor(skill_keywords: Optional[set[str]] = None):
+def _build_spacy_extractor(skill_keywords: set[str] | None = None):
     """Return a callable that extracts skills via spaCy noun chunks.
 
     The noun-chunk approach:
@@ -143,7 +142,8 @@ def _build_spacy_extractor(skill_keywords: Optional[set[str]] = None):
         import spacy  # type: ignore[import]
     except ImportError:
         print(
-            "  [extractor B] spaCy not installed — pip install spacy && python -m spacy download en_core_web_sm",
+            "  [extractor B] spaCy not installed — pip install spacy"
+            " && python -m spacy download en_core_web_sm",
             file=sys.stderr,
         )
 
@@ -226,7 +226,7 @@ def _micro_prf(gold_sets: list[set[str]], pred_sets: list[set[str]]) -> dict[str
 # ── Main entry point ──────────────────────────────────────────────────────────
 
 
-def run_ab_test(labels_path: Optional[Path] = None) -> dict[str, dict]:
+def run_ab_test(labels_path: Path | None = None) -> dict[str, dict]:
     """Run the A/B comparison and return results dict.
 
     Returns:

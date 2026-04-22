@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections import defaultdict
 from datetime import timedelta
-from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
@@ -14,17 +13,17 @@ from roleprint.api import cache
 from roleprint.api.deps import get_session
 from roleprint.api.schemas import SentimentWeek
 from roleprint.db.models import JobPosting, ProcessedPosting
-from roleprint.nlp.sentiment import count_urgency
 from roleprint.nlp.pipeline import _week_start
+from roleprint.nlp.sentiment import count_urgency
 
 router = APIRouter(prefix="/api/sentiment", tags=["sentiment"])
 
 _CACHE_TTL = 300
 
 
-@router.get("/timeline", response_model=List[SentimentWeek])
+@router.get("/timeline", response_model=list[SentimentWeek])
 def get_sentiment_timeline(
-    role_category: Optional[str] = Query(None),
+    role_category: str | None = Query(None),
     weeks: int = Query(8, ge=1, le=52),
     session: Session = Depends(get_session),
 ):

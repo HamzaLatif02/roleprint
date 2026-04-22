@@ -1,10 +1,10 @@
 """Unit tests for ORM models and query helpers (SQLite in-memory, no Postgres needed)."""
 
 import uuid
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 import pytest
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from roleprint.db.base import Base
@@ -30,7 +30,7 @@ def session():
 @pytest.fixture(scope="module")
 def seed(session: Session):
     """Insert a minimal set of rows used across multiple tests."""
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
     p1 = JobPosting(
         source="reed",
         role_category="data analyst",

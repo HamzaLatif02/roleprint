@@ -6,10 +6,9 @@ Models are separated from ORM models (no SQLAlchemy coupling).
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
-
 
 # ── /api/skills/trending ──────────────────────────────────────────────────────
 
@@ -26,7 +25,7 @@ class SkillTrendItem(BaseModel):
 
 
 class SkillTrendPage(BaseModel):
-    data: List[SkillTrendItem]
+    data: list[SkillTrendItem]
     page: int
     page_size: int
     total_count: int
@@ -39,12 +38,12 @@ class SkillTrendPage(BaseModel):
 
 
 class RoleSkillProfile(BaseModel):
-    top_skills: List[str] = Field(description="Top skills by pct_of_postings")
-    unique_skills: List[str] = Field(description="Skills not present in the other role")
+    top_skills: list[str] = Field(description="Top skills by pct_of_postings")
+    unique_skills: list[str] = Field(description="Skills not present in the other role")
 
 
 class SkillCompareResponse(BaseModel):
-    roles: List[str]
+    roles: list[str]
     overlap_pct: float = Field(
         ge=0.0,
         le=100.0,
@@ -55,8 +54,8 @@ class SkillCompareResponse(BaseModel):
         le=1.0,
         description="Cosine similarity of pct_of_postings vectors",
     )
-    shared_skills: List[str]
-    role_profiles: Dict[str, RoleSkillProfile]
+    shared_skills: list[str]
+    role_profiles: dict[str, RoleSkillProfile]
 
 
 # ── /api/topics ───────────────────────────────────────────────────────────────
@@ -113,15 +112,15 @@ class PostingItem(BaseModel):
     source: str
     role_category: str
     scraped_at: str
-    posted_at: Optional[str] = None
-    skills: List[str] = Field(default_factory=list)
-    sentiment_score: Optional[float] = None
-    topics: Dict[str, Any] = Field(default_factory=dict)
-    entities: Dict[str, Any] = Field(default_factory=dict)
+    posted_at: str | None = None
+    skills: list[str] = Field(default_factory=list)
+    sentiment_score: float | None = None
+    topics: dict[str, Any] = Field(default_factory=dict)
+    entities: dict[str, Any] = Field(default_factory=dict)
 
 
 class PaginatedPostings(BaseModel):
-    data: List[PostingItem]
+    data: list[PostingItem]
     page: int = Field(ge=1)
     page_size: int = Field(ge=1)
     total_count: int = Field(ge=0)
@@ -137,14 +136,14 @@ class StatsSummary(BaseModel):
     total_postings: int
     processed_postings: int
     unprocessed_postings: int
-    last_updated: Optional[str] = None
-    last_scraped: Optional[str] = Field(
+    last_updated: str | None = None
+    last_scraped: str | None = Field(
         default=None,
-        description="ISO timestamp of the most recent scraped_at in job_postings for the queried scope",
+        description="ISO timestamp of the most recent scraped_at in job_postings for the queried scope",  # noqa: E501
     )
     roles_tracked: int
     weeks_of_data: int
-    sources: List[str] = Field(default_factory=list)
+    sources: list[str] = Field(default_factory=list)
 
 
 # ── /api/skills/gap ──────────────────────────────────────────────────────────
@@ -152,7 +151,7 @@ class StatsSummary(BaseModel):
 
 class SkillGapRequest(BaseModel):
     role_category: str = Field(description="Role to analyse, e.g. 'data analyst'")
-    user_skills: List[str] = Field(description="Skills the user already has")
+    user_skills: list[str] = Field(description="Skills the user already has")
 
 
 class SkillGapSkillItem(BaseModel):
@@ -164,9 +163,9 @@ class SkillGapSkillItem(BaseModel):
 class SkillGapResponse(BaseModel):
     role_category: str
     match_score: float = Field(ge=0.0, le=100.0, description="% of top-30 skills the user has")
-    matched_skills: List[SkillGapSkillItem]
-    missing_skills: List[SkillGapSkillItem]
-    bonus_skills: List[SkillGapSkillItem]
+    matched_skills: list[SkillGapSkillItem]
+    missing_skills: list[SkillGapSkillItem]
+    bonus_skills: list[SkillGapSkillItem]
     total_postings_analysed: int
 
 

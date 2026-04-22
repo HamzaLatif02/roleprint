@@ -2,9 +2,10 @@
 
 import uuid
 from datetime import date, datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     Date,
     DateTime,
@@ -12,7 +13,6 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
-    JSON,
     String,
     Text,
     UniqueConstraint,
@@ -40,7 +40,7 @@ class JobPosting(Base):
     scraped_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    posted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    posted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     is_processed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     # Relationship
@@ -77,10 +77,10 @@ class ProcessedPosting(Base):
         nullable=False,
         unique=True,
     )
-    skills_extracted: Mapped[List[str]] = mapped_column(JSON, nullable=False, default=list)
+    skills_extracted: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
     sentiment_score: Mapped[float] = mapped_column(Float, nullable=False)
-    topics: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
-    entities: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    topics: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
+    entities: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, default=dict)
     processed_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+
 from bs4 import BeautifulSoup
 
 # ── Boilerplate patterns ──────────────────────────────────────────────────────

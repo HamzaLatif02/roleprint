@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
@@ -19,9 +18,9 @@ router = APIRouter(prefix="/api/topics", tags=["topics"])
 _CACHE_TTL = 300
 
 
-@router.get("", response_model=List[TopicItem])
+@router.get("", response_model=list[TopicItem])
 def get_topics(
-    role_category: Optional[str] = Query(None),
+    role_category: str | None = Query(None),
     session: Session = Depends(get_session),
 ):
     """Return topic model results aggregated across all processed postings.
@@ -57,8 +56,6 @@ def get_topics(
     result = []
     for label, data in sorted(agg.items(), key=lambda x: -x[1]["count"]):
         avg_prob = sum(data["probs"]) / len(data["probs"]) if data["probs"] else 0.0
-        # Keywords are derived from the label string (BERTopic uses underscore-joined words)
-        keywords = [w for w in label.replace("_", " ").split() if w not in ("-1",)]
         result.append(
             {
                 "topic_id": data["topic_id"],

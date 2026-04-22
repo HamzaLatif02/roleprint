@@ -11,15 +11,14 @@ Run:
 from __future__ import annotations
 
 import os
-from collections import Counter, defaultdict
-from datetime import date, datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional, Tuple
-from uuid import uuid4
+from collections import defaultdict
+from datetime import UTC, date, datetime, timedelta
+from typing import Any
 
 import structlog
 from dotenv import load_dotenv
-from sqlalchemy import func as sa_func, select
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func as sa_func
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from roleprint.db.models import JobPosting, ProcessedPosting, SkillTrend
@@ -38,9 +37,9 @@ BATCH_SIZE = int(os.getenv("NLP_BATCH_SIZE", "50"))
 
 def process_posting(
     posting: JobPosting,
-    nlp: Optional[Any] = None,
-    topic_mdl: Optional[Any] = None,
-) -> Dict:
+    nlp: Any | None = None,
+    topic_mdl: Any | None = None,
+) -> dict:
     """Run the full NLP stack on one ``JobPosting``.
 
     Args:
@@ -54,7 +53,6 @@ def process_posting(
     """
     # 1. Clean
     cleaned = cleaner.clean(posting.raw_text or "")
-    cleaned_lower = cleaned.lower()
 
     # 2. Skills
     skills = skill_extractor.extract_skills(cleaned, nlp=nlp)
@@ -88,7 +86,7 @@ def process_posting(
 # ── Database write helpers ────────────────────────────────────────────────────
 
 
-def _write_result(session: Session, posting: JobPosting, result: Dict) -> None:
+def _write_result(session: Session, posting: JobPosting, result: dict) -> None:
     """Insert a ``ProcessedPosting`` row and mark the source as processed."""
     proc = ProcessedPosting(
         posting_id=posting.id,
@@ -96,7 +94,7 @@ def _write_result(session: Session, posting: JobPosting, result: Dict) -> None:
         sentiment_score=result["sentiment_score"],
         topics=result["topics"],
         entities=result["entities"],
-        processed_at=datetime.now(tz=timezone.utc),
+        processed_at=datetime.now(tz=UTC),
     )
     session.add(proc)
     posting.is_processed = True
@@ -164,15 +162,15 @@ def _upsert_skill_trend(
         )
 
 
-def _update_skill_trends(session: Session, batch_results: List[Tuple[JobPosting, Dict]]) -> None:
+def _update_skill_trends(session: Session, batch_results: list[tuple[JobPosting, dict]]) -> None:
     """Aggregate skill mentions from a processed batch and upsert skill_trends."""
 
     # Collect (role, week) → {skill: count, _total: n}
-    aggregated: Dict[Tuple[str, date], Dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    aggregated: dict[tuple[str, date], dict[str, int]] = defaultdict(lambda: defaultdict(int))
 
     for posting, result in batch_results:
         role = posting.role_category
-        week = _week_start(posting.scraped_at or datetime.now(tz=timezone.utc))
+        week = _week_start(posting.scraped_at or datetime.now(tz=UTC))
         key = (role, week)
 
         aggregated[key]["_total"] += 1
@@ -191,9 +189,9 @@ def _update_skill_trends(session: Session, batch_results: List[Tuple[JobPosting,
 def run_batch(
     session: Session,
     batch_size: int = BATCH_SIZE,
-    nlp: Optional[Any] = None,
-    topic_mdl: Optional[Any] = None,
-) -> Dict:
+    nlp: Any | None = None,
+    topic_mdl: Any | None = None,
+) -> dict:
     """Process one batch of unprocessed postings.
 
     Args:
@@ -219,7 +217,7 @@ def run_batch(
 
     processed_count = 0
     error_count = 0
-    batch_results: List[Tuple[JobPosting, Dict]] = []
+    batch_results: list[tuple[JobPosting, dict]] = []
 
     for posting in postings:
         try:
@@ -254,7 +252,7 @@ def run_batch(
     return {"processed": processed_count, "errors": error_count}
 
 
-def run_all(session: Optional[Session] = None) -> Dict:
+def run_all(session: Session | None = None) -> dict:
     """Process all unprocessed postings until exhausted.
 
     Args:
@@ -305,6 +303,7 @@ def main() -> None:
 
 def _configure_logging() -> None:
     import logging
+
     import structlog
 
     logging.basicConfig(format="%(message)s", level=logging.INFO)

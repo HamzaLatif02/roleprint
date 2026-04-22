@@ -1,7 +1,7 @@
 """Abstract base class for all Roleprint job scrapers."""
 
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional
+from typing import Any
 
 import structlog
 from sqlalchemy import select
@@ -32,7 +32,7 @@ class BaseJobScraper(ABC):
         role: str,
         location: str = "United Kingdom",
         pages: int = 3,
-    ) -> List[dict]:
+    ) -> list[dict]:
         """Fetch job listings for *role* and return a list of raw posting dicts.
 
         Each dict must contain at minimum:
@@ -42,14 +42,14 @@ class BaseJobScraper(ABC):
         """
 
     @abstractmethod
-    def parse_posting(self, raw: Any) -> Optional[dict]:
+    def parse_posting(self, raw: Any) -> dict | None:
         """Parse a single raw result (HTML fragment or API dict) into a
         normalised posting dict.  Return ``None`` to skip the result.
         """
 
     # ── shared helpers ────────────────────────────────────────────────────────
 
-    def deduplicate(self, postings: List[dict], session: Session) -> List[dict]:
+    def deduplicate(self, postings: list[dict], session: Session) -> list[dict]:
         """Remove postings whose URL already exists in *job_postings*.
 
         Args:

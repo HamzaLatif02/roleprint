@@ -10,8 +10,8 @@ from __future__ import annotations
 import asyncio
 import json
 import random
-from datetime import datetime, timezone
-from typing import Any, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import httpx
 import structlog
@@ -56,12 +56,12 @@ class RemoteOKScraper(BaseJobScraper):
     SOURCE = "remoteok"
 
     def __init__(self) -> None:
-        self._client: Optional[httpx.AsyncClient] = None
-        self._cache: Optional[List[dict]] = None  # raw API payload, fetched once
+        self._client: httpx.AsyncClient | None = None
+        self._cache: list[dict] | None = None  # raw API payload, fetched once
 
     # ── context manager ───────────────────────────────────────────────────────
 
-    async def __aenter__(self) -> "RemoteOKScraper":
+    async def __aenter__(self) -> RemoteOKScraper:
         self._client = httpx.AsyncClient(
             headers={
                 "User-Agent": random_agent(),
@@ -83,7 +83,7 @@ class RemoteOKScraper(BaseJobScraper):
         role: str,
         location: str = "Remote",
         pages: int = 1,  # API returns everything at once; pages unused
-    ) -> List[dict]:
+    ) -> list[dict]:
         """Return postings whose tags or title match *role*.
 
         Fetches the full API payload once and caches it for subsequent
@@ -95,7 +95,7 @@ class RemoteOKScraper(BaseJobScraper):
         raw_jobs = await self._fetch_all()
         keywords = _ROLE_KEYWORDS.get(role.lower(), [role.lower()])
 
-        matched: List[dict] = []
+        matched: list[dict] = []
         for job in raw_jobs:
             parsed = self.parse_posting(job)
             if parsed and self._matches_role(job, keywords):
@@ -105,7 +105,7 @@ class RemoteOKScraper(BaseJobScraper):
         log.info("remoteok.search_complete", role=role, matched=len(matched))
         return matched
 
-    def parse_posting(self, raw: Any) -> Optional[dict]:
+    def parse_posting(self, raw: Any) -> dict | None:
         """Normalise a single RemoteOK API job object.
 
         Args:
@@ -136,11 +136,11 @@ class RemoteOKScraper(BaseJobScraper):
         location = raw.get("location") or "Remote"
 
         # posted_at — RemoteOK provides an epoch timestamp
-        posted_at: Optional[datetime] = None
+        posted_at: datetime | None = None
         epoch = raw.get("epoch")
         if epoch:
             try:
-                posted_at = datetime.fromtimestamp(int(epoch), tz=timezone.utc)
+                posted_at = datetime.fromtimestamp(int(epoch), tz=UTC)
             except (ValueError, OSError):
                 pass
 
@@ -160,7 +160,7 @@ class RemoteOKScraper(BaseJobScraper):
 
     # ── private helpers ───────────────────────────────────────────────────────
 
-    async def _fetch_all(self) -> List[dict]:
+    async def _fetch_all(self) -> list[dict]:
         """Fetch the full RemoteOK API payload (cached within session)."""
         if self._cache is not None:
             return self._cache
@@ -202,7 +202,7 @@ class RemoteOKScraper(BaseJobScraper):
         return []
 
     @staticmethod
-    def _matches_role(job: dict, keywords: List[str]) -> bool:
+    def _matches_role(job: dict, keywords: list[str]) -> bool:
         """Return True if any keyword appears in the job's tags or title.
 
         Tags are normalised (hyphens → spaces) before comparison so that

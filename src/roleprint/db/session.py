@@ -1,6 +1,5 @@
 import os
 from collections.abc import Generator
-from typing import Optional
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
@@ -10,8 +9,8 @@ from sqlalchemy.orm import Session, sessionmaker
 load_dotenv()
 
 # Lazy singletons — created on first use so import doesn't require DATABASE_URL
-_engine: Optional[Engine] = None
-_SessionLocal: Optional[sessionmaker] = None
+_engine: Engine | None = None
+_SessionLocal: sessionmaker | None = None
 
 
 def _get_engine() -> Engine:

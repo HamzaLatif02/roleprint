@@ -12,12 +12,10 @@ from __future__ import annotations
 import asyncio
 import os
 from collections import defaultdict
-from datetime import datetime, timezone
-from typing import List, Optional
+from datetime import UTC, datetime
 
 import structlog
 from dotenv import load_dotenv
-from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -31,7 +29,7 @@ load_dotenv()
 
 log = structlog.get_logger(__name__)
 
-ROLE_CATEGORIES: List[str] = [
+ROLE_CATEGORIES: list[str] = [
     "data analyst",
     "data scientist",
     "ml engineer",
@@ -55,7 +53,7 @@ ADZUNA_PAGES_PER_ROLE = int(os.getenv("ADZUNA_PAGES_PER_ROLE", "3"))
 # ── helpers ────────────────────────────────────────────────────────────────────
 
 
-def _save_postings(postings: List[dict], session: Session) -> int:
+def _save_postings(postings: list[dict], session: Session) -> int:
     """Bulk-insert postings, skipping duplicates.  Returns rows inserted."""
     inserted = 0
     for p in postings:
@@ -67,7 +65,7 @@ def _save_postings(postings: List[dict], session: Session) -> int:
             location=p.get("location", ""),
             raw_text=p.get("raw_text", ""),
             url=p["url"],
-            scraped_at=datetime.now(tz=timezone.utc),
+            scraped_at=datetime.now(tz=UTC),
             posted_at=p.get("posted_at"),
             is_processed=False,
         )
@@ -165,7 +163,7 @@ async def scrape_adzuna(session: Session) -> dict:
 # ── orchestrator ───────────────────────────────────────────────────────────────
 
 
-async def run_all(session: Optional[Session] = None) -> dict:
+async def run_all(session: Session | None = None) -> dict:
     """Run both scrapers and return a summary dict.
 
     Args:

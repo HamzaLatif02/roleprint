@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from datetime import date, timedelta
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import structlog
@@ -35,7 +35,7 @@ def week_over_week_change(
     skill: str,
     role_category: str,
     session: Session,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Compute the percentage change in mentions vs the prior week.
 
     Compares the two most recent ``week_start`` entries for *(skill,
@@ -102,7 +102,7 @@ def rising_skills(
     role_category: str,
     session: Session,
     top_n: int = 10,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Return the top-N rising skills for a role category.
 
     Wraps ``week_over_week_change`` across all skills seen this week for
@@ -156,7 +156,7 @@ def skill_cooccurrence(
     session: Session,
     top_n: int = 20,
     min_count: int = 2,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Compute a skill co-occurrence matrix for a role category.
 
     Uses ``processed_postings.skills_extracted`` (one row per posting) to
@@ -177,10 +177,10 @@ def skill_cooccurrence(
         - ``"matrix"``    – full NxN co-occurrence matrix as a nested list
                             (useful for heatmap visualisations).
     """
-    from scipy.sparse import lil_matrix, csr_matrix  # type: ignore[import]
+    from scipy.sparse import csr_matrix, lil_matrix  # type: ignore[import]
 
     # Fetch skill lists from all processed postings for this role
-    skill_lists: List[List[str]] = list(
+    skill_lists: list[list[str]] = list(
         session.scalars(
             select(ProcessedPosting.skills_extracted)
             .join(JobPosting, ProcessedPosting.posting_id == JobPosting.id)
@@ -192,13 +192,13 @@ def skill_cooccurrence(
         return {"skills": [], "top_pairs": [], "matrix": []}
 
     # Build vocabulary
-    all_skills: List[str] = sorted({s for lst in skill_lists for s in lst})
+    all_skills: list[str] = sorted({s for lst in skill_lists for s in lst})
     if not all_skills:
         return {"skills": [], "top_pairs": [], "matrix": []}
 
     n_docs = len(skill_lists)
     n_skills = len(all_skills)
-    skill_to_idx: Dict[str, int] = {s: i for i, s in enumerate(all_skills)}
+    skill_to_idx: dict[str, int] = {s: i for i, s in enumerate(all_skills)}
 
     # Build binary incidence matrix  (n_docs × n_skills)
     incidence = lil_matrix((n_docs, n_skills), dtype=np.float32)
@@ -213,7 +213,7 @@ def skill_cooccurrence(
     cooc: np.ndarray = (incidence_csr.T @ incidence_csr).toarray()
 
     # Extract upper-triangle pairs (exclude self-co-occurrence on diagonal)
-    pairs: List[Dict[str, Any]] = []
+    pairs: list[dict[str, Any]] = []
     for i in range(n_skills):
         for j in range(i + 1, n_skills):
             count = int(cooc[i, j])
@@ -268,12 +268,12 @@ def role_similarity(
         Float in [0, 1] — 1.0 = identical skill profiles, 0.0 = no overlap.
     """
 
-    def _skill_vector(role: str) -> Dict[str, float]:
+    def _skill_vector(role: str) -> dict[str, float]:
         rows = list(session.scalars(select(SkillTrend).where(SkillTrend.role_category == role)))
         if not rows:
             return {}
         # Average pct_of_postings per skill (in case of multiple weeks)
-        totals: Dict[str, list] = defaultdict(list)
+        totals: dict[str, list] = defaultdict(list)
         for r in rows:
             totals[r.skill].append(r.pct_of_postings)
         return {skill: float(np.mean(pcts)) for skill, pcts in totals.items()}
@@ -298,9 +298,9 @@ def role_similarity(
 
 
 def role_similarity_matrix(
-    roles: List[str],
+    roles: list[str],
     session: Session,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Compute pairwise cosine similarities across a list of role categories.
 
     Args:
@@ -335,7 +335,7 @@ def emerging_skills(
     lookback_weeks: int = 4,
     min_current_count: int = _EMERGING_MIN_CURRENT,
     max_old_pct: float = _EMERGING_MAX_OLD_PCT,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Find skills with near-zero presence N weeks ago that are growing now.
 
     Algorithm:
@@ -360,7 +360,7 @@ def emerging_skills(
         ``old_count``, ``current_week``.
     """
     # Determine the current week (latest in the table)
-    latest_week: Optional[date] = session.scalar(
+    latest_week: date | None = session.scalar(
         select(SkillTrend.week_start).order_by(SkillTrend.week_start.desc()).limit(1)
     )
     if latest_week is None:
@@ -392,7 +392,7 @@ def emerging_skills(
         .group_by(SkillTrend.skill, SkillTrend.role_category)
     ).all()
 
-    historical_index: Dict[Tuple[str, str], float] = {
+    historical_index: dict[tuple[str, str], float] = {
         (r.skill, r.role_category): r.max_pct for r in historical_rows
     }
 
@@ -400,11 +400,11 @@ def emerging_skills(
     old_count_rows = list(
         session.scalars(select(SkillTrend).where(SkillTrend.week_start == lookback_start))
     )
-    old_count_index: Dict[Tuple[str, str], int] = {
+    old_count_index: dict[tuple[str, str], int] = {
         (r.skill, r.role_category): r.mention_count for r in old_count_rows
     }
 
-    emerging: List[Dict[str, Any]] = []
+    emerging: list[dict[str, Any]] = []
 
     for row in current_rows:
         if row.mention_count < min_current_count:

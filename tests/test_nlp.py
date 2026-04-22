@@ -7,20 +7,14 @@ Sentiment uses real VADER (downloaded in session-scoped fixture).
 
 from __future__ import annotations
 
-import json
 import uuid
 from collections import namedtuple
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import List
-from unittest.mock import MagicMock, patch
+from datetime import UTC, datetime
+from unittest.mock import MagicMock
 
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-
-# ── Sample fixtures ───────────────────────────────────────────────────────────
-from tests.fixtures.sample_jobs import DATA_ANALYST_JD, PM_JD, SWE_JD
 
 # ── Project imports ───────────────────────────────────────────────────────────
 from roleprint.db.base import Base
@@ -33,6 +27,8 @@ from roleprint.nlp.pipeline import (
     process_posting,
 )
 
+# ── Sample fixtures ───────────────────────────────────────────────────────────
+from tests.fixtures.sample_jobs import DATA_ANALYST_JD, PM_JD, SWE_JD
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Shared DB fixture
@@ -57,7 +53,7 @@ def _make_posting(role: str, text: str, source: str = "reed") -> JobPosting:
         location="London",
         raw_text=text,
         url=f"https://example.com/{uuid.uuid4()}",
-        scraped_at=datetime(2026, 4, 14, 9, 0, tzinfo=timezone.utc),
+        scraped_at=datetime(2026, 4, 14, 9, 0, tzinfo=UTC),
         is_processed=False,
     )
 
@@ -319,7 +315,7 @@ MockEnt = namedtuple("Ent", ["text", "label_"])
 def _make_mock_nlp(entities: list) -> MagicMock:
     """Return a callable mock that acts like spacy.load(...)."""
     mock_doc = MagicMock()
-    mock_doc.ents = [MockEnt(text=t, label_=l) for t, l in entities]
+    mock_doc.ents = [MockEnt(text=t, label_=label) for t, label in entities]
     nlp = MagicMock(return_value=mock_doc)
     return nlp
 
@@ -472,7 +468,7 @@ class TestPipeline:
 
     def test_week_start_returns_monday(self):
         # 2026-04-14 is a Tuesday
-        dt = datetime(2026, 4, 14, tzinfo=timezone.utc)
+        dt = datetime(2026, 4, 14, tzinfo=UTC)
         ws = _week_start(dt)
         assert ws.weekday() == 0  # Monday
         assert str(ws) == "2026-04-13"
@@ -526,7 +522,7 @@ class TestPipeline:
 
     def test_update_skill_trends_increments_existing(self, db):
         # Insert initial trend
-        ws = _week_start(datetime(2026, 4, 14, tzinfo=timezone.utc))
+        ws = _week_start(datetime(2026, 4, 14, tzinfo=UTC))
         initial = SkillTrend(
             skill="Python",
             role_category="test_role",
@@ -538,7 +534,7 @@ class TestPipeline:
         db.commit()
 
         posting = _make_posting("test_role", "Python and SQL")
-        posting.scraped_at = datetime(2026, 4, 14, tzinfo=timezone.utc)
+        posting.scraped_at = datetime(2026, 4, 14, tzinfo=UTC)
         db.add(posting)
         db.flush()
 

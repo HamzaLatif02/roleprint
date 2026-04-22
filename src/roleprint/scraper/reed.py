@@ -5,8 +5,8 @@ from __future__ import annotations
 import asyncio
 import random
 import urllib.robotparser
-from datetime import datetime, timezone
-from typing import Any, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 from urllib.parse import quote_plus, urljoin
 
 import httpx
@@ -40,12 +40,12 @@ class ReedScraper(BaseJobScraper):
     SOURCE = "reed"
 
     def __init__(self) -> None:
-        self._client: Optional[httpx.AsyncClient] = None
-        self._robots: Optional[urllib.robotparser.RobotFileParser] = None
+        self._client: httpx.AsyncClient | None = None
+        self._robots: urllib.robotparser.RobotFileParser | None = None
 
     # ── context manager ───────────────────────────────────────────────────────
 
-    async def __aenter__(self) -> "ReedScraper":
+    async def __aenter__(self) -> ReedScraper:
         self._client = httpx.AsyncClient(
             headers={"User-Agent": random_agent()},
             follow_redirects=True,
@@ -65,7 +65,7 @@ class ReedScraper(BaseJobScraper):
         role: str,
         location: str = "United Kingdom",
         pages: int = 3,
-    ) -> List[dict]:
+    ) -> list[dict]:
         """Scrape *pages* pages of Reed search results for *role*.
 
         Returns a list of normalised posting dicts.
@@ -73,7 +73,7 @@ class ReedScraper(BaseJobScraper):
         if self._client is None:
             raise RuntimeError("Use 'async with ReedScraper() as s:' context manager.")
 
-        results: List[dict] = []
+        results: list[dict] = []
         role_slug = quote_plus(role.lower().replace(" ", "-"))
 
         for page in range(1, pages + 1):
@@ -102,7 +102,7 @@ class ReedScraper(BaseJobScraper):
 
         return results
 
-    def parse_posting(self, raw: Any) -> Optional[dict]:
+    def parse_posting(self, raw: Any) -> dict | None:
         """Parse a single ``<article>`` HTML fragment into a posting dict.
 
         Args:
@@ -169,11 +169,11 @@ class ReedScraper(BaseJobScraper):
 
         # ── posted_at ─────────────────────────────────────────────────────────
         time_tag = article.find("time")
-        posted_at: Optional[datetime] = None
+        posted_at: datetime | None = None
         if time_tag and time_tag.get("datetime"):
             try:
                 posted_at = datetime.fromisoformat(time_tag["datetime"].rstrip("Z")).replace(
-                    tzinfo=timezone.utc
+                    tzinfo=UTC
                 )
             except ValueError:
                 pass
@@ -200,7 +200,7 @@ class ReedScraper(BaseJobScraper):
 
     # ── private helpers ───────────────────────────────────────────────────────
 
-    async def _fetch(self, url: str) -> Optional[str]:
+    async def _fetch(self, url: str) -> str | None:
         """GET *url* with exponential backoff on 429/503."""
         assert self._client is not None
 
@@ -260,12 +260,12 @@ class ReedScraper(BaseJobScraper):
             return True
         return self._robots.can_fetch("*", url)
 
-    def _parse_search_page(self, html: str, role: str) -> List[dict]:
+    def _parse_search_page(self, html: str, role: str) -> list[dict]:
         """Extract all job cards from a search results page."""
         soup = BeautifulSoup(html, "html.parser")
         cards = soup.find_all("article", attrs={"data-qa": "job-card"})
 
-        postings: List[dict] = []
+        postings: list[dict] = []
         for card in cards:
             parsed = self.parse_posting(str(card))
             if parsed:

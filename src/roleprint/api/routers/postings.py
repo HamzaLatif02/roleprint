@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import func as sa_func, select
+from sqlalchemy import func as sa_func
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from roleprint.api.deps import get_session
@@ -17,7 +16,7 @@ router = APIRouter(prefix="/api/postings", tags=["postings"])
 
 @router.get("/recent", response_model=PaginatedPostings)
 def get_recent_postings(
-    role_category: Optional[str] = Query(None, description="Filter to one role category"),
+    role_category: str | None = Query(None, description="Filter to one role category"),
     page: int = Query(1, ge=1, description="1-based page number"),
     page_size: int = Query(20, ge=1, le=100, description="Rows per page (max 100)"),
     session: Session = Depends(get_session),

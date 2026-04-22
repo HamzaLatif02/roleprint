@@ -13,7 +13,7 @@ so callers (and tests) can inject a mock or reuse a shared model instance.
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import structlog
 
@@ -79,8 +79,8 @@ def get_nlp() -> Any:
 
 def extract_entities(
     text: str,
-    nlp: Optional[Any] = None,
-) -> Dict[str, List[str]]:
+    nlp: Any | None = None,
+) -> dict[str, list[str]]:
     """Extract named entities from *text*.
 
     Args:
@@ -102,7 +102,7 @@ def extract_entities(
         nlp = get_nlp()
 
     doc = nlp(text)
-    buckets: Dict[str, set] = defaultdict(set)
+    buckets: dict[str, set] = defaultdict(set)
 
     for ent in doc.ents:
         label = ent.label_
@@ -126,9 +126,9 @@ def extract_entities(
 
 
 def merge_tool_entities(
-    entities: Dict[str, List[str]],
-    skills: List[str],
-) -> Dict[str, List[str]]:
+    entities: dict[str, list[str]],
+    skills: list[str],
+) -> dict[str, list[str]]:
     """Add recognised technical skills to the ``orgs`` bucket.
 
     spaCy's small model often fails to tag tools like "Kubernetes" or

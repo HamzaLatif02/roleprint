@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import distinct, func as sa_func, select
+from sqlalchemy import distinct, select
+from sqlalchemy import func as sa_func
 from sqlalchemy.orm import Session
 
 from roleprint.api import cache
@@ -20,7 +19,7 @@ _CACHE_TTL = 300
 
 @router.get("/summary", response_model=StatsSummary)
 def get_stats_summary(
-    role_category: Optional[str] = Query(default=None),
+    role_category: str | None = Query(default=None),
     session: Session = Depends(get_session),
 ):
     """Return high-level dataset statistics.

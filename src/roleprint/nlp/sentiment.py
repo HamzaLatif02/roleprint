@@ -8,7 +8,6 @@ need fine-tuning on this domain.
 from __future__ import annotations
 
 import re
-from typing import Dict, Optional
 
 import structlog
 
@@ -58,7 +57,7 @@ def _get_analyzer():
 # ── Public API ────────────────────────────────────────────────────────────────
 
 
-def analyse(text: str) -> Dict[str, float]:
+def analyse(text: str) -> dict[str, float]:
     """Compute sentiment and urgency signals for a job description.
 
     Args:

@@ -9,7 +9,6 @@ import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from roleprint.api import cache
 from roleprint.api.routers import (  # noqa: E402
     export,
     postings,
@@ -30,9 +29,10 @@ log = structlog.get_logger(__name__)
 async def lifespan(app: FastAPI):
     # ── startup ───────────────────────────────────────────────────────────────
     try:
+        import pathlib
+
         from alembic import command
         from alembic.config import Config
-        import pathlib
 
         ini_path = pathlib.Path(__file__).resolve().parents[3] / "alembic.ini"
         alembic_cfg = Config(str(ini_path))

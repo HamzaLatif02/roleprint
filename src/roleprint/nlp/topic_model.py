@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import pickle
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import structlog
 
@@ -22,14 +22,14 @@ log = structlog.get_logger(__name__)
 _MODEL_PATH = Path("models/topic_model.pkl")
 _EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 MIN_DOCS = 50  # minimum corpus size to train
-_EMPTY_TOPIC: Dict = {}
+_EMPTY_TOPIC: dict = {}
 
 # ── Model cache ───────────────────────────────────────────────────────────────
 
-_topic_model: Optional[Any] = None
+_topic_model: Any | None = None
 
 
-def _load_or_none() -> Optional[Any]:
+def _load_or_none() -> Any | None:
     """Load a saved BERTopic model from disk, or return None."""
     global _topic_model
     if _topic_model is not None:
@@ -52,7 +52,7 @@ def _save(model: Any) -> None:
 # ── Public API ────────────────────────────────────────────────────────────────
 
 
-def train(docs: List[str]) -> Optional[Any]:
+def train(docs: list[str]) -> Any | None:
     """Train a BERTopic model on *docs* and save it to disk.
 
     Args:
@@ -89,7 +89,7 @@ def train(docs: List[str]) -> Optional[Any]:
     return model
 
 
-def get_or_train(docs: List[str]) -> Optional[Any]:
+def get_or_train(docs: list[str]) -> Any | None:
     """Return saved model if available, otherwise train one.
 
     Args:
@@ -105,9 +105,9 @@ def get_or_train(docs: List[str]) -> Optional[Any]:
 
 
 def assign_topics(
-    texts: List[str],
-    model: Optional[Any] = None,
-) -> List[Dict]:
+    texts: list[str],
+    model: Any | None = None,
+) -> list[dict]:
     """Assign a topic to each text in *texts*.
 
     Args:

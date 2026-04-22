@@ -9,17 +9,17 @@ from __future__ import annotations
 
 import json
 import os
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 
 log = structlog.get_logger(__name__)
 
-_redis_client: Optional[Any] = None
+_redis_client: Any | None = None
 _redis_unavailable: bool = False  # set True after first connection failure
 
 
-def _get_client() -> Optional[Any]:
+def _get_client() -> Any | None:
     """Lazily connect to Redis; returns ``None`` if unavailable."""
     global _redis_client, _redis_unavailable
 
@@ -48,7 +48,7 @@ def _get_client() -> Optional[Any]:
     return _redis_client
 
 
-def get(key: str) -> Optional[Any]:
+def get(key: str) -> Any | None:
     """Return a cached value, or ``None`` on miss / error."""
     client = _get_client()
     if client is None:

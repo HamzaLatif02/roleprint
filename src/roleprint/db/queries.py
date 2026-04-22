@@ -6,14 +6,12 @@ from the scheduler, scripts, and tests alike.
 """
 
 from datetime import date
-from typing import List, Optional
 from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from roleprint.db.models import JobPosting, SkillTrend
-
 
 # ── 1. Unprocessed postings ───────────────────────────────────────────────────
 
@@ -22,8 +20,8 @@ def get_unprocessed_postings(
     session: Session,
     *,
     limit: int = 100,
-    role_category: Optional[str] = None,
-) -> List[JobPosting]:
+    role_category: str | None = None,
+) -> list[JobPosting]:
     """Return job postings that have not yet been through the NLP pipeline.
 
     Args:
@@ -49,9 +47,9 @@ def get_skill_trends_by_role(
     session: Session,
     role_category: str,
     *,
-    since: Optional[date] = None,
+    since: date | None = None,
     top_n: int = 20,
-) -> List[SkillTrend]:
+) -> list[SkillTrend]:
     """Return weekly skill trend rows for a role category, ordered by mention count.
 
     Args:
@@ -77,7 +75,7 @@ def get_skill_trends_by_role(
 def get_posting_with_analysis(
     session: Session,
     posting_id: UUID,
-) -> Optional[JobPosting]:
+) -> JobPosting | None:
     """Fetch a job posting eagerly joined with its processed analysis.
 
     Returns ``None`` if the posting does not exist.
@@ -99,7 +97,7 @@ def get_recent_postings_by_role(
     *,
     limit: int = 50,
     include_analysis: bool = False,
-) -> List[JobPosting]:
+) -> list[JobPosting]:
     """Return the most recently scraped postings for a given role category.
 
     Args:
@@ -127,9 +125,9 @@ def get_top_skills_overall(
     session: Session,
     *,
     since: date,
-    until: Optional[date] = None,
+    until: date | None = None,
     top_n: int = 25,
-) -> List[SkillTrend]:
+) -> list[SkillTrend]:
     """Return the highest-mentioned skills across *all* role categories in a window.
 
     Aggregation is left to the caller if cross-role rollup is needed;

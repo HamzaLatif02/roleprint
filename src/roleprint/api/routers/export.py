@@ -4,8 +4,7 @@ from __future__ import annotations
 
 import csv
 import io
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
@@ -29,7 +28,7 @@ _COLUMNS_GAP = ["skill", "status", "demand_pct", "role_category"]
 
 
 def _today() -> str:
-    return datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
+    return datetime.now(tz=UTC).strftime("%Y-%m-%d")
 
 
 def _csv_response(rows: list[list], columns: list[str], filename: str) -> StreamingResponse:
@@ -59,10 +58,13 @@ def _csv_response(rows: list[list], columns: list[str], filename: str) -> Stream
 @router.get(
     "/skills/trending",
     summary="Export trending skills as CSV",
-    response_description="CSV file with columns: skill, role_category, week_start, mention_count, pct_of_postings, wow_change",
+    response_description=(
+        "CSV file with columns: skill, role_category, week_start,"
+        " mention_count, pct_of_postings, wow_change"
+    ),
 )
 def export_trending(
-    role_category: Optional[str] = Query(
+    role_category: str | None = Query(
         None, description="Filter to one role category; omit for all roles"
     ),
     weeks: int = Query(4, ge=1, le=52, description="Number of recent weeks to include"),

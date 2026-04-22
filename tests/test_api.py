@@ -9,7 +9,7 @@ path without requiring a running Redis server.
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from unittest.mock import patch
 
 import pytest
@@ -50,7 +50,7 @@ def seeded_session(db_session):
     """Populate the in-memory DB with a small deterministic dataset."""
     week = date(2026, 4, 13)  # a Monday
     prev_week = date(2026, 4, 6)
-    scraped = datetime(2026, 4, 14, 10, 0, tzinfo=timezone.utc)
+    scraped = datetime(2026, 4, 14, 10, 0, tzinfo=UTC)
 
     # Two job postings in different roles
     jp1 = JobPosting(

@@ -8,11 +8,7 @@ Covers:
 
 from __future__ import annotations
 
-import os
-from unittest.mock import MagicMock, patch
-
-import pytest
-
+from unittest.mock import patch
 
 # ── scrape_job ────────────────────────────────────────────────────────────────
 
@@ -81,6 +77,7 @@ class TestBuildScheduler:
     def test_custom_scrape_interval_env(self, monkeypatch):
         monkeypatch.setenv("SCRAPE_INTERVAL_HRS", "12")
         import importlib
+
         from roleprint.scheduler import main as sched_main
 
         importlib.reload(sched_main)

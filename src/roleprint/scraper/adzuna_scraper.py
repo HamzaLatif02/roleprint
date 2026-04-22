@@ -5,8 +5,8 @@ from __future__ import annotations
 import asyncio
 import os
 import random
-from datetime import datetime, timezone
-from typing import Any, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import httpx
 import structlog
@@ -38,13 +38,13 @@ class AdzunaScraper(BaseJobScraper):
     SOURCE = "adzuna"
 
     def __init__(self) -> None:
-        self._client: Optional[httpx.AsyncClient] = None
+        self._client: httpx.AsyncClient | None = None
         self._app_id = os.getenv("ADZUNA_APP_ID", "")
         self._app_key = os.getenv("ADZUNA_APP_KEY", "")
 
     # ── context manager ───────────────────────────────────────────────────────
 
-    async def __aenter__(self) -> "AdzunaScraper":
+    async def __aenter__(self) -> AdzunaScraper:
         if not self._app_id or not self._app_key:
             raise RuntimeError(
                 "ADZUNA_APP_ID and ADZUNA_APP_KEY environment variables must be set."
@@ -66,7 +66,7 @@ class AdzunaScraper(BaseJobScraper):
         role: str,
         location: str = "United Kingdom",
         pages: int = 3,
-    ) -> List[dict]:
+    ) -> list[dict]:
         """Fetch *pages* pages of Adzuna results for *role*.
 
         Returns a list of normalised posting dicts.
@@ -76,7 +76,7 @@ class AdzunaScraper(BaseJobScraper):
         if self._client is None:
             raise RuntimeError("Use 'async with AdzunaScraper() as s:' context manager.")
 
-        results: List[dict] = []
+        results: list[dict] = []
 
         for page in range(1, pages + 1):
             url = _API_BASE.format(page=page)
@@ -99,7 +99,7 @@ class AdzunaScraper(BaseJobScraper):
                 log.info("adzuna.no_more_results", role=role, page=page)
                 break
 
-            page_postings: List[dict] = []
+            page_postings: list[dict] = []
             for raw in raw_results:
                 parsed = self.parse_posting(raw)
                 if parsed:
@@ -121,7 +121,7 @@ class AdzunaScraper(BaseJobScraper):
 
         return results
 
-    def parse_posting(self, raw: Any) -> Optional[dict]:
+    def parse_posting(self, raw: Any) -> dict | None:
         """Parse a single Adzuna API result dict into a normalised posting dict.
 
         Args:
@@ -147,11 +147,11 @@ class AdzunaScraper(BaseJobScraper):
 
         raw_text = (raw.get("description") or "").strip()
 
-        posted_at: Optional[datetime] = None
+        posted_at: datetime | None = None
         created = raw.get("created")
         if created:
             try:
-                posted_at = datetime.fromisoformat(created.rstrip("Z")).replace(tzinfo=timezone.utc)
+                posted_at = datetime.fromisoformat(created.rstrip("Z")).replace(tzinfo=UTC)
             except (ValueError, AttributeError):
                 pass
 
@@ -167,7 +167,7 @@ class AdzunaScraper(BaseJobScraper):
 
     # ── private helpers ───────────────────────────────────────────────────────
 
-    async def _fetch(self, url: str, params: dict) -> Optional[dict]:
+    async def _fetch(self, url: str, params: dict) -> dict | None:
         """GET *url* with *params*, exponential backoff on 429."""
         assert self._client is not None
 

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import math
 from datetime import timedelta
-from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
@@ -14,7 +13,6 @@ from roleprint.api import cache
 from roleprint.api.deps import get_session
 from roleprint.api.schemas import (
     EmergingSkillItem,
-    RoleSkillProfile,
     SkillCompareResponse,
     SkillGapRequest,
     SkillGapResponse,
@@ -41,14 +39,13 @@ def _get_latest_week(session: Session):
 
 def _build_trending(
     session: Session,
-    role_category: Optional[str],
+    role_category: str | None,
     weeks: int,
-) -> List[dict]:
+) -> list[dict]:
     latest = _get_latest_week(session)
     if not latest:
         return []
 
-    cutoff = latest - timedelta(weeks=max(weeks - 1, 0))
     prev_week = latest - timedelta(weeks=1)
 
     # Current-week rows
@@ -102,9 +99,9 @@ def _get_skill_vector(session: Session, role: str) -> dict:
 # ── GET /api/skills/trending ─────────────────────────────────────────────────
 
 
-@router.get("/trending", response_model=List[SkillTrendItem])
+@router.get("/trending", response_model=list[SkillTrendItem])
 def get_trending(
-    role_category: Optional[str] = Query(None, description="Filter to one role category"),
+    role_category: str | None = Query(None, description="Filter to one role category"),
     weeks: int = Query(4, ge=1, le=52, description="How many recent weeks to consider"),
     session: Session = Depends(get_session),
 ):
@@ -126,7 +123,7 @@ def get_trending(
 
 @router.get("/trending/paged", response_model=SkillTrendPage)
 def get_trending_paged(
-    role_category: Optional[str] = Query(None, description="Filter to one role category"),
+    role_category: str | None = Query(None, description="Filter to one role category"),
     weeks: int = Query(4, ge=1, le=52, description="How many recent weeks to consider"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(15, ge=1, le=100, description="Results per page"),
@@ -322,7 +319,7 @@ def analyse_skill_gap(
 # ── GET /api/skills/emerging ─────────────────────────────────────────────────
 
 
-@router.get("/emerging", response_model=List[EmergingSkillItem])
+@router.get("/emerging", response_model=list[EmergingSkillItem])
 def get_emerging(
     lookback_weeks: int = Query(4, ge=1, le=26),
     session: Session = Depends(get_session),
