@@ -11,10 +11,7 @@ jobs:
     name: Lint + Test (Python 3.11)
     runs-on: ubuntu-latest
 
-    services:
-      # In-memory SQLite is used in tests — no Postgres service needed.
-      # Redis is mocked at the cache module level in test_api.py.
-
+    # Tests use SQLite in-memory and mock Redis — no service containers needed.
     steps:
       - uses: actions/checkout@v4
 
