@@ -61,7 +61,7 @@ function SkillsPaginationBar({ page, totalPages, totalCount, pageSize, onPage, o
         <select
           value={pageSize}
           onChange={(e) => onPageSize(Number(e.target.value))}
-          className="text-xs py-1 px-2 h-7"
+          className="text-xs py-1 pl-2 h-7"
           aria-label="Skills per page"
         >
           {[10, 15, 25].map((n) => (

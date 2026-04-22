@@ -104,7 +104,7 @@ function PaginationBar({ page, totalPages, totalCount, pageSize, onPage, onPageS
         <select
           value={pageSize}
           onChange={(e) => onPageSize(Number(e.target.value))}
-          className="text-xs py-1 px-2 h-7"
+          className="text-xs py-1 pl-2 h-7"
           aria-label="Rows per page"
         >
           {[10, 20, 50, 100].map((n) => (
