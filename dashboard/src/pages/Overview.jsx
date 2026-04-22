@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts'
@@ -22,6 +22,114 @@ function useChartColors() {
 
 const AMBER = '#f5a623'
 const TEAL = '#2dd4bf'
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+
+function buildPageList(current, total) {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+  const pages = [1]
+  const start = Math.max(2, current - 2)
+  const end = Math.min(total - 1, current + 2)
+  if (start > 2) pages.push(null)
+  for (let i = start; i <= end; i++) pages.push(i)
+  if (end < total - 1) pages.push(null)
+  pages.push(total)
+  return pages
+}
+
+function SkillsPaginationBar({ page, totalPages, totalCount, pageSize, onPage, onPageSize, loading }) {
+  const start = totalCount === 0 ? 0 : (page - 1) * pageSize + 1
+  const end = Math.min(page * pageSize, totalCount)
+  const pageList = buildPageList(page, totalPages)
+
+  const btnBase =
+    'min-w-[28px] h-7 flex items-center justify-center rounded-lg font-mono text-xs ' +
+    'border transition-all duration-100 disabled:opacity-40 disabled:cursor-not-allowed'
+  const btnInactive = btnBase + ' border-border text-ink-400 hover:border-border-bright hover:text-ink-200 bg-transparent'
+  const btnActive   = btnBase + ' border-amber-300/60 dark:border-amber-dim bg-amber-100 dark:bg-amber-muted text-amber-700 dark:text-amber-glow'
+  const btnEllipsis = btnBase + ' border-transparent text-ink-500 cursor-default'
+
+  return (
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-3 sm:px-5 py-3 border-t border-border">
+      {/* Count + page size */}
+      <div className="flex items-center gap-3 shrink-0">
+        <span className="font-mono text-[10px] text-ink-400">
+          {totalCount === 0
+            ? 'No skills'
+            : `Showing ${start.toLocaleString()}–${end.toLocaleString()} of ${totalCount.toLocaleString()} skills`}
+        </span>
+        <select
+          value={pageSize}
+          onChange={(e) => onPageSize(Number(e.target.value))}
+          className="text-xs py-1 px-2 h-7"
+          aria-label="Skills per page"
+        >
+          {[10, 15, 25].map((n) => (
+            <option key={n} value={n}>{n} / page</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Page buttons — desktop */}
+      <div className="hidden sm:flex items-center gap-1">
+        <button
+          onClick={() => onPage(page - 1)}
+          disabled={page <= 1 || loading}
+          className={btnInactive + ' px-2'}
+          aria-label="Previous page"
+        >
+          ‹
+        </button>
+        {pageList.map((p, i) =>
+          p === null ? (
+            <span key={`e${i}`} className={btnEllipsis + ' px-1'}>…</span>
+          ) : (
+            <button
+              key={p}
+              onClick={() => p !== page && onPage(p)}
+              disabled={loading}
+              className={p === page ? btnActive + ' px-2' : btnInactive + ' px-2'}
+              aria-current={p === page ? 'page' : undefined}
+            >
+              {p}
+            </button>
+          )
+        )}
+        <button
+          onClick={() => onPage(page + 1)}
+          disabled={page >= totalPages || loading}
+          className={btnInactive + ' px-2'}
+          aria-label="Next page"
+        >
+          ›
+        </button>
+      </div>
+
+      {/* Simplified nav — mobile */}
+      <div className="flex sm:hidden items-center gap-2">
+        <button
+          onClick={() => onPage(page - 1)}
+          disabled={page <= 1 || loading}
+          className={btnInactive + ' px-3'}
+          aria-label="Previous page"
+        >
+          ‹
+        </button>
+        <span className="font-mono text-xs text-ink-400 whitespace-nowrap">
+          Page {page} of {totalPages}
+        </span>
+        <button
+          onClick={() => onPage(page + 1)}
+          disabled={page >= totalPages || loading}
+          className={btnInactive + ' px-3'}
+          aria-label="Next page"
+        >
+          ›
+        </button>
+      </div>
+    </div>
+  )
+}
 
 function StatBar({ data, loading, error, refetch }) {
   const stats = [
@@ -251,6 +359,21 @@ export default function Overview() {
 
   const rising = (trending ?? []).filter((t) => t.is_rising).slice(0, 8)
 
+  // All Skills — paginated separately from the chart/rising data
+  const [skillsPage, setSkillsPage] = useState(1)
+  const [skillsPageSize, setSkillsPageSize] = useState(15)
+  useEffect(() => { setSkillsPage(1) }, [roleFilter, skillsPageSize]) // eslint-disable-line
+
+  const fetchSkillsPage = useCallback(
+    () => api.trendingPaged(roleFilter, skillsPage, skillsPageSize),
+    [roleFilter, skillsPage, skillsPageSize]
+  )
+  const { data: skillsData, loading: skillsLoading, error: skillsError, refetch: refetchSkillsPage } = useApi(fetchSkillsPage, [roleFilter, skillsPage, skillsPageSize])
+
+  const pagedSkills = skillsData?.data ?? []
+  const skillsTotal = skillsData?.total_count ?? 0
+  const skillsTotalPages = skillsData?.total_pages ?? 1
+
   return (
     <div className="p-3 sm:p-5 lg:p-7 max-w-7xl mx-auto">
       {/* Page header */}
@@ -329,7 +452,9 @@ export default function Overview() {
       <div className="card mt-4 sm:mt-5 overflow-hidden">
         <div className="px-3 sm:px-5 py-4 border-b border-border flex items-center justify-between">
           <h2 className="font-display text-base tracking-widest text-ink-100">ALL SKILLS</h2>
-          <span className="label-mono text-[9px] text-ink-400">{(trending ?? []).length} skills tracked</span>
+          <span className="label-mono text-[9px] text-ink-400">
+            {skillsLoading ? 'Loading…' : `${skillsTotal.toLocaleString()} skills tracked`}
+          </span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -342,9 +467,9 @@ export default function Overview() {
                 <th className="text-right px-3 sm:px-5 py-3 label-mono text-[9px] font-normal text-ink-400">WoW</th>
               </tr>
             </thead>
-            <tbody>
-              {trendingLoading ? (
-                Array.from({ length: 8 }, (_, i) => (
+            <tbody className={skillsLoading ? 'opacity-50 pointer-events-none' : ''}>
+              {skillsLoading && pagedSkills.length === 0 ? (
+                Array.from({ length: skillsPageSize }, (_, i) => (
                   <tr key={i} className="border-b border-border">
                     {Array.from({ length: 5 }, (_, j) => (
                       <td key={j} className={`px-4 py-3 ${j === 1 || j === 3 ? 'hidden sm:table-cell' : ''}`}>
@@ -353,9 +478,9 @@ export default function Overview() {
                     ))}
                   </tr>
                 ))
-              ) : trendingError ? (
-                <ErrorStateRow colSpan={5} error={trendingError} onRetry={refetchTrending} />
-              ) : (trending ?? []).length === 0 ? (
+              ) : skillsError ? (
+                <ErrorStateRow colSpan={5} error={skillsError} onRetry={refetchSkillsPage} />
+              ) : pagedSkills.length === 0 ? (
                 <EmptyStateRow
                   colSpan={5}
                   icon="🗂"
@@ -364,33 +489,60 @@ export default function Overview() {
                     ? 'No skills found for this role. Try clearing the role filter.'
                     : 'No skills have been extracted yet. The pipeline needs to process some postings first.'}
                 />
-              ) : (trending ?? []).map((row) => {
-                const wow = row.wow_change
-                const sign = wow > 0 ? '+' : ''
-                return (
-                  <tr
-                    key={`${row.skill}:${row.role_category}`}
-                    className="border-b border-border odd:bg-void-800 even:bg-void-900 hover:bg-void-700 transition-colors group"
-                  >
-                    <td className="px-3 sm:px-5 py-3 font-medium text-ink-100 group-hover:text-amber-glow transition-colors">
-                      {row.skill}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-xs text-ink-400 hidden sm:table-cell">{row.role_category}</td>
-                    <td className="px-4 py-3 text-right font-mono text-xs text-ink-200">{row.mention_count}</td>
-                    <td className="px-4 py-3 text-right font-mono text-xs text-ink-300 hidden sm:table-cell">
-                      {(row.pct_of_postings * 100).toFixed(1)}%
-                    </td>
-                    <td className="px-3 sm:px-5 py-3 text-right">
-                      <span className={wow > 20 ? 'badge-rising' : wow < -10 ? 'badge-falling' : 'badge-neutral'}>
-                        {sign}{wow.toFixed(1)}%
-                      </span>
-                    </td>
+              ) : (
+                pagedSkills.map((row) => {
+                  const wow = row.wow_change
+                  const sign = wow > 0 ? '+' : ''
+                  return (
+                    <tr
+                      key={`${row.skill}:${row.role_category}`}
+                      className="border-b border-border odd:bg-void-800 even:bg-void-900 hover:bg-void-700 transition-colors group"
+                    >
+                      <td className="px-3 sm:px-5 py-3 font-medium text-ink-100 group-hover:text-amber-glow transition-colors">
+                        {row.skill}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-ink-400 hidden sm:table-cell">{row.role_category}</td>
+                      <td className="px-4 py-3 text-right font-mono text-xs text-ink-200">{row.mention_count}</td>
+                      <td className="px-4 py-3 text-right font-mono text-xs text-ink-300 hidden sm:table-cell">
+                        {(row.pct_of_postings * 100).toFixed(1)}%
+                      </td>
+                      <td className="px-3 sm:px-5 py-3 text-right">
+                        <span className={wow > 20 ? 'badge-rising' : wow < -10 ? 'badge-falling' : 'badge-neutral'}>
+                          {sign}{wow.toFixed(1)}%
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })
+              )}
+              {/* Skeleton overlay rows while navigating pages */}
+              {skillsLoading && pagedSkills.length > 0 && (
+                Array.from({ length: skillsPageSize }, (_, i) => (
+                  <tr key={`sk${i}`} className="border-b border-border">
+                    {Array.from({ length: 5 }, (_, j) => (
+                      <td key={j} className={`px-4 py-3 ${j === 1 || j === 3 ? 'hidden sm:table-cell' : ''}`}>
+                        <div className="skeleton h-3 rounded" style={{ width: j === 0 ? '80px' : j === 1 ? '100px' : '48px' }} />
+                      </td>
+                    ))}
                   </tr>
-                )
-              })}
+                ))
+              )}
             </tbody>
           </table>
         </div>
+
+        {/* Pagination bar — always visible */}
+        {!skillsError && (
+          <SkillsPaginationBar
+            page={skillsPage}
+            totalPages={skillsTotalPages}
+            totalCount={skillsTotal}
+            pageSize={skillsPageSize}
+            onPage={setSkillsPage}
+            onPageSize={setSkillsPageSize}
+            loading={skillsLoading}
+          />
+        )}
       </div>
     </div>
   )

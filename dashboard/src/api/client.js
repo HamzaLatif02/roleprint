@@ -85,6 +85,12 @@ export const api = {
     return apiFetch(`/api/skills/trending?${params}`)
   },
 
+  trendingPaged: (roleCategory, page = 1, pageSize = 15, weeks = 4) => {
+    const params = new URLSearchParams({ page, page_size: pageSize, weeks })
+    if (roleCategory) params.set('role_category', roleCategory)
+    return apiFetch(`/api/skills/trending/paged?${params}`)
+  },
+
   emerging: (lookbackWeeks = 6) =>
     apiFetch(`/api/skills/emerging?lookback_weeks=${lookbackWeeks}`),
 

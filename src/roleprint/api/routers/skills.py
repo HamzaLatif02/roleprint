@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from datetime import timedelta
 from typing import List, Optional
 
@@ -19,6 +20,7 @@ from roleprint.api.schemas import (
     SkillGapResponse,
     SkillGapSkillItem,
     SkillTrendItem,
+    SkillTrendPage,
 )
 from roleprint.db.models import SkillTrend
 from roleprint.nlp.trends import emerging_skills, role_similarity
@@ -119,6 +121,45 @@ def get_trending(
     result = _build_trending(session, role_category, weeks)
     cache.set(key, result, ttl=_CACHE_TTL)
     return result
+
+
+# ── GET /api/skills/trending/paged ──────────────────────────────────────────
+
+@router.get("/trending/paged", response_model=SkillTrendPage)
+def get_trending_paged(
+    role_category: Optional[str] = Query(None, description="Filter to one role category"),
+    weeks: int = Query(4, ge=1, le=52, description="How many recent weeks to consider"),
+    page: int = Query(1, ge=1, description="Page number (1-indexed)"),
+    page_size: int = Query(15, ge=1, le=100, description="Results per page"),
+    session: Session = Depends(get_session),
+):
+    """Paginated version of /trending — returns an envelope with total_count and page metadata.
+
+    Reuses the same Redis cache as the unpaginated endpoint and slices in-memory,
+    so pagination adds no extra DB queries.
+    """
+    key = f"rp:trending:{role_category}:{weeks}"
+    if (hit := cache.get(key)) is not None:
+        all_results = hit
+    else:
+        all_results = _build_trending(session, role_category, weeks)
+        cache.set(key, all_results, ttl=_CACHE_TTL)
+
+    total_count = len(all_results)
+    total_pages = max(1, math.ceil(total_count / page_size))
+    page = min(page, total_pages)
+    start = (page - 1) * page_size
+    end = start + page_size
+
+    return {
+        "data": all_results[start:end],
+        "page": page,
+        "page_size": page_size,
+        "total_count": total_count,
+        "total_pages": total_pages,
+        "has_next": page < total_pages,
+        "has_prev": page > 1,
+    }
 
 
 # ── GET /api/skills/compare ──────────────────────────────────────────────────

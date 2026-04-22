@@ -22,6 +22,16 @@ class SkillTrendItem(BaseModel):
     is_rising: bool = Field(description="True when wow_change > 20 %")
 
 
+class SkillTrendPage(BaseModel):
+    data: List[SkillTrendItem]
+    page: int
+    page_size: int
+    total_count: int
+    total_pages: int
+    has_next: bool
+    has_prev: bool
+
+
 # ── /api/skills/compare ───────────────────────────────────────────────────────
 
 class RoleSkillProfile(BaseModel):
