@@ -349,6 +349,7 @@ function RisingPill({ item }) {
 }
 
 export default function Overview() {
+  useEffect(() => { document.title = 'Overview — Roleprint' }, [])
   const { roleFilter } = useApp()
 
   const fetchStats = useCallback(() => api.stats(roleFilter), [roleFilter])

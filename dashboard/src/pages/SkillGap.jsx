@@ -175,6 +175,7 @@ function ResultsSkeleton() {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function SkillGap() {
+  useEffect(() => { document.title = 'Skill Gap — Roleprint' }, [])
   const inputRef = useRef(null)
 
   // Persist role selection

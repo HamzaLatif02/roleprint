@@ -67,6 +67,7 @@ function SkillTag({ skill, highlight = false }) {
 }
 
 export default function Comparison() {
+  useEffect(() => { document.title = 'Compare — Roleprint' }, [])
   const [roleA, setRoleA] = useState('')
   const [roleB, setRoleB] = useState('')
   const [compareRoles, setCompareRoles] = useState(null)

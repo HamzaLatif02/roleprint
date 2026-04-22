@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect } from 'react'
 
 // ── Pipeline stepper ──────────────────────────────────────────────────────────
 
@@ -111,6 +111,7 @@ function Divider() {
 const SECTION_CARD = 'bg-white dark:bg-void-800 rounded-xl shadow-sm border border-gray-100/50 dark:border-border p-6 mb-6'
 
 export default function About() {
+  useEffect(() => { document.title = 'About — Roleprint' }, [])
   return (
     <div className="p-5 lg:p-10 max-w-4xl mx-auto">
       {/* ── Page header ── */}
@@ -218,9 +219,9 @@ export default function About() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl">
           {[
             { label: 'Scraper runs', value: 'Every 6 hours', color: '#f5a623' },
-            { label: 'NLP processing', value: 'Every 7 hours', sub: '1 hour after scraping', color: '#2dd4bf' },
+            { label: 'NLP processing', value: 'Every 6 hours', sub: '1 hour after scraping', color: '#2dd4bf' },
             { label: 'Dashboard data', value: 'Automatic', sub: 'After each processing run', color: '#818cf8' },
-            { label: 'Skill trends', value: 'Weekly', sub: 'Recalculated every Monday', color: '#4ade80' },
+            { label: 'Skill trends', value: 'Every 6 hours', sub: 'Updated with each NLP run', color: '#4ade80' },
           ].map((item) => (
             <div key={item.label} className="card p-4 flex items-start gap-4">
               <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ background: item.color }} />

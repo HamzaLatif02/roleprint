@@ -196,6 +196,7 @@ function TableSkeleton({ rows = 10 }) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function Postings() {
+  useEffect(() => { document.title = 'Postings — Roleprint' }, [])
   const { roleFilter } = useApp()
   const tableRef = useRef(null)
 

@@ -6,7 +6,7 @@ import math
 from datetime import timedelta
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -91,7 +91,6 @@ def _build_trending(
 def _get_skill_vector(session: Session, role: str) -> dict:
     """skill → max pct_of_postings across all weeks."""
     from collections import defaultdict
-    import numpy as np
 
     rows = list(session.scalars(
         select(SkillTrend).where(SkillTrend.role_category == role)
@@ -179,7 +178,6 @@ def compare_roles(
     """
     role_list = [r.strip() for r in roles.split(",") if r.strip()]
     if len(role_list) < 2:
-        from fastapi import HTTPException
         raise HTTPException(status_code=422, detail="Provide at least 2 roles separated by comma")
 
     key = f"rp:compare:{':'.join(sorted(role_list))}"

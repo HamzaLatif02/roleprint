@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
@@ -104,6 +104,7 @@ function SparklineCard({ item, color }) {
 }
 
 export default function Trends() {
+  useEffect(() => { document.title = 'Trends — Roleprint' }, [])
   const { roleFilter } = useApp()
   const { axis, grid } = useChartColors()
 

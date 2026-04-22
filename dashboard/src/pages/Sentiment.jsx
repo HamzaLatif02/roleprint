@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import {
   AreaChart, Area, LineChart, Line, ComposedChart,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine,
@@ -29,7 +29,6 @@ function SentimentTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
   const sentiment = payload.find((p) => p.dataKey === 'avg_sentiment')
   const urgency = payload.find((p) => p.dataKey === 'urgency_score')
-  const count = payload.find((p) => p.dataKey === 'posting_count')
   return (
     <div className="custom-tooltip min-w-[180px]">
       <div className="label-mono text-[9px] mb-2 text-ink-400">{label}</div>
@@ -45,15 +44,9 @@ function SentimentTooltip({ active, payload, label }) {
         </div>
       )}
       {urgency && (
-        <div className="flex items-center justify-between gap-4 mb-1">
+        <div className="flex items-center justify-between gap-4">
           <span className="text-xs text-ink-200">Urgency hits</span>
           <span className="font-mono text-xs font-bold" style={{ color: AMBER }}>{urgency.value}</span>
-        </div>
-      )}
-      {count && (
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-xs text-ink-400">Postings</span>
-          <span className="font-mono text-xs text-ink-300">{count.value}</span>
         </div>
       )}
     </div>
@@ -68,6 +61,7 @@ function SentimentBadge({ value }) {
 }
 
 export default function Sentiment() {
+  useEffect(() => { document.title = 'Sentiment — Roleprint' }, [])
   const { roleFilter } = useApp()
   const { axis, grid, zeroLine } = useChartColors()
   const width = useWindowWidth()

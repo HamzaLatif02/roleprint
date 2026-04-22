@@ -30,7 +30,7 @@ def get_sentiment_timeline(
 ):
     """Return average sentiment and urgency score per week.
 
-    Urgency is computed client-side by running the urgency-phrase counter
+    Urgency is computed server-side by running the urgency-phrase counter
     on each posting's ``raw_text`` and summing per week.  Results are sorted
     chronologically (oldest first).
     Cached 5 minutes.
@@ -41,7 +41,6 @@ def get_sentiment_timeline(
 
     # Find the most recent week
     from sqlalchemy import func as sa_func
-    from roleprint.db.models import SkillTrend
 
     latest_scraped = session.scalar(
         select(sa_func.max(JobPosting.scraped_at))
