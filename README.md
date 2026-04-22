@@ -87,9 +87,9 @@ There are two audiences for this project. For job seekers, the dashboard is a li
 <p align="center"><i>Sentiment timeline — VADER composite area chart with dashed urgency overlay and weekly breakdown table.</i></p>
 
 <p align="center">
-  <img src="docs/screenshots/about.png" width="800"/>
+  <img src="docs/screenshots/postings.png" width="800"/>
 </p>
-<p align="center"><i>About page — pipeline walkthrough, data sources, tech stack, and update frequency.</i></p>
+<p align="center"><i>Postings page — paginated recent job postings with NLP enrichment fields, role filter, and configurable page size.</i></p>
 
 ---
 
@@ -297,7 +297,7 @@ The React dashboard is deployed from the `dashboard/` subdirectory. `vercel.json
 
 **Supabase (database)**
 
-A managed PostgreSQL instance on Supabase's free tier. All tables are created via Alembic migrations (`alembic upgrade head`) — there is no manual schema setup. Both Railway services connect via `DATABASE_URL`. Row Level Security is disabled for the service role used by the API.
+A managed PostgreSQL instance on Supabase's free tier. All tables are created via Alembic migrations (`alembic upgrade head`) — there is no manual schema setup. Both Railway services connect via `DATABASE_URL`. Row Level Security is enabled on all tables.
 
 ---
 
